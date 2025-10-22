@@ -2,8 +2,6 @@ import { themes as prismThemes } from "prism-react-renderer";
 import type { Config } from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
 
-//todo reconfigure repo so that the designpatternpedia is the source in the git directory
-//todo enable test builds for PRs, add as a status check to complete
 //todo enable search
 const config: Config = {
   title: "Design Pattern Pedia",
@@ -28,7 +26,7 @@ const config: Config = {
         docs: {
           sidebarPath: "./sidebars.ts",
           editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+            "https://github.com/S7-OpenLearning-Individual/DesignPatternPedia/tree/main/",
         },
         blog: false,
         theme: {
