@@ -4,7 +4,9 @@
   - [Page Structure](#page-structure)
   - [Coding Standards](#coding-standards)
   - [Installation](#installation)
+    - [Local Development](#local-development)
     - [Build and serve](#build-and-serve)
+  - [Contributing](#contributing)
 
 This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
 
@@ -46,22 +48,25 @@ Some extras, common elements may include;
 3. All basic page elements that can be re-used should be turned into components.
 4. Code is written in American English.
 5. Page content is written in Queens English.
-6. All pages are `.mdx` files.
-7. Code compiles and tests pass.
-8. Directories follow the correct pattern structure.
-9. Each page is built using the [page structure](#page-structure).
+6. Page content is cited, sourced, and referenced where deemed necessary.
+7. All docs/pages are `.mdx` files.
+8. Code compiles and tests pass.
+9. Directories follow the correct pattern structure.
+10. Each page is built using the [page structure](#page-structure).
 
 ## Installation
 
-````bash
- npm i
-```s
+To install the required packages and otherwise dependencies, run the following command;
+
+```bash
+npm i
+```
 
 ### Local Development
 
 ```bash
  npm run start
-````
+```
 
 This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
 
@@ -78,3 +83,7 @@ And then to serve the newly created build, simply run.
 ```bash
  npm run serve
 ```
+
+## Contributing
+
+Would you like to propose changes to the pattern-wiki? Then feel free to create a pull request in this repository. Make sure that your PR follows the standards as set in the [coding standards](#coding-standards) and [page structure](#page-structure). These standards ensure that the wiki is of high quality and that both the users and developers can find the right information quickly.

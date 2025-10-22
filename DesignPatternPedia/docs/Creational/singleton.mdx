@@ -1,5 +1,130 @@
 ---
 title: Singleton
+hide_title: true
 ---
 
-This page describes the singleton pattern
+import { CreationalPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from '@theme/TOCInline';
+
+<CreationalPatternTag title="Singleton" aliases={["Single Instance Pattern"]}/>
+
+---
+
+The **Singleton** pattern ensures that a class has only one instance throughout the lifetime of an application and provides a single, well-known global access point to that instance. It’s one of the simplest creational design patterns, often used to control access to shared resources or global states, such as configuration objects, loggers, or connection pools.
+
+## 🧩The problem
+Some components in a system are meant to exist only once. For example, imagine a
+logging service that writes messages to a single log file. If each part of an
+application created its own logger instance, messages could become disorganized,
+duplicated, or even lost. Similarly, in database connections or system-wide
+configuration management, having multiple instances could cause conflicts or
+inconsistent behavior. The challenge is to guarantee that a single instance of a class can be created and accessed in a well-defined manner, without scattering global variables around.
+
+## 🛠️Solutions
+
+The Singleton pattern introduces a way to manage this shared instance explicitly. The class itself controls its instantiation by:
+
+- Making the constructor private or protected, thus preventing direct creation with `new`.
+- Exposing a static method (`getInstance()`) that acts as a single point of access.
+- Storing the one and only instance inside a static variable within the class.
+
+In essence, Singleton turns a regular class into both a **factory** and a **unique data holder**.
+
+
+<TwoColumnProsCons 
+  pros={["Guarantees that only one instance of a class exists", "Provides controlled global access point", "Helps coordinate shared resources"]}
+  cons={["Violates the Single Responsibility Principle", "Introduces hidden dependencies and tight coupling", "Complicates unit testing and parallel execution"]}
+/>
+
+
+### 🏛️Metaphors
+
+Think of a government maintaining records of all its citizens. Regardless of who
+requests a record, all requests for identification go to the same centralized storage managed by
+one controlling authority, the government.
+
+In this example, the government is considered a Singleton.
+
+### 💡Real-world examples
+Common practical scenarios for applying the Singleton pattern include:
+
+- Application configuration managers, ensuring consistent settings across the app.
+- Logger or audit services, ensuring all logs funnel through a single instance.
+- Database connection pools, you wouldn't want multiple connections being created unnecessarily.
+- Caching systems , to ensure a single source of truth for cached data.
+
+## 🧭Implementation Plan
+
+To implement a Singleton manually:
+
+1. Make the class constructor private so no external code can instantiate it directly.  
+2. Create a static field to hold the single instance.  
+3. Provide a static method that returns the existing instance or creates it lazily if it doesn't exist yet.  
+4. Handle thread-safety when the Singleton may be accessed concurrently.
+
+
+### 💻Code samples
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+class Singleton {
+    // Static property to hold the single instance.
+    private static instance: Singleton;
+
+    // Private constructor to prevent direct instantiation.
+    private constructor() {}
+
+    // Static method to either retrieve the single instance or instantiate it if it doesn't exist.
+    public static getInstance(): Singleton {
+        if (!Singleton.instance) {
+            Singleton.instance = new Singleton();
+        }
+
+        return Singleton.instance;
+    }
+}
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+class Singleton:
+    # Static variable to hold the single instance.
+    _instance = None
+
+    # Private constructor to prevent direct instantiation.
+    def __new__(cls):
+        # Check if an instance already exists.
+        if cls._instance is None:
+            # Create and store the single instance.
+            cls._instance = super().__new__(cls)
+        
+        # Return the single instance.
+        return cls._instance
+```
+
+</TabItem> </Tabs>
+
+### 🎮Playground
+Try creating multiple instances and see how the Singleton restricts this.
+
+## 🔗Relations to other patterns
+- [Factory Method](../Creational/factory-method.mdx), [Abstract Factory](../Creational/abstract-factory.mdx), or [Builder](../Creational/builder.mdx) may rely on Singleton to ensure a single configuration or product source is used globally.
+- [Facade](../Structural/facade.mdx) objects can themselves be singletons that encapsulate a subsystem behind a single interface.
+- Unlike [Flyweight](../Structural/flyweight.mdx), which manages many shared objects, Singleton restricts creation to precisely one object.
+
+---
+
+## 📚Sources
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring Guru - Singleton](https://refactoring.guru/design-patterns/singleton)
+- [Wikipedia - Singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern)
+- [W3Schools - Singleton Method Design Pattern](https://www.geeksforgeeks.org/system-design/singleton-design-pattern/)
