@@ -1,0 +1,107 @@
+:root {
+  --tag-creational-bg: #C6F6D5;
+  --tag-creational-color: #166534;
+  --tag-creational-border: #7EE8A5;
+  
+  --tag-behavioral-bg: #E0E7FF;
+  --tag-behavioral-color: #5B21B6;
+  --tag-behavioral-border: #B6B6F7;
+  
+  --tag-structural-bg: #FEF3C7;
+  --tag-structural-color: #92400E;
+  --tag-structural-border: #F9D47A;
+
+  --alias-tag-bg: #222;
+  --alias-tag-color: #fff;
+}
+
+[data-theme='dark'] {
+  --tag-creational-bg: rgba(198, 246, 213, 0.15);
+  --tag-creational-color: #4ade80;
+  --tag-creational-border: rgba(126, 232, 165, 0.4);
+  
+  --tag-behavioral-bg: rgba(224, 231, 255, 0.15);
+  --tag-behavioral-color: #818cf8;
+  --tag-behavioral-border: rgba(182, 182, 247, 0.4);
+  
+  --tag-structural-bg: rgba(254, 243, 199, 0.15);
+  --tag-structural-color: #fbbf24;
+  --tag-structural-border: rgba(249, 212, 122, 0.4);
+
+  --alias-tag-bg: var(--ifm-background-surface-color);
+  --alias-tag-color: var(--ifm-color-emphasis-900);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--ifm-heading-color);
+}
+
+.tag {
+  display: inline-block;
+  padding: 1.5px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  position: relative;
+  top: -0.4em;
+  margin-left: 2px;
+  z-index: 1;
+  transition: box-shadow 0.2s;
+  box-shadow: 0 2px 8px 0 rgba(80,200,255,0.10);
+}
+
+.tag-creational {
+  background: var(--tag-creational-bg);
+  color: var(--tag-creational-color);
+  border: 1.5px solid var(--tag-creational-border);
+}
+
+.tag-behavioral {
+  background: var(--tag-behavioral-bg);
+  color: var(--tag-behavioral-color);
+  border: 1.5px solid var(--tag-behavioral-border);
+}
+
+.tag-structural {
+  background: var(--tag-structural-bg);
+  color: var(--tag-structural-color);
+  border: 1.5px solid var(--tag-structural-border);
+}
+
+.aliasContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+  color: var(--ifm-font-color-base);
+}
+
+.aliasTag {
+  background: var(--alias-tag-bg);
+  color: var(--alias-tag-color);
+  border-radius: 16px;
+  padding: 2px 8px;
+  font-size: 14px;
+  font-weight: 500;
+  border: 1px solid var(--ifm-color-emphasis-200);
+}

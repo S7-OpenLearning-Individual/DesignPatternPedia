@@ -1,0 +1,150 @@
+---
+title: Singleton
+hide_title: true
+---
+
+import { CreationalPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from '@theme/TOCInline';
+
+<CreationalPatternTag title="Singleton" aliases={["Single Instance Pattern"]}/>
+
+## 🧭Implementation Plan
+
+To implement a Singleton manually:
+
+1. Make the class constructor private so no external code can instantiate it directly.  
+2. Create a static field to hold the single instance.  
+3. Provide a static method that returns the existing instance or creates it lazily if it doesn't exist yet.  
+4. Handle thread-safety when the Singleton may be accessed concurrently.
+
+
+### 💻Code samples
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+class Singleton {
+    // Static property to hold the single instance.
+    private static instance: Singleton;
+
+    // Private constructor to prevent direct instantiation.
+    private constructor() {}
+
+    // Static method to either retrieve the single instance or instantiate it if it doesn't exist.
+    public static getInstance(): Singleton {
+        if (!Singleton.instance) {
+            Singleton.instance = new Singleton();
+        }
+
+        return Singleton.instance;
+    }
+}
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+class Singleton:
+    # Static variable to hold the single instance.
+    _instance = None
+
+    # Private constructor to prevent direct instantiation.
+    def __new__(cls):
+        # Check if an instance already exists.
+        if cls._instance is None:
+            # Create and store the single instance.
+            cls._instance = super().__new__(cls)
+        
+        # Return the single instance.
+        return cls._instance
+```
+
+</TabItem> </Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function SingletonDemo() {
+  // State for current instance and log
+  const [instance, setInstance] = React.useState(null);
+  const [log, setLog] = React.useState([]);
+  // Singleton reference persists across renders
+  const singletonRef = React.useRef(null);
+
+  // Create a new singleton instance with a 6-digit id
+  const createInstance = () => ({ id: (Math.floor(100000 + Math.random() * 900000)).toString() });
+
+  // Singleton API
+  const getInstance = () => {
+    if (!singletonRef.current) singletonRef.current = createInstance();
+    return singletonRef.current;
+  };
+  const resetInstance = () => { singletonRef.current = null; };
+
+  // Button handlers
+  const handleCreate = () => {
+    const obj = getInstance();
+    setInstance(obj);
+    setLog(l => [...l, `Create Instance → id: ${obj.id}`]);
+  };
+  const handleReset = () => {
+    resetInstance();
+    setInstance(null);
+    setLog(l => [...l, 'Singleton reset']);
+  };
+  const handleClearLogs = () => setLog([]);
+
+  // UI
+  return (
+    <div style={{ fontFamily: "sans-serif" }}>
+      <h3>Singleton Instance Demo</h3>
+      {/* Create, Reset, and Clear Logs buttons */}
+      <button onClick={handleCreate}>Create Instance</button>
+      <button onClick={handleReset} style={{ marginLeft: 8 }}>Reset Singleton</button>
+      <button onClick={handleClearLogs} style={{ marginLeft: 8 }}>Clear Logs</button>
+      {/* Show instance info if exists */}
+      {instance && (
+        <div style={{ marginTop: 10, padding: 10, border: "1px solid #ccc" }}>
+          Current instance id: {instance.id}
+        </div>
+      )}
+      {/* Log display */}
+      <div style={{ marginTop: 10 }}>
+        <h4>Click Log:</h4>
+        <ul>
+          {log.map((entry, i) => (
+            <li key={i}>{entry}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+```
+
+
+## 🔗Relations to other patterns
+- [Factory Method](../Creational/factory-method.mdx), [Abstract Factory](../Creational/abstract-factory.mdx), or [Builder](../Creational/builder.mdx) may rely on Singleton to ensure a single configuration or product source is used globally.
+- [Facade](../Structural/facade.mdx) objects can themselves be singletons that encapsulate a subsystem behind a single interface.
+- Unlike [Flyweight](../Structural/flyweight.mdx), which manages many shared objects, Singleton restricts creation to precisely one object.
+
+---
+
+## 📚Sources
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring Guru - Singleton](https://refactoring.guru/design-patterns/singleton)
+- [Wikipedia - Singleton pattern](https://en.wikipedia.org/wiki/Singleton_pattern)
+- [W3Schools - Singleton Method Design Pattern](https://www.geeksforgeeks.org/system-design/singleton-design-pattern/)
