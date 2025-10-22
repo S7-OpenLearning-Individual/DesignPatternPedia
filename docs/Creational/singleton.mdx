@@ -9,51 +9,6 @@ import TOCInline from '@theme/TOCInline';
 
 <CreationalPatternTag title="Singleton" aliases={["Single Instance Pattern"]}/>
 
----
-
-The **Singleton** pattern ensures that a class has only one instance throughout the lifetime of an application and provides a single, well-known global access point to that instance. It’s one of the simplest creational design patterns, often used to control access to shared resources or global states, such as configuration objects, loggers, or connection pools.
-
-## 🧩The problem
-Some components in a system are meant to exist only once. For example, imagine a
-logging service that writes messages to a single log file. If each part of an
-application created its own logger instance, messages could become disorganized,
-duplicated, or even lost. Similarly, in database connections or system-wide
-configuration management, having multiple instances could cause conflicts or
-inconsistent behavior. The challenge is to guarantee that a single instance of a class can be created and accessed in a well-defined manner, without scattering global variables around.
-
-## 🛠️Solutions
-
-The Singleton pattern introduces a way to manage this shared instance explicitly. The class itself controls its instantiation by:
-
-- Making the constructor private or protected, thus preventing direct creation with `new`.
-- Exposing a static method (`getInstance()`) that acts as a single point of access.
-- Storing the one and only instance inside a static variable within the class.
-
-In essence, Singleton turns a regular class into both a **factory** and a **unique data holder**.
-
-
-<TwoColumnProsCons 
-  pros={["Guarantees that only one instance of a class exists", "Provides controlled global access point", "Helps coordinate shared resources"]}
-  cons={["Violates the Single Responsibility Principle", "Introduces hidden dependencies and tight coupling", "Complicates unit testing and parallel execution"]}
-/>
-
-
-### 🏛️Metaphors
-
-Think of a government maintaining records of all its citizens. Regardless of who
-requests a record, all requests for identification go to the same centralized storage managed by
-one controlling authority, the government.
-
-In this example, the government is considered a Singleton.
-
-### 💡Real-world examples
-Common practical scenarios for applying the Singleton pattern include:
-
-- Application configuration managers, ensuring consistent settings across the app.
-- Logger or audit services, ensuring all logs funnel through a single instance.
-- Database connection pools, you wouldn't want multiple connections being created unnecessarily.
-- Caching systems , to ensure a single source of truth for cached data.
-
 ## 🧭Implementation Plan
 
 To implement a Singleton manually:
@@ -113,7 +68,72 @@ class Singleton:
 </TabItem> </Tabs>
 
 ### 🎮Playground
-Try creating multiple instances and see how the Singleton restricts this.
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function SingletonDemo() {
+  // State for current instance and log
+  const [instance, setInstance] = React.useState(null);
+  const [log, setLog] = React.useState([]);
+  // Singleton reference persists across renders
+  const singletonRef = React.useRef(null);
+
+  // Create a new singleton instance with a 6-digit id
+  const createInstance = () => ({ id: (Math.floor(100000 + Math.random() * 900000)).toString() });
+
+  // Singleton API
+  const getInstance = () => {
+    if (!singletonRef.current) singletonRef.current = createInstance();
+    return singletonRef.current;
+  };
+  const resetInstance = () => { singletonRef.current = null; };
+
+  // Button handlers
+  const handleCreate = () => {
+    const obj = getInstance();
+    setInstance(obj);
+    setLog(l => [...l, `Create Instance → id: ${obj.id}`]);
+  };
+  const handleReset = () => {
+    resetInstance();
+    setInstance(null);
+    setLog(l => [...l, 'Singleton reset']);
+  };
+  const handleClearLogs = () => setLog([]);
+
+  // UI
+  return (
+    <div style={{ fontFamily: "sans-serif" }}>
+      <h3>Singleton Instance Demo</h3>
+      {/* Create, Reset, and Clear Logs buttons */}
+      <button onClick={handleCreate}>Create Instance</button>
+      <button onClick={handleReset} style={{ marginLeft: 8 }}>Reset Singleton</button>
+      <button onClick={handleClearLogs} style={{ marginLeft: 8 }}>Clear Logs</button>
+      {/* Show instance info if exists */}
+      {instance && (
+        <div style={{ marginTop: 10, padding: 10, border: "1px solid #ccc" }}>
+          Current instance id: {instance.id}
+        </div>
+      )}
+      {/* Log display */}
+      <div style={{ marginTop: 10 }}>
+        <h4>Click Log:</h4>
+        <ul>
+          {log.map((entry, i) => (
+            <li key={i}>{entry}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+```
+
 
 ## 🔗Relations to other patterns
 - [Factory Method](../Creational/factory-method.mdx), [Abstract Factory](../Creational/abstract-factory.mdx), or [Builder](../Creational/builder.mdx) may rely on Singleton to ensure a single configuration or product source is used globally.

@@ -35,7 +35,17 @@ const config: Config = {
       } satisfies Preset.Options,
     ],
   ],
-
+  themes: [
+    "@docusaurus/theme-live-codeblock",
+    [
+      require.resolve("@easyops-cn/docusaurus-search-local"),
+      {
+        hashed: true,
+        indexDocs: true,
+        indexPages: true,
+      },
+    ],
+  ],
   themeConfig: {
     // Replace with your project's social card
     image: "img/docusaurus-social-card.jpg",
