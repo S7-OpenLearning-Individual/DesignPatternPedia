@@ -31,13 +31,6 @@ The Singleton pattern introduces a way to manage this shared instance explicitly
 
 In essence, Singleton turns a regular class into both a **factory** and a **unique data holder**.
 
-
-<TwoColumnProsCons 
-  pros={["Guarantees that only one instance of a class exists", "Provides controlled global access point", "Helps coordinate shared resources"]}
-  cons={["Violates the Single Responsibility Principle", "Introduces hidden dependencies and tight coupling", "Complicates unit testing and parallel execution"]}
-/>
-
-
 ### 🏛️Metaphors
 
 Think of a government maintaining records of all its citizens. Regardless of who
@@ -53,6 +46,13 @@ Common practical scenarios for applying the Singleton pattern include:
 - Logger or audit services, ensuring all logs funnel through a single instance.
 - Database connection pools, you wouldn't want multiple connections being created unnecessarily.
 - Caching systems , to ensure a single source of truth for cached data.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons 
+  pros={["Guarantees that only one instance of a class exists", "Provides controlled global access point", "Helps coordinate shared resources"]}
+  cons={["Violates the Single Responsibility Principle", "Introduces hidden dependencies and tight coupling", "Complicates unit testing and parallel execution"]}
+/>
 
 ## 🧭Implementation Plan
 
