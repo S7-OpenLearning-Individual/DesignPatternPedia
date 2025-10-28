@@ -94,6 +94,7 @@ const config: Config = {
           ],
         },
       ],
+      copyright: `Made by Joris Brugman`,
     },
     prism: {
       theme: prismThemes.github,

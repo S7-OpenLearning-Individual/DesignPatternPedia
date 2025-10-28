@@ -13,7 +13,6 @@ export default function TwoColumnProsCons({
 }: TwoColumnProsConsProps): React.ReactElement {
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>⚖️ Pros and Cons</h2>
       <div className={styles.columnsContainer}>
         <div className={styles.column}>
           <h3>Pros</h3>

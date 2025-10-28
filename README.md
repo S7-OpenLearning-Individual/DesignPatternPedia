@@ -29,7 +29,8 @@ Each page follows a basic structure to ensure that a user can easily find metada
    1. Real world examples of application of the pattern.
 8. Pros and cons
    1. Pros and cons of the pattern.
-9. Your turn
+9. Applicability
+   1. Explain when, and HOW the pattern is applicable to a situation.
 10. How can the user see a potential implementation plan.
 11. Code samples
 12. Snippets in various programming languages.
@@ -53,6 +54,7 @@ Some extras, common elements may include;
 8. Code compiles and tests pass.
 9. Directories follow the correct pattern structure.
 10. Each page is built using the [page structure](#page-structure).
+11. Custom components should not use a title, they should use the correct heading level in the page itself to ensure proper url based linking.
 
 ## Installation
 

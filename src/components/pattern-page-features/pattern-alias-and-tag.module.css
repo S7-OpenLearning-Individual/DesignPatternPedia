@@ -100,8 +100,9 @@
   background: var(--alias-tag-bg);
   color: var(--alias-tag-color);
   border-radius: 16px;
-  padding: 2px 8px;
+  padding: 0px  6px;
   font-size: 14px;
   font-weight: 500;
   border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 4px;
 }
