@@ -1,5 +1,108 @@
 ---
 title: Prototype
+hide_title: true
 ---
 
-This is Prototype Pattern page
+import { CreationalPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from '@theme/TOCInline';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+
+<CreationalPatternTag title="Prototype" aliases={["Clone"]}/>
+---
+
+**Prototype** is a pattern that lets you copy existing objects without making your code dependant on their actual implementations or classes.
+
+## 🧩The problem
+
+Let's say you want to create a copy or clone of an existing object. However, the exact details of the object's class or structure aren't fully known at runtime, or the object is part of a complex hierarchy. You want to avoid tight coupling between your code and the specific classes of the objects you're working with. Additionally, creating new instances of these objects through traditional means (like using constructors) might be inefficient or impractical, especially if the objects are complex or resource-intensive to create from scratch. Furthermore, there are times when you cannot create an object directly because the class of the object is hidden, or you want to avoid the overhead of creating a new instance from scratch.
+
+## 🛠️Solutions
+
+The Prototype pattern addresses these challenges by allowing you to create new objects by cloning existing ones, known as **prototypes**. Instead of initializing objects directly, you copy an existing object, which serves as a prototype. This is typically achieved through a method like `clone()`, which creates a copy of the object. An object which supports cloning or copying is referred to as a *prototype*. When you have lots of configurations or dozens of fields, prototyping may serve as a good alternative to subclassing.
+
+
+### 🏛️Metaphors
+
+Imagine a sculptor who has created a beautiful statue. Instead of sculpting a new statue from scratch each time, the sculptor makes a mold of the original statue. Whenever a new statue is needed, the sculptor simply pours material into the mold to create an exact replica. In this scenario, the original statue is the prototype, and the mold allows for easy duplication without needing to recreate the entire sculpture process.
+
+### 💡Real-world examples
+Common practical scenarios for applying the Prototype pattern include:
+
+- Cloning complex objects in a game (e.g., characters, items) without knowing their exact class.
+- Creating a new document in a word processor by copying an existing one, preserving its formatting and content.
+- [Mitotic cell division](https://en.wikipedia.org/wiki/Mitosis) in biology, where a cell replicates its DNA and divides to form two identical daughter cells.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons 
+  pros={["You can clone objects without being dependant on their concrete classes.", "You can remove duplicate initialization logic.", "You get an alternative option to inheritance." ]}
+  cons={["Cloning complex objects with circular references may become tricky."]}
+/>
+
+
+## 🔍Applicability
+
+<Applicability items={[
+  {
+    situation: "Use the Prototype pattern when the system should be independent of how its products are created, composed, and represented.",
+    context: "This pattern helps in situations where the exact classes of the objects being created are not known beforehand, allowing for more flexible and decoupled code. An example could include a third-party API or library. By applying this interface you make your own code independent of the third-party implementation."
+  },
+  {
+    situation: "Use the Prototype pattern when you want to limit the number of subclasses that may exist in the system.",
+    context: "By using prototypes, you can avoid creating a large number of subclasses for every possible configuration of an object. Instead, you can create a few prototype instances and clone them as needed, reducing the complexity of the class hierarchy."
+  }
+]} />
+
+
+## 🧭Implementation Plan
+
+To implement a Prototype manually:
+
+1. Create a Prototype interface with a clone method, or alternatively add a `clone()` method to the existing classes.
+2. Implement the Prototype interface in the classes you want to clone.
+3. Use the clone method to create copies of objects instead of using constructors.
+
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+//ts code here
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+#python code here
+```
+
+</TabItem> </Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+// code
+```
+
+## 🔗Relations to other patterns
+- x
+---
+
+## 📚Sources
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring Guru - Protoype](https://refactoring.guru/design-patterns/prototype)
+- [Geeks for Geeks - Prototype Design Pattern](https://www.geeksforgeeks.org/system-design/prototype-design-pattern/)
+- [Wikipedia - Prototype Pattern](https://en.wikipedia.org/wiki/Prototype_pattern)
