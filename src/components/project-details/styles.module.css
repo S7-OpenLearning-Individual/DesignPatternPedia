@@ -1,0 +1,82 @@
+.projectDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 6rem;
+  margin: auto auto 6rem auto;
+  width: 60%;
+  align-items: center;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3rem;
+  width: 100%;
+}
+
+.reverse {
+  flex-direction: row-reverse;
+}
+
+.icon {
+  align-items: center;
+  justify-content: center;
+  margin: 0 2rem;
+}
+
+.cardSvg {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+}
+
+.text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+.reverse .text {
+  text-align: right;
+}
+
+.text h2 {
+  margin-bottom: 1rem;
+}
+
+/* Responsive adjustments for mobile screens */
+@media (max-width: 768px) {
+  .projectDetails {
+    width: 90%;
+    gap: 4rem;
+    margin: 2rem auto;
+  }
+
+  .card {
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    text-align: center;
+  }
+
+  .reverse {
+    flex-direction: column;
+  }
+
+  .text,
+  .reverse .text {
+    text-align: center;
+  }
+
+  .cardSvg {
+    width: 100px;
+    height: 100px;
+  }
+
+  .icon {
+    margin: 0;
+  }
+}

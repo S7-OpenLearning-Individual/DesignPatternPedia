@@ -1,11 +1,10 @@
 label: Behavioral
-position: 1
 link:
   type: generated-index
   title: Behavioral Design Patterns
   description: >
     Behavioral are focussed on communication, the assignment of responsibilities between objects and complex transactions such as algorithms.
-  slug: /Behavioral
+  slug: /behavioral
   keywords:
     - design pattern
     - behavioral

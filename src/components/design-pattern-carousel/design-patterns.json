@@ -1,0 +1,57 @@
+ [
+  {
+    name: "Singleton",
+    description: "Ensures a class has only one instance.",
+    path: "/design-patterns/singleton",
+  },
+  {
+    name: "Observer",
+    description: "Objects subscribe to state changes.",
+    path: "/design-patterns/observer",
+  },
+  {
+    name: "Factory Method",
+    description: "Creates objects without specifying exact class.",
+    path: "/design-patterns/factory-method",
+  },
+  {
+    name: "Observer",
+    description: "Objects subscribe to state changes.",
+    path: "/design-patterns/observer",
+  },
+  {
+    name: "Factory Method",
+    description: "Creates objects without specifying exact class.",
+    path: "/design-patterns/factory-method",
+  },
+  {
+    name: "Observer",
+    description: "Objects subscribe to state changes.",
+    path: "/design-patterns/observer",
+  },
+  {
+    name: "Factory Method",
+    description: "Creates objects without specifying exact class.",
+    path: "/design-patterns/factory-method",
+  },
+  {
+    name: "Observer",
+    description: "Objects subscribe to state changes.",
+    path: "/design-patterns/observer",
+  },
+  {
+    name: "Factory Method",
+    description: "Creates objects without specifying exact class.",
+    path: "/design-patterns/factory-method",
+  },
+  {
+    name: "Observer",
+    description: "Objects subscribe to state changes.",
+    path: "/design-patterns/observer",
+  },
+  {
+    name: "Factory Method",
+    description: "Creates objects without specifying exact class.",
+    path: "/design-patterns/factory-method",
+  },
+];
