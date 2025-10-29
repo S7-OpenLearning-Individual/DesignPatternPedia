@@ -5,12 +5,6 @@ import styles from "./styles.module.css";
 import Heading from "@theme/Heading";
 import Link from "@docusaurus/Link";
 
-function getPrimaryColor() {
-  return getComputedStyle(document.documentElement).getPropertyValue(
-    "--ifm-color-primary"
-  );
-}
-
 type ProjectDetail = {
   title: string;
   Svg: React.ComponentType<React.ComponentProps<"svg">>;
@@ -34,8 +28,7 @@ const details: ProjectDetail[] = [
     Svg: require("@site/static/icons/search.svg").default,
     description: (
       <>
-        This wiki is a personal project created by{" "}
-        <span style={{ color: getPrimaryColor() }}>a person for a people</span>.
+        This wiki is a personal project created by <b>a person for a people</b>.
         Transparency is part of the gift of sharing information. The content of
         this cite is not hidden beyond any paywalls, transactions, questionable
         tracking nor analytical cookies. It is purely focused on delivering you

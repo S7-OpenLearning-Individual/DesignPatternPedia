@@ -6,7 +6,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 import Link from "@docusaurus/Link";
-import { designPatterns } from "../../data/designPatterns";
+import { designPatterns } from "../../data/design-patterns";
 
 const DesignPatternCarousel: React.FC = () => {
   return (

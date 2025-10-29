@@ -97,12 +97,6 @@ export const designPatterns: DesignPattern[] = [
     path: "behavioral/command",
   },
   {
-    name: "Interpreter",
-    description: "Defines a grammar for a language and interprets sentences.",
-    category: "behavioral",
-    path: "behavioral/interpreter",
-  },
-  {
     name: "Iterator",
     description:
       "Provides a way to access elements sequentially without exposing underlying representation.",
