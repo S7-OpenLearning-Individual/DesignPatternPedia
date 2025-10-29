@@ -1,5 +1,213 @@
 ---
 title: Prototype
+hide_title: true
 ---
 
-This is Prototype Pattern page
+import { CreationalPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from '@theme/TOCInline';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+
+<CreationalPatternTag title="Prototype" aliases={["Clone"]}/>
+---
+
+**Prototype** is a pattern that lets you copy existing objects without making your code dependant on their actual implementations or classes.
+
+## 🧩The problem
+
+Let's say you want to create a copy or clone of an existing object. However, the exact details of the object's class or structure aren't fully known at runtime, or the object is part of a complex hierarchy. You want to avoid tight coupling between your code and the specific classes of the objects you're working with. Additionally, creating new instances of these objects through traditional means (like using constructors) might be inefficient or impractical, especially if the objects are complex or resource-intensive to create from scratch. Furthermore, there are times when you cannot create an object directly because the class of the object is hidden, or you want to avoid the overhead of creating a new instance from scratch.
+
+## 🛠️Solutions
+
+The Prototype pattern addresses these challenges by allowing you to create new objects by cloning existing ones, known as **prototypes**. Instead of initializing objects directly, you copy an existing object, which serves as a prototype. This is typically achieved through a method like `clone()`, which creates a copy of the object. An object which supports cloning or copying is referred to as a *prototype*. When you have lots of configurations or dozens of fields, prototyping may serve as a good alternative to subclassing.
+
+
+### 🏛️Metaphors
+
+Imagine a sculptor who has created a beautiful statue. Instead of sculpting a new statue from scratch each time, the sculptor makes a mold of the original statue. Whenever a new statue is needed, the sculptor simply pours material into the mold to create an exact replica. In this scenario, the original statue is the prototype, and the mold allows for easy duplication without needing to recreate the entire sculpture process.
+
+### 💡Real-world examples
+Common practical scenarios for applying the Prototype pattern include:
+
+- Cloning complex objects in a game (e.g., characters, items) without knowing their exact class.
+- Creating a new document in a word processor by copying an existing one, preserving its formatting and content.
+- [Mitotic cell division](https://en.wikipedia.org/wiki/Mitosis) in biology, where a cell replicates its DNA and divides to form two identical daughter cells.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons 
+  pros={["You can clone objects without being dependant on their concrete classes.", "You can remove duplicate initialization logic.", "You get an alternative option to inheritance." ]}
+  cons={["Cloning complex objects with circular references may become tricky."]}
+/>
+
+
+## 🔍Applicability
+
+<Applicability items={[
+  {
+    situation: "Use the Prototype pattern when the system should be independent of how its products are created, composed, and represented.",
+    context: "This pattern helps in situations where the exact classes of the objects being created are not known beforehand, allowing for more flexible and decoupled code. An example could include a third-party API or library. By applying this interface you make your own code independent of the third-party implementation."
+  },
+  {
+    situation: "Use the Prototype pattern when you want to limit the number of subclasses that may exist in the system.",
+    context: "By using prototypes, you can avoid creating a large number of subclasses for every possible configuration of an object. Instead, you can create a few prototype instances and clone them as needed, reducing the complexity of the class hierarchy."
+  }
+]} />
+
+
+## 🧭Implementation Plan
+
+To implement a Prototype manually:
+
+1. Create a Prototype interface with a clone method, or alternatively add a `clone()` method to the existing classes.
+2. Implement the Prototype interface in the classes you want to clone.
+3. Use the clone method to create copies of objects instead of using constructors.
+4. [OPTIONAL] Create a Prototype Registry, a centralized place to store and manage prototype instances, or use a Factory that utilizes prototypes for object creation.
+5. Replace the direct call to the constructor with calls to the clone method.
+
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+// Prototype interface
+interface Prototype {
+  clone(): Prototype;
+}
+
+// Concrete prototype
+class Person implements Prototype {
+  name: string;
+  age: number;
+
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+  }
+
+  clone(): Prototype {
+    return new Person(this.name, this.age);
+  }
+}
+
+// Usage
+const original = new Person("Alice", 30);
+const copy = original.clone();
+console.log(copy); // Person { name: 'Alice', age: 30 }
+
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+import copy # https://docs.python.org/3/library/copy.html
+
+# Python does not support interfaces natively, so we can just define a clone method in the class.
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def clone(self):
+        return copy.deepcopy(self)
+
+# Usage
+original = Person("Alice", 30)
+copy_person = original.clone()
+print(copy_person.name, copy_person.age)  # Alice 30
+
+```
+
+</TabItem> </Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function PrototypeDemo() {
+  // The prototype object with shared methods
+  const animalPrototype = {
+    speak() {
+      return `Hi, I'm a ${this.type} called ${this.name}`;
+    }
+  };
+
+  // Function to clone the prototype and create a new animal
+  function createAnimal(type, name) {
+    const animal = Object.create(animalPrototype);
+    animal.type = type;
+    animal.name = name;
+    return animal;
+  }
+
+  const [type, setType] = React.useState("Cat");
+  const [name, setName] = React.useState("Whiskers");
+  const [animals, setAnimals] = React.useState([]);
+
+  // Add a new animal to the list
+  function handleCreate() {
+    const animal = createAnimal(type, name);
+    setAnimals([animal, ...animals]);
+  }
+
+  return (
+    <div>
+      <h3>Prototype Pattern — Playground</h3>
+      <div>
+        <label>
+          Type:{" "}
+          <input
+            value={type}
+            onChange={e => setType(e.target.value)}
+            style={{ marginRight: 8 }}
+          />
+        </label>
+        <label>
+          Name:{" "}
+          <input
+            value={name}
+            onChange={e => setName(e.target.value)}
+            style={{ marginRight: 8 }}
+          />
+        </label>
+        <button onClick={handleCreate}>Create animal</button>
+      </div>
+      <ul>
+        {animals.map((animal, i) => (
+          <li key={i}>{animal.speak()}</li>
+        ))}
+      </ul>
+      <div style={{ marginTop: 12}}>
+        Each new animal is cloned from <code>animalPrototype</code>. Try changing the
+        fields and creating multiple animals to see prototype sharing in action!
+      </div>
+    </div>
+  );
+}
+
+```
+
+## 🔗Relations to other patterns
+- Designs that make heavy use of [Composite](/docs/Structural/composite.mdx) and [Decorator](/docs/Structural/decorator.mdx) can often benefit from using [Prototype](/docs/Creational/prototype). Applying the pattern lets you clone complex structures instead of re-constructing them from scratch.
+- [Prototypes](/docs/Creational/prototype) can help when you need to save copies of [Commands](/docs/Behavioural/command.mdx) into history.
+- [Abstract Factories](/docs/Creational/abstract-factory) classes are often based on a set of [Factory Methods](/docs/Creational/factory-method.mdx), but you can also use [Prototype](/docs/Creational/prototype) to compose the methods on these classes.
+- [Abstract Factories](/docs/Creational/abstract-factory), [Builders](/docs/Creational/builder), and [Prototypes](/docs/Creational/prototype) can be implemented as [Singleton](/docs/Creational/singleton).
+
+---
+
+## 📚Sources
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring Guru - Prototype](https://refactoring.guru/design-patterns/prototype)
+- [Geeks for Geeks - Prototype Design Pattern](https://www.geeksforgeeks.org/system-design/prototype-design-pattern/)
+- [Wikipedia - Prototype Pattern](https://en.wikipedia.org/wiki/Prototype_pattern)
