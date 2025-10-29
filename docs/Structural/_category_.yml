@@ -1,0 +1,12 @@
+label: Structural
+position: 1
+link:
+  type: generated-index
+  title: Structural Design Patterns
+  description: >
+    Structural design patterns are concerned with how classes and objects are composed to form larger structures.
+  slug: /structural
+  keywords:
+    - design pattern
+    - structural
+    - software architecture

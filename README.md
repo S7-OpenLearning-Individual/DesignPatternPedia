@@ -16,6 +16,7 @@ Each page follows a basic structure to ensure that a user can easily find metada
 
 1. The name of the design pattern.
    1. Include extra used names or alternative names used just below the title itself.
+   2. Each page needs a 'description' in the config, with a funny quote or otherwise short hook to get users engaged.
 2. The group the design pattern belongs to.
    1. Creational, Structural or Behavioral
 3. Description
