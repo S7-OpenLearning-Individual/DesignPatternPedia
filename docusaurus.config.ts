@@ -60,11 +60,26 @@ const config: Config = {
       },
       items: [
         {
-          type: "docSidebar",
-          sidebarId: "tutorialSidebar",
           position: "left",
-          label: "Patterns",
+          to: "/docs/overview",
+          label: "Overview",
         },
+        {
+          position: "left",
+          to: "docs/behavioral",
+          label: "Behavioral",
+        },
+        {
+          position: "left",
+          to: "docs/creational",
+          label: "Creational",
+        },
+        {
+          position: "left",
+          to: "docs/structural",
+          label: "Structural",
+        },
+        { to: "/manifest", label: "Manifesto", position: "left" },
         {
           href: "https://github.com/S7-OpenLearning-Individual/DesignPatternPedia",
           label: "GitHub",
@@ -76,16 +91,7 @@ const config: Config = {
       style: "dark",
       links: [
         {
-          title: "Docs",
-          items: [
-            {
-              label: "Tutorial",
-              to: "/docs/intro",
-            },
-          ],
-        },
-        {
-          title: "More",
+          title: "Contribute & Feedback",
           items: [
             {
               label: "GitHub",
