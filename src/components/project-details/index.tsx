@@ -43,12 +43,12 @@ const details: ProjectDetail[] = [
       <>
         The free content provided to you was collected with the assistance of
         generative AI such as{" "}
-        <Link href="https://www.perplexity.ai/">Perplexity</Link> and{" "}
-        <Link href="https://github.com/copilot">Copilot</Link>. While AI helped
+        <Link to="https://www.perplexity.ai/">Perplexity</Link> and{" "}
+        <Link to="https://github.com/copilot">Copilot</Link>. While AI helped
         gather and draft the information, all content has been reviewed and
         refined by a human to ensure accuracy and clarity. Therefore this
         project has been dubbed as{" "}
-        <Link href="https://mmmlabel.tech/#mmmlabel">Cyborg</Link> level of AI
+        <Link to="https://mmmlabel.tech/#mmmlabel">Cyborg</Link> level of AI
         assistance.
       </>
     ),
