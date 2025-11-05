@@ -1,5 +1,404 @@
 ---
 title: Abstract Factory
+hide_title: true
+description: >
+ It's not a pyramid scheme, it's a factory scheme.
 ---
 
-This is Abstract Factory Pattern page
+import { CreationalPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from '@theme/TOCInline';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+
+<CreationalPatternTag title="Abstract Factory"/>
+
+
+---
+
+The **abstract factory** pattern is a creational pattern that can help create groups of related products without specifying their concrete implementations. 
+
+## 🧩The problem
+
+Let's say you are creating a armour shop, and you want to offer different styles of armour (e.g. medieval, modern and futuristic). Each style includes a set of related products like gloves, a chest plate and a helmet. You want to ensure that when a customer selects a particular style, all the armour pieces they receive are consistent in design and aesthetics. You  will need a way to create families of related armour products without tightly coupling your code to specific implementations. 
+
+## 🛠️Solutions
+
+An abstract factory acn provide a solution to this problem, to start you should declare interfaces for each distinct product family (e.g. helmet, chest plate and gloves). Then you must make all variants of said products family implement the newly created interface. This would mean if you have a `Helmet` interface, then these would be implemented in the `ModernHelmet`, `MedievalHemet` and `FuturisticHelmet` classes.
+
+To continue you declare the actual **abstract factory**, this is another interface with methods that all products of the family will use. An example would be `wearHelmet` or `throwOnGroundInFrustration`, which are applicable to all products in the family. These methods must return an abstract product type, represented by the interface we have just created, `Helmet`, `ModernHelmet`, `MedievalHelmet` or `FuturisticHelmet`.
+
+For each product variant you create a separate concrete factory based on the earlier made **abstract factory** interface. A factory is a class that returns products of a particular kind ([Factory Method](/docs/creational/factory-method)). Now the specific factories can only produce their respective family of products. Meaning the `MedievalArmoury` can only create `MedievalHelmet` and `MedievalGloves`, not `FuturisticHelmet` or other non-matching family products.
+
+By applying this, the client can work with the factories and products via their relevant abstract interfaces. It is not relevant for the client how the factory implements the creation of products, just that it returns a product of our initial interface. E.g. the warehouse needs a `Helmet`, it does, and should, not care whether that product is a `MedievalHelmet` or `FuturisticHelmet`. It'll always match as long as the same factory is used. The client usually chooses a type of factory on initialization based on the specified configuration or environmental settings.
+
+### 🏛️Metaphors
+
+An abstract factory is like a car manufacturer that produces different models of cars (e.g., sedan, SUV, truck) without specifying the exact details of each model. The manufacturer provides a common interface for creating cars, and each model implements its own specific features and characteristics. This allows customers to choose a car model based on their preferences without needing to know the intricate details of how each car is built.
+
+### 💡Real-world examples
+Common practical scenarios for applying the Abstract Factory pattern include:
+
+- GUI frameworks: Different operating systems have distinct UI components. An abstract factory can create families of related UI elements (buttons, text fields, menus) for different platforms (Windows, macOS, Linux) without specifying their concrete implementations.
+- Document Generation: An abstract factory can be used to create different types of documents (e.g., PDF, Word, HTML) with a consistent interface for generating and formatting content.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons 
+  pros={["Open/Closed Principle. You can introduce new variants of products without breaking existing client code.", "Single Responsibility Principle. You can extract the product creation code into one place, making the code easier to support.", "Ensures that products from the same factory always match expectations", "Avoids tightly coupling product to client code."]}
+  cons={["Code may become more cluttered and complicated then required, as a lot of new classes, relations, and interfaces are required."]}
+/>
+
+
+## 🔍Applicability
+
+<Applicability items={[
+  {
+    situation: "Use the abstract factory pattern when your system needs to be independent of how its products are created, composed, and represented.",
+    context: "The abstract factory pattern allows you to create families of related products without specifying their concrete implementations, furthermore it allows for future extension of the catalogue of products without breaking existing client code."
+  },
+]} />
+
+
+## 🧭Implementation Plan
+
+To implement an Abstract Factory manually:
+
+1. Create a clear overview of the different products and their variants.
+2. Declare an abstract product interface for these product types, then create a concrete product which implement this interface.
+3. Declare an abstract factory with a set of methods for all abstract products.
+4. Implement a concrete factory for each product variant.
+5. Initialize your factory somewhere in your start-up code, taking into account application configuration and environmental variables.
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+// Abstract Products
+interface Helmet {
+  getProtection(): string;
+}
+
+interface ChestPlate {
+  getProtection(): string;
+}
+
+interface Gloves {
+  getProtection(): string;
+}
+
+// Concrete Products - Medieval
+class MedievalHelmet implements Helmet {
+  getProtection(): string {
+    return "Medieval Helmet: Provides basic head protection";
+  }
+}
+
+class MedievalChestPlate implements ChestPlate {
+  getProtection(): string {
+    return "Medieval Chest Plate: Iron torso protection";
+  }
+}
+
+class MedievalGloves implements Gloves {
+  getProtection(): string {
+    return "Medieval Gloves: Leather hand protection";
+  }
+}
+
+// Concrete Products - Futuristic
+class FuturisticHelmet implements Helmet {
+  getProtection(): string {
+    return "Futuristic Helmet: Energy shield with HUD";
+  }
+}
+
+class FuturisticChestPlate implements ChestPlate {
+  getProtection(): string {
+    return "Futuristic Chest Plate: Nano-fiber armor";
+  }
+}
+
+class FuturisticGloves implements Gloves {
+  getProtection(): string {
+    return "Futuristic Gloves: Smart-tech grip enhancers";
+  }
+}
+
+// Abstract Factory
+interface ArmourFactory {
+  createHelmet(): Helmet;
+  createChestPlate(): ChestPlate;
+  createGloves(): Gloves;
+}
+
+// Concrete Factories
+class MedievalArmourFactory implements ArmourFactory {
+  createHelmet(): Helmet {
+    return new MedievalHelmet();
+  }
+
+  createChestPlate(): ChestPlate {
+    return new MedievalChestPlate();
+  }
+
+  createGloves(): Gloves {
+    return new MedievalGloves();
+  }
+}
+
+class FuturisticArmourFactory implements ArmourFactory {
+  createHelmet(): Helmet {
+    return new FuturisticHelmet();
+  }
+
+  createChestPlate(): ChestPlate {
+    return new FuturisticChestPlate();
+  }
+
+  createGloves(): Gloves {
+    return new FuturisticGloves();
+  }
+}
+
+// Client code
+function equipWarrior(factory: ArmourFactory) {
+  const helmet = factory.createHelmet();
+  const chestPlate = factory.createChestPlate();
+  const gloves = factory.createGloves();
+
+  console.log(helmet.getProtection());
+  console.log(chestPlate.getProtection());
+  console.log(gloves.getProtection());
+}
+
+// Usage
+console.log("Equipping with Medieval armour:");
+equipWarrior(new MedievalArmourFactory());
+
+console.log("\nEquipping with Futuristic armour:");
+equipWarrior(new FuturisticArmourFactory());
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+from abc import ABC, abstractmethod
+
+# Abstract Products
+class Helmet(ABC):
+    @abstractmethod
+    def get_protection(self) -> str:
+        pass
+
+class ChestPlate(ABC):
+    @abstractmethod
+    def get_protection(self) -> str:
+        pass
+
+class Gloves(ABC):
+    @abstractmethod
+    def get_protection(self) -> str:
+        pass
+
+# Concrete Products - Medieval
+class MedievalHelmet(Helmet):
+    def get_protection(self) -> str:
+        return "Medieval Helmet: Provides basic head protection"
+
+class MedievalChestPlate(ChestPlate):
+    def get_protection(self) -> str:
+        return "Medieval Chest Plate: Iron torso protection"
+
+class MedievalGloves(Gloves):
+    def get_protection(self) -> str:
+        return "Medieval Gloves: Leather hand protection"
+
+# Concrete Products - Futuristic
+class FuturisticHelmet(Helmet):
+    def get_protection(self) -> str:
+        return "Futuristic Helmet: Energy shield with HUD"
+
+class FuturisticChestPlate(ChestPlate):
+    def get_protection(self) -> str:
+        return "Futuristic Chest Plate: Nano-fiber armor"
+
+class FuturisticGloves(Gloves):
+    def get_protection(self) -> str:
+        return "Futuristic Gloves: Smart-tech grip enhancers"
+
+# Abstract Factory
+class ArmourFactory(ABC):
+    @abstractmethod
+    def create_helmet(self) -> Helmet:
+        pass
+    
+    @abstractmethod
+    def create_chest_plate(self) -> ChestPlate:
+        pass
+    
+    @abstractmethod
+    def create_gloves(self) -> Gloves:
+        pass
+
+# Concrete Factories
+class MedievalArmourFactory(ArmourFactory):
+    def create_helmet(self) -> Helmet:
+        return MedievalHelmet()
+    
+    def create_chest_plate(self) -> ChestPlate:
+        return MedievalChestPlate()
+    
+    def create_gloves(self) -> Gloves:
+        return MedievalGloves()
+
+class FuturisticArmourFactory(ArmourFactory):
+    def create_helmet(self) -> Helmet:
+        return FuturisticHelmet()
+    
+    def create_chest_plate(self) -> ChestPlate:
+        return FuturisticChestPlate()
+    
+    def create_gloves(self) -> Gloves:
+        return FuturisticGloves()
+
+# Client code
+def equip_warrior(factory: ArmourFactory) -> None:
+    helmet = factory.create_helmet()
+    chest_plate = factory.create_chest_plate()
+    gloves = factory.create_gloves()
+    
+    print(helmet.get_protection())
+    print(chest_plate.get_protection())
+    print(gloves.get_protection())
+
+# Usage
+if __name__ == "__main__":
+    equip_warrior(MedievalArmourFactory())
+    
+    equip_warrior(FuturisticArmourFactory())
+```
+
+</TabItem> </Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function AbstractFactoryDemo() {
+  // State for selected factory and equipped armour
+  const [factoryType, setFactoryType] = React.useState("Medieval");
+  const [equippedArmour, setEquippedArmour] = React.useState([]);
+
+  // Armour factories - each creates a family of related products
+  const factories = {
+    Medieval: {
+      name: "Medieval Armoury",
+      createHelmet: () => ({ piece: "Helmet", description: "Iron helmet with nose guard", defense: 15 }),
+      createChestPlate: () => ({ piece: "Chest Plate", description: "Heavy chainmail armor", defense: 30 }),
+      createGloves: () => ({ piece: "Gloves", description: "Leather gauntlets", defense: 8 }),
+      emoji: "⚔️"
+    },
+    Futuristic: {
+      name: "Futuristic Tech Lab",
+      createHelmet: () => ({ piece: "Helmet", description: "Energy shield with HUD", defense: 40 }),
+      createChestPlate: () => ({ piece: "Chest Plate", description: "Nano-fiber combat suit", defense: 55 }),
+      createGloves: () => ({ piece: "Gloves", description: "Smart-tech grip enhancers", defense: 20 }),
+      emoji: "🚀"
+    },
+    Elven: {
+      name: "Elven Forge",
+      createHelmet: () => ({ piece: "Helmet", description: "Enchanted mithril circlet", defense: 25 }),
+      createChestPlate: () => ({ piece: "Chest Plate", description: "Blessed elven plate", defense: 45 }),
+      createGloves: () => ({ piece: "Gloves", description: "Silken battle gloves", defense: 12 }),
+      emoji: "🧝"
+    }
+  };
+
+  // Equip a full set of armour from selected factory
+  const equipFullSet = () => {
+    const factory = factories[factoryType];
+    const armourSet = [
+      factory.createHelmet(),
+      factory.createChestPlate(),
+      factory.createGloves()
+    ];
+    setEquippedArmour(armourSet);
+  };
+
+  // Calculate total defense
+  const totalDefense = equippedArmour.reduce((sum, item) => sum + item.defense, 0);
+  const currentFactory = factories[factoryType];
+
+  return (
+    <div>
+      <h3>Abstract Factory — Armour Shop {currentFactory.emoji}</h3>
+      
+      {/* Factory Selection */}
+      <div style={{ marginBottom: 16 }}>
+        <label style={{ marginRight: 8 }}>Select Factory:</label>
+        <select 
+          value={factoryType} 
+          onChange={(e) => setFactoryType(e.target.value)}
+          style={{ marginRight: 8 }}
+        >
+          {Object.keys(factories).map(type => (
+            <option key={type} value={type}>{factories[type].name}</option>
+          ))}
+        </select>
+        <button onClick={equipFullSet}>
+          Equip Full Set
+        </button>
+      </div>
+
+      {/* Equipped Armour Display */}
+      {equippedArmour.length > 0 && (
+        <div style={{ padding: 12, border: "1px solid #ccc", borderRadius: 4 }}>
+          <h4>Equipped Armour Set</h4>
+          <ul>
+            {equippedArmour.map((item, i) => (
+              <li key={i}>
+                <strong>{item.piece}:</strong> {item.description} (+{item.defense} defense)
+              </li>
+            ))}
+          </ul>
+          <div style={{ marginTop: 12 }}>
+            <strong>Total Defense: {totalDefense}</strong>
+          </div>
+        </div>
+      )}
+
+      {/* Explanation */}
+      <div style={{ marginTop: 16, fontSize: "0.9em" }}>
+        Each factory creates a <strong>family of related products</strong> (helmet, chest plate, gloves) 
+        that belong together. Try switching factories to see how the pattern ensures all pieces match!
+      </div>
+    </div>
+  );
+}
+```
+
+## 🔗Relations to other patterns
+
+- Many designs start by using [Factory Method](/docs/creational/factory-method) (less complicated and more customizable via subclasses) and evolve toward [Abstract Factory](/docs/creational/abstract-factory), [Prototype](/docs/creational/prototype), or [Builder](/docs/creational/builder).
+- [Builder](/docs/creational/builder) focuses on constructing complex objects step by step. [Abstract Factory](/docs/creational/abstract-factory) specializes in creating families of related objects. Abstract Factory returns the product immediately, whereas Builder lets you run some additional construction steps before fetching the product.
+- [Abstract Factory](/docs/creational/abstract-factory) classes are often based on a set of [Factory Methods](/docs/creational/factory-method), but you can also use [Prototype](/docs/creational/prototype) to compose the methods on these classes.
+- [Abstract Factory](/docs/creational/abstract-factory) can serve as an alternative to [Facade](/docs/structural/facade) when you only want to hide the way the subsystem objects are created from the client code.
+- [Abstract Factories](/docs/creational/abstract-factory), [Builders](/docs/creational/builder) and [Prototypes](/docs/creational/prototype) can all be implemented as [Singletons](/docs/creational/singleton).
+
+---
+
+## 📚Sources
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring Guru - Abstract Factory](https://refactoring.guru/design-patterns/abstract-factory)
+- [Geeks for Geeks - Abstract Factory pattern](https://www.geeksforgeeks.org/system-design/abstract-factory-pattern/)
