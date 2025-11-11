@@ -2,17 +2,24 @@
 title: Factory Method
 hide_title: true
 description: >
- Give the constructor a break...
+  Give the constructor a break...
 ---
 
-import { CreationalPatternTag, BehavioralPatternTag, StructuralPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import {
+  CreationalPatternTag,
+  BehavioralPatternTag,
+  StructuralPatternTag,
+} from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
 import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
-import TOCInline from '@theme/TOCInline';
+import TOCInline from "@theme/TOCInline";
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import Applicability from "@site/src/components/pattern-page-features/applicability";
 
-<CreationalPatternTag title="Factory Method" aliases={["Virtual Constructor"]}/>
+<CreationalPatternTag
+  title="Factory Method"
+  aliases={["Virtual Constructor"]}
+/>
 
 ---
 
@@ -31,6 +38,7 @@ The factory method pattern suggests that you create a separate method (the facto
 Imagine a toy factory that produces different types of toys. Instead of having a single assembly line that creates all toys, the factory has multiple specialized assembly lines for different toy types (e.g., action figures, dolls, puzzles). Each assembly line is responsible for creating its specific type of toy. When a customer places an order, the factory uses the appropriate assembly line to produce the requested toy type. This way, the factory can easily add new toy types in the future by simply introducing new assembly lines without disrupting the existing ones.
 
 ### 💡Real-world examples
+
 Common practical scenarios for applying the Factory Method pattern include:
 
 - A logistics application that needs to create different types of transport vehicles (e.g., trucks, ships, planes) based on the cargo being shipped. Here all vehicles adhere to a common 'vehicle' (interface) type.
@@ -38,26 +46,36 @@ Common practical scenarios for applying the Factory Method pattern include:
 
 ## ⚖️ Pros and Cons
 
-<TwoColumnProsCons 
-  pros={["Avoids tightly coupling code to specific classes","Enhances code flexibility and extensibility","Promotes adherence to the Open/Closed Principle"]}
-  cons={["Increased complexity due to the introduction of additional classes","Potential for over-engineering in simple scenarios"]
-}
+<TwoColumnProsCons
+  pros={[
+    "Avoids tightly coupling code to specific classes",
+    "Enhances code flexibility and extensibility",
+    "Promotes adherence to the Open/Closed Principle",
+  ]}
+  cons={[
+    "Increased complexity due to the introduction of additional classes",
+    "Potential for over-engineering in simple scenarios",
+  ]}
 />
-
 
 ## 🔍Applicability
 
-<Applicability items={[
+<Applicability
+  items={[
     {
-        situation: "Use the Factory Method pattern when a class cannot anticipate the type of objects it needs to create beforehand.",
-        context: "The factory method allows subclasses to determine the specific type of object to instantiate. Meaning in the future if you need a new shipping type you can just create a new subclass, instead of refactoring existing code."
+      situation:
+        "Use the Factory Method pattern when a class cannot anticipate the type of objects it needs to create beforehand.",
+      context:
+        "The factory method allows subclasses to determine the specific type of object to instantiate. Meaning in the future if you need a new shipping type you can just create a new subclass, instead of refactoring existing code.",
     },
     {
-        situation: "Use the factory method when you want to re-use resources or manage object creation more efficiently.",
-        context: "The factory method allows you to centralize the object creation logic, making it easier to manage and optimize resource usage. For example you can implement caching or pooling mechanisms within the factory method to reuse existing objects instead of creating new ones each time."
+      situation:
+        "Use the factory method when you want to re-use resources or manage object creation more efficiently.",
+      context:
+        "The factory method allows you to centralize the object creation logic, making it easier to manage and optimize resource usage. For example you can implement caching or pooling mechanisms within the factory method to reuse existing objects instead of creating new ones each time.",
     },
-]} />
-
+  ]}
+/>
 
 ## 🧭Implementation Plan
 
@@ -67,7 +85,6 @@ To implement a Factory Method manually:
 2. Add an empty factory method to a base class, e.g. `createShippingMethod()`. The return type should match the common interface defined in step 1.
 3. Create the concrete creator (sub-) classes, e.g. `BoxShipping` and `EnvelopeShipping`, that override the factory method to instantiate and return specific types of objects that implement the common interface.
 4. Client code should call the factory method to create objects, instead of directly instantiating them. This way the client code remains decoupled from the specific classes being created.
-
 
 ### 💻Code samples
 
@@ -100,7 +117,8 @@ class BoxShipping implements ShippingMethod {
 // Concrete Products - different shipping implementations
 class EnvelopeShipping implements ShippingMethod {
   calculateCost(weight: number): number {
-    return Math.max(5, weight * 1.2); kg
+    return Math.max(5, weight * 1.2);
+    kg;
   }
 
   package(item: string): string {
@@ -135,7 +153,7 @@ abstract class ShippingService {
   // Template method - uses the factory method
   processOrder(item: string, weight: number): void {
     const shipping = this.createShippingMethod();
-    
+
     console.log(`📦 ${shipping.package(item)}`);
     console.log(`💰 Cost: $${shipping.calculateCost(weight).toFixed(2)}`);
     console.log(`🚚 ${shipping.deliver()}`);
@@ -162,7 +180,11 @@ class PremiumShippingService extends ShippingService {
 }
 
 // Client code - works with any shipping service without knowing the details
-function processCustomerOrder(service: ShippingService, item: string, weight: number): void {
+function processCustomerOrder(
+  service: ShippingService,
+  item: string,
+  weight: number
+): void {
   service.processOrder(item, weight);
 }
 
@@ -173,7 +195,6 @@ const weight = 0.5; // 0.5 kg
 processCustomerOrder(new StandardShippingService(), toyOrder, weight);
 processCustomerOrder(new ExpressShippingService(), toyOrder, weight);
 processCustomerOrder(new PremiumShippingService(), toyOrder, weight);
-
 ```
 
 </TabItem>
@@ -187,11 +208,11 @@ class ShippingMethod(ABC):
     @abstractmethod
     def calculate_cost(self, weight: float) -> float:
         pass
-    
+
     @abstractmethod
     def package(self, item: str) -> str:
         pass
-    
+
     @abstractmethod
     def deliver(self) -> str:
         pass
@@ -200,30 +221,30 @@ class ShippingMethod(ABC):
 class BoxShipping(ShippingMethod):
     def calculate_cost(self, weight: float) -> float:
         return weight * 2.5  # $2.50 per kg for box shipping
-    
+
     def package(self, item: str) -> str:
         return f"{item} securely packed in a protective box with bubble wrap"
-    
+
     def deliver(self) -> str:
         return "Delivered via ground transport (3-5 business days)"
 
 class EnvelopeShipping(ShippingMethod):
     def calculate_cost(self, weight: float) -> float:
         return max(5, weight * 1.2)  # Minimum $5 or $1.20 per kg
-    
+
     def package(self, item: str) -> str:
         return f"{item} placed in a padded envelope"
-    
+
     def deliver(self) -> str:
         return "Delivered via express mail (1-2 business days)"
 
 class InsuredShipping(ShippingMethod):
     def calculate_cost(self, weight: float) -> float:
         return weight * 3.5 + 15  # Higher cost + insurance fee
-    
+
     def package(self, item: str) -> str:
         return f"{item} packed in reinforced box with tracking and insurance"
-    
+
     def deliver(self) -> str:
         return "Delivered with signature required and full insurance coverage"
 
@@ -233,11 +254,11 @@ class ShippingService(ABC):
     @abstractmethod
     def create_shipping_method(self) -> ShippingMethod:
         pass
-    
+
     # Template method - uses the factory method
     def process_order(self, item: str, weight: float) -> None:
         shipping = self.create_shipping_method()
-        
+
         print(f"📦 {shipping.package(item)}")
         print(f"💰 Cost: ${shipping.calculate_cost(weight):.2f}")
         print(f"🚚 {shipping.deliver()}")
@@ -263,7 +284,7 @@ def process_customer_order(service: ShippingService, item: str, weight: float) -
 if __name__ == "__main__":
     toy_order = "Limited Edition Action Figure"
     weight = 0.5  # 0.5 kg
-    
+
     process_customer_order(StandardShippingService(), toy_order, weight)
     process_customer_order(ExpressShippingService(), toy_order, weight)
     process_customer_order(PremiumShippingService(), toy_order, weight)
@@ -292,30 +313,34 @@ function FactoryMethodDemo() {
     type: "Standard Box",
     calculateCost: (w) => w * 2.5,
     deliveryTime: "3-5 business days",
-    icon: "📦"
+    icon: "📦",
   });
 
   const createExpressShipping = () => ({
     type: "Express Envelope",
     calculateCost: (w) => Math.max(5, w * 1.2),
     deliveryTime: "1-2 business days",
-    icon: "✉️"
+    icon: "✉️",
   });
 
   const createPremiumShipping = () => ({
     type: "Premium Insured",
     calculateCost: (w) => w * 3.5 + 15,
     deliveryTime: "Next day + signature",
-    icon: "🎁"
+    icon: "🎁",
   });
 
   // Factory Method - returns the appropriate shipping method
   const getShippingMethod = (type) => {
-    switch(type) {
-      case "standard": return createStandardShipping();
-      case "express": return createExpressShipping();
-      case "premium": return createPremiumShipping();
-      default: return createStandardShipping();
+    switch (type) {
+      case "standard":
+        return createStandardShipping();
+      case "express":
+        return createExpressShipping();
+      case "premium":
+        return createPremiumShipping();
+      default:
+        return createStandardShipping();
     }
   };
 
@@ -323,7 +348,7 @@ function FactoryMethodDemo() {
   const handleProcessOrder = () => {
     const shipping = getShippingMethod(shippingType);
     const cost = shipping.calculateCost(weight);
-    
+
     const order = {
       id: Date.now(),
       item,
@@ -331,9 +356,9 @@ function FactoryMethodDemo() {
       shipping: shipping.type,
       cost: cost.toFixed(2),
       delivery: shipping.deliveryTime,
-      icon: shipping.icon
+      icon: shipping.icon,
     };
-    
+
     setOrders([order, ...orders]);
   };
 
@@ -342,9 +367,16 @@ function FactoryMethodDemo() {
   return (
     <div style={{ fontFamily: "sans-serif" }}>
       <h3>Factory Method — Shipping Demo</h3>
-      
+
       {/* Order Form */}
-      <div style={{ marginBottom: 16, padding: 12, border: "1px solid #ccc", borderRadius: 4 }}>
+      <div
+        style={{
+          marginBottom: 16,
+          padding: 12,
+          border: "1px solid #ccc",
+          borderRadius: 4,
+        }}
+      >
         <div style={{ marginBottom: 8 }}>
           <label style={{ display: "block", marginBottom: 4 }}>
             Item:
@@ -356,7 +388,7 @@ function FactoryMethodDemo() {
             />
           </label>
         </div>
-        
+
         <div style={{ marginBottom: 8 }}>
           <label style={{ display: "block", marginBottom: 4 }}>
             Weight (kg):
@@ -370,7 +402,7 @@ function FactoryMethodDemo() {
             />
           </label>
         </div>
-        
+
         <div style={{ marginBottom: 12 }}>
           <label style={{ display: "block", marginBottom: 4 }}>
             Shipping Method:
@@ -385,13 +417,11 @@ function FactoryMethodDemo() {
             </select>
           </label>
         </div>
-        
+
         <button onClick={handleProcessOrder} style={{ marginRight: 8 }}>
           Process Order
         </button>
-        <button onClick={handleClearOrders}>
-          Clear Orders
-        </button>
+        <button onClick={handleClearOrders}>Clear Orders</button>
       </div>
 
       {/* Orders Display */}
@@ -409,15 +439,17 @@ function FactoryMethodDemo() {
                   padding: 12,
                   border: "1px solid #ddd",
                   borderRadius: 4,
-                  backgroundColor: "#f9f9f9"
+                  backgroundColor: "#f9f9f9",
                 }}
               >
                 <div style={{ fontSize: "1.2em", marginBottom: 4 }}>
                   {order.icon} <strong>{order.item}</strong> ({order.weight} kg)
                 </div>
                 <div style={{ fontSize: "0.9em", color: "#555" }}>
-                  Method: {order.shipping}<br/>
-                  Cost: ${order.cost}<br/>
+                  Method: {order.shipping}
+                  <br />
+                  Cost: ${order.cost}
+                  <br />
                   Delivery: {order.delivery}
                 </div>
               </li>
@@ -425,11 +457,20 @@ function FactoryMethodDemo() {
           </ul>
         )}
       </div>
-      
-      <div style={{ marginTop: 16, padding: 12, backgroundColor: "#e3f2fd", borderRadius: 4 }}>
-        <strong>💡 Factory Method in Action:</strong> Each shipping type is created by a 
-        different factory function. The <code>getShippingMethod()</code> decides which factory 
-        to use, keeping the order processing code decoupled from specific shipping implementations.
+
+      <div
+        style={{
+          marginTop: 16,
+          padding: 12,
+          backgroundColor: "#e3f2fd",
+          borderRadius: 4,
+        }}
+      >
+        <strong>💡 Factory Method in Action:</strong> Each shipping type is
+        created by a different factory function. The{" "}
+        <code>getShippingMethod()</code> decides which factory to use, keeping
+        the order processing code decoupled from specific shipping
+        implementations.
       </div>
     </div>
   );
@@ -437,6 +478,7 @@ function FactoryMethodDemo() {
 ```
 
 ## 🔗Relations to other patterns
+
 - Lots of people start with the [Factory Method](/docs/creational/factory-method) pattern prior to implementing something such as [Abstract Factory](/docs/creational/abstract-factory), [Builder](/docs/creational/builder) or [Prototype](/docs/creational/prototype) patterns. The latter patterns are more flexible, but also come with increased complexity.
 - [Prototype](/docs/creational/prototype) isn't based on inheritance, so it does not have its drawbacks. On the other hand, [Prototype](/docs/creational/prototype) requires a complicated initialization of the cloned object. [Factory Method](/docs/creational/factory-method) is based on inheritance but doesn't require an initialization step.
 - [Factory Method](/docs/creational/factory-method) is a specialization of [Template Method](/docs/behavioral/template-method). At the same time, a Factory Method may serve as a step in a large Template Method.
@@ -444,6 +486,7 @@ function FactoryMethodDemo() {
 ---
 
 ## 📚Sources
+
 Information used in this page was collected from various reliable sources:
 
 - [Refactoring Guru - Factory Method](https://refactoring.guru/design-patterns/factory-method)

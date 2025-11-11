@@ -1,5 +1,330 @@
 ---
 title: Bridge
+hide_title: true
+description: >
+  Making sure the customer can't ruin your existing implementation.
 ---
 
-This is Bridge Pattern page
+import {
+  CreationalPatternTag,
+  BehavioralPatternTag,
+  StructuralPatternTag,
+} from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from "@theme/TOCInline";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+import BridgeSolutionSvg from "@site/static/img/patterns/bridge-solution.drawio.svg";
+import BridgeProblemSvg from "@site/static/img/patterns/bridge-problem.drawio.svg";
+
+<StructuralPatternTag title="Bridge" />
+
+---
+
+The **Bridge pattern** is a structural design pattern that decouples an abstraction from its implementation, allowing both to vary independently.
+
+## 🧩The problem
+
+Let's say you have a customer that wants to export the contents of a database to a certain file type. In this example the customer has asked to export to `JSON` format. You create an interface called `IExporter`, you also make a concrete implementation called `JsonExporter` that handles the exporting of a user profile to a JSON file. Currently, the customer only wants to export settings to JSON format, so this implementation works fine. Eventually, since customers never know what they want, the customer comes back and suggest exporting settings and friends to `JSON` as well. You expand the `JsonExporter` class to handle both settings and friends exporting.
+
+The customer comes back, they request to also supported `CSV` format for exporting. You create a new class called `CsvExporter` that handles exporting to CSV format. You'll know need to expand this class to handle both settings and friends exporting as well. As you can see, this approach quickly leads to a combinatorial explosion of classes as you add more export formats and data types. Each entity that the customer wants to export requires a new class for each format, leading to a maintenance nightmare.
+
+<div style={{ textAlign: "center" }}>
+  <BridgeProblemSvg />
+</div>
+
+## 🛠️Solutions
+
+This is exactly where the **Bridge pattern** comes in. The Bridge pattern suggests that we separate the abstraction (the entities to be exported) from its implementation (the export format). By doing so, we can create a hierarchy of abstractions and implementations that can be combined in various ways without leading to a combinatorial explosion of classes.
+
+In this structure, instead of having a single `IExporter` interface, we can have an `Exporter` abstraction that defines the export operation. Then, we can have concrete implementations for each export format, such as `JsonExporter` and `CsvExporter`. Each entity to be exported, like `Settings` and `Friends`, can then use an instance of the `Exporter` abstraction to perform the export operation.
+
+<div style={{ textAlign: "center" }}>
+  <BridgeSolutionSvg />
+</div>
+
+By applying composition over inheritence, we can easily add new export formats or entities to be exported without modifying existing code. This makes the system more flexible and easier to maintain.
+
+### 🏛️Metaphors
+
+Imagine a bridge that connects two separate islands, allowing people to travel between them without being tied to a specific path or route. Both sides of the river can grow and develop independently, while the bridge provides a flexible connection between them.
+
+### 💡Real-world examples
+
+Common practical scenarios for applying the X pattern include:
+
+- Graphic rendering systems where shapes (abstractions) can be drawn using different rendering engines (implementations).
+- Database access layers where the abstraction represents database operations and the implementation represents different database systems (e.g., MySQL, PostgreSQL).
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons
+  pros={[
+    "Code becomes more independent of one another",
+    " The client code works with high-level abstractions. It isn't exposed to the platform details.",
+    "Single Responsibility Principle. You can focus on high-level logic in the abstraction and on platform details in the implementation.",
+    "Open/Closed Principle. You can introduce new abstractions and implementations independently from each other.",
+  ]}
+  cons={[
+    "Code might become more complicated by applying the pattern unnecessarily",
+  ]}
+/>
+
+## 🔍Applicability
+
+<Applicability
+  items={[
+    {
+      situation:
+        "Use the Bridge pattern when you want to divide and organize a monolithic class that has several variants of some functionality (for example, if the class can work with various database servers).",
+      context:
+        " The bigger a class becomes, the harder it is to figure out how it works, and the longer it takes to make a change. The changes made to one of the variations of functionality may require making changes across the whole class, which often results in making errors or not addressing some critical side effects. The Bridge pattern lets you split the monolithic class into several class hierarchies. After this, you can change the classes in each hierarchy independently of the classes in the others. This approach simplifies code maintenance and minimizes the risk of breaking existing code. ",
+    },
+    {
+      situation:
+        "Use the Bridge if you need to be able to switch implementations at runtime.",
+      context:
+        "Although it's optional, the Bridge pattern lets you replace the implementation object inside the abstraction. It's as easy as assigning a new value to a field. By the way, this last item is the main reason why so many people confuse the Bridge with the Strategy pattern. Remember that a pattern is more than just a certain way to structure your classes. It may also communicate intent and a problem being addressed.",
+    },
+  ]}
+/>
+
+## 🧭Implementation Plan
+
+To implement a Bridge manually:
+
+1. Identify the orthogonal dimensions in your system that can vary independently. For example, the entities to export (Settings, Friends, Profile) and the export formats (JSON, CSV, XML).
+2. Create an implementation interface that defines operations for one dimension (e.g., `ExportFormat` with an `export()` method). This will be the "bridge" that implementations will follow.
+3. Create concrete implementation classes for each variant of that dimension (e.g., `JsonExporter`, `CsvExporter`, `XmlExporter`) that implement the interface from step 2.
+4. Create an abstraction class for the other dimension that holds a reference to the implementation interface. This class delegates work to the implementation object (e.g., `DataExporter` with a reference to `ExportFormat`).
+5. Create refined abstraction subclasses for each variant of the abstraction dimension (e.g., `SettingsExporter`, `FriendsExporter`, `ProfileExporter`). Each subclass uses the implementation object to perform its specific operations.
+6. Client code can now combine any abstraction with any implementation, allowing both hierarchies to evolve independently.
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+// Implementation interface
+interface ExportFormat {
+  export(data: string): string;
+}
+
+// Concrete implementations
+class JsonExporter implements ExportFormat {
+  export(data: string): string {
+    return `{ "data": "${data}" }`;
+  }
+}
+
+class CsvExporter implements ExportFormat {
+  export(data: string): string {
+    return `data\n${data}`;
+  }
+}
+
+// Abstraction
+abstract class DataExporter {
+  constructor(protected format: ExportFormat) {}
+
+  abstract exportData(): string;
+}
+
+// Refined abstractions
+class SettingsExporter extends DataExporter {
+  exportData(): string {
+    const settingsData = "theme=dark;language=en";
+    return this.format.export(settingsData);
+  }
+}
+
+class FriendsExporter extends DataExporter {
+  exportData(): string {
+    const friendsData = "Alice,Bob,Charlie";
+    return this.format.export(friendsData);
+  }
+}
+
+// Usage
+const settingsJson = new SettingsExporter(new JsonExporter());
+console.log(settingsJson.exportData()); // { "data": "theme=dark;language=en" }
+
+const friendsCsv = new FriendsExporter(new CsvExporter());
+console.log(friendsCsv.exportData()); // data\nAlice,Bob,Charlie
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+from abc import ABC, abstractmethod
+
+# Implementation interface
+class ExportFormat(ABC):
+    @abstractmethod
+    def export(self, data: str) -> str:
+        pass
+
+# Concrete implementations
+class JsonExporter(ExportFormat):
+    def export(self, data: str) -> str:
+        return f'{{ "data": "{data}" }}'
+
+class CsvExporter(ExportFormat):
+    def export(self, data: str) -> str:
+        return f'data\n{data}'
+
+# Abstraction
+class DataExporter(ABC):
+    def __init__(self, format: ExportFormat):
+        self.format = format
+
+    @abstractmethod
+    def export_data(self) -> str:
+        pass
+
+# Refined abstractions
+class SettingsExporter(DataExporter):
+    def export_data(self) -> str:
+        settings_data = "theme=dark;language=en"
+        return self.format.export(settings_data)
+
+class FriendsExporter(DataExporter):
+    def export_data(self) -> str:
+        friends_data = "Alice,Bob,Charlie"
+        return self.format.export(friends_data)
+
+# Usage
+settings_json = SettingsExporter(JsonExporter())
+print(settings_json.export_data())  # { "data": "theme=dark;language=en" }
+
+friends_csv = FriendsExporter(CsvExporter())
+print(friends_csv.export_data())  # data\nAlice,Bob,Charlie
+```
+
+</TabItem> </Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function BridgeDemo() {
+  // Export format implementations (the "bridge" implementations)
+  const formats = {
+    JSON: (data) => `{ "data": "${data}" }`,
+    CSV: (data) => `data\n${data}`,
+    XML: (data) => `<data>${data}</data>`,
+  };
+
+  // Data types (abstractions)
+  const dataTypes = {
+    Settings: () => "theme=dark;language=en",
+    Friends: () => "Alice,Bob,Charlie",
+    Profile: () => "John Doe,john@example.com",
+  };
+
+  const [selectedFormat, setSelectedFormat] = React.useState("JSON");
+  const [selectedData, setSelectedData] = React.useState("Settings");
+  const [exports, setExports] = React.useState([]);
+
+  const handleExport = () => {
+    const data = dataTypes[selectedData]();
+    const result = formats[selectedFormat](data);
+    const timestamp = new Date().toLocaleTimeString();
+    setExports([
+      { dataType: selectedData, format: selectedFormat, result, timestamp },
+      ...exports,
+    ]);
+  };
+
+  return (
+    <div style={{ fontFamily: "sans-serif" }}>
+      <h3>Bridge Pattern demo</h3>
+      <div style={{ marginBottom: 16 }}>
+        <label style={{ marginRight: 16 }}>
+          Data Type:{" "}
+          <select
+            value={selectedData}
+            onChange={(e) => setSelectedData(e.target.value)}
+            style={{ marginLeft: 8 }}
+          >
+            {Object.keys(dataTypes).map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Format:{" "}
+          <select
+            value={selectedFormat}
+            onChange={(e) => setSelectedFormat(e.target.value)}
+          >
+            {Object.keys(formats).map((format) => (
+              <option key={format} value={format}>
+                {format}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button onClick={handleExport} style={{ marginLeft: 16 }}>
+          Export
+        </button>
+        <button
+          onClick={() => setExports([])}
+          style={{ marginLeft: 8 }}
+          disabled={exports.length === 0}
+        >
+          Clear
+        </button>
+      </div>
+      <div>
+        <strong>Export History:</strong>
+        {exports.length === 0 ? (
+          <p style={{ color: "#666" }}>
+            No exports yet. Select a data type and format, then click Export.
+          </p>
+        ) : (
+          <ul style={{ listStyle: "none", padding: 0 }}>
+            {exports.map((exp, i) => (
+              <li key={i} style={{}}>
+                <div>
+                  <strong>
+                    {exp.dataType} → {exp.format}
+                  </strong>{" "}
+                  <span>({exp.timestamp})</span>
+                </div>
+                <code>{exp.result}</code>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+## 🔗Relations to other patterns
+
+- [Bridge](/docs/structural/bridge) is usually designed up-front, letting you develop parts of an application independently of each other. On the other hand, [Adapter](/docs/structural/adapter) is commonly used with an existing app to make some otherwise-incompatible classes work together nicely.
+- [Bridge](/docs/structural/bridge), [State](/docs/behavioral/state), [Strategy](/docs/behavioral/strategy) (and to some degree [Adapter](/docs/structural/adapter)) have very similar structures. Indeed, all of these patterns are based on composition, which is delegating work to other objects. However, they all solve different problems. A pattern isn't just a recipe for structuring your code in a specific way. It can also communicate to other developers the problem the pattern solves.
+- You can use [Abstract Factory](/docs/creational/abstract-factory) along with [Bridge](/docs/structural/bridge). This pairing is useful when some abstractions defined by Bridge can only work with specific implementations. In this case, Abstract Factory can encapsulate these relations and hide the complexity from the client code.
+- You can combine [Builder](/docs/creational/builder) with [Bridge](/docs/structural/bridge): the director class plays the role of the abstraction, while different builders act as implementations.
+
+---
+
+## 📚Sources
+
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring.Guru - Bridge Pattern](https://refactoring.guru/design-patterns/bridge)
+- [Medium - Bridge pattern without bullshit](https://medium.com/@iamprovidence/bridge-pattern-without-bullsh-t-38d7d851ed4d)

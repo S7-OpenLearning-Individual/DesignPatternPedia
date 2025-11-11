@@ -19,6 +19,9 @@ const config: Config = {
     defaultLocale: "en",
     locales: ["en"],
   },
+  markdown: {
+    mermaid: true,
+  },
   presets: [
     [
       "classic",
@@ -45,6 +48,7 @@ const config: Config = {
         indexPages: true,
       },
     ],
+    "@docusaurus/theme-mermaid",
   ],
   themeConfig: {
     // Replace with your project's social card
