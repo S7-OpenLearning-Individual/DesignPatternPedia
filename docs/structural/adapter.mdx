@@ -1,5 +1,250 @@
 ---
 title: Adapter
+hide_title: true
+description: >
+  describe the pattern in one sentence.
 ---
 
-This is Adapter Pattern page
+import StructuralPatternTag from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from '@theme/TOCInline';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+
+<StructuralPatternTag title="Adapter" aliases={["Wrapper"]}/>
+
+---
+
+The **adapter pattern** is a structural design pattern that let's incompatible interfaces work together and interact.
+
+## 🧩The problem
+
+Let's say you are creating a fantastic new weather app. Instead of creating your own weather stations you'd like to implement weather data from an actual meteorological  institute. You achieve this by querying their API. However, this data is returned YAML format, instead of the expected JSON which your application is built on. Thus you cannot rely on this data directly, you'll need to transform or modify it in such a way that your application can understand it. That is where the adapter design pattern comes into play.
+
+## 🛠️Solutions
+
+A solution to this problem would be to 'adapt' the data from the meteorological institute into a format that your application can understand. This is done by creating an `adapter` class that acts as a bridge between the two incompatible interfaces. The adapter class would take the YAML data from the API, convert it into JSON format, and then provide it to your application in a way that it can work with seamlessly. This allows your application to use the weather data without needing to modify its existing codebase to handle YAML format directly.
+
+In some cases adapters can be used to work both ways, meaning you could also report data back to the meteorological institute in their expected format, by adapting your application's data into YAML format.
+
+### 🏛️Metaphors
+
+Think of an adapter as a power plug adapter you might use when traveling to a different country. Different countries have different types of electrical outlets, and your device's plug may not fit into the outlet. The power plug adapter acts as a bridge, allowing your device to connect to the foreign outlet by adapting the plug shape to fit. Similarly, in software, an adapter allows two incompatible interfaces to work together by converting one interface into another that the client expects.
+
+### 💡Real-world examples
+
+Common practical scenarios for applying the Adapter pattern include:
+
+- Integrating third-party libraries or APIs that have different interfaces than your application.
+- Adapting legacy code to work with new systems without modifying the existing codebase.
+- Converting data formats, such as XML to JSON, to ensure compatibility between different systems.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons 
+  pros={["Single Responsibility Principle. You can separate the interface or data conversion code from the primary business logic of the program.", " Open/Closed Principle. You can introduce new types of adapters into the program without breaking the existing client code, as long as they work with the adapters through the client interface."]}
+  cons={[" The overall complexity of the code increases because you need to introduce a set of new interfaces and classes. Sometimes it’s simpler just to change the service class so that it matches the rest of your code."]}
+/>
+
+
+## 🔍Applicability
+
+<Applicability items={[
+  {
+    situation: " Use the Adapter class when you want to connect incompatible (legacy) code with a new class that has a different interface.",
+    context: "The adapter pattern allows you to create a bridge or layer between the incompatible (legacy) code and the new class, enabling them to work together without modifying their existing code."
+  },
+]} />
+
+
+## 🧭Implementation Plan
+
+To implement an Adapter manually:
+
+1. Find incompatible pieces of code, this could be a service class and a 3rd party or legacy code.
+2. Define an adapter interface that the client code will use to interact with the service class.
+3. Create an adapter class that implements the adapter interface and holds a reference to an instance of the service class.
+4. Implement the methods of the adapter class to translate calls from the client code into calls to the service class, adapting data formats as necessary.
+5. Update the client code to use the adapter interface instead of directly interacting with the service class.
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+// Legacy weather service that returns data in YAML format
+class YAMLWeatherService {
+  getWeatherData(): string {
+    return `temperature: 26
+            humidity: 65
+            condition: sunny`;
+    }
+}
+
+// Modern interface expected by the application
+interface WeatherService {
+  getWeather(): { temperature: number; humidity: number; condition: string };
+}
+
+// Adapter that converts YAML to JSON format
+class WeatherAdapter implements WeatherService {
+  private yamlService: YAMLWeatherService;
+
+  constructor(yamlService: YAMLWeatherService) {
+    this.yamlService = yamlService;
+  }
+
+  getWeather(): { temperature: number; humidity: number; condition: string } {
+    const yamlData = this.yamlService.getWeatherData();
+    
+    // Convert YAML to JSON
+    const lines = yamlData.split('\n');
+    const data: any = {};
+    lines.forEach(line => {
+      const [key, value] = line.split(': ');
+      data[key] = isNaN(Number(value)) ? value : Number(value);
+    });
+    
+    return data;
+  }
+}
+
+// Usage
+const legacyService = new YAMLWeatherService();
+const adapter = new WeatherAdapter(legacyService);
+const weather = adapter.getWeather();
+console.log(weather); // { temperature: 22, humidity: 65, condition: 'sunny' }
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+# Legacy weather service that returns data in YAML format
+class YAMLWeatherService:
+    def get_weather_data(self):
+        return """temperature: 22
+                humidity: 65
+                condition: sunny"""
+
+# Modern interface expected by the application
+class WeatherService:
+    def get_weather(self):
+        raise NotImplementedError
+
+# Adapter that converts YAML to JSON format
+class WeatherAdapter(WeatherService):
+    def __init__(self, yaml_service):
+        self.yaml_service = yaml_service
+
+    def get_weather(self):
+        yaml_data = self.yaml_service.get_weather_data()
+        
+        # Convert YAML to dictionary
+        lines = yaml_data.split('\n')
+        data = {}
+        for line in lines:
+            key, value = line.split(': ')
+            data[key] = int(value) if value.isdigit() else value
+        
+        return data
+
+# Usage
+legacy_service = YAMLWeatherService()
+adapter = WeatherAdapter(legacy_service)
+weather = adapter.get_weather()
+print(weather)  # {'temperature': 22, 'humidity': 65, 'condition': 'sunny'}
+```
+
+</TabItem> </Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function AdapterDemo() {
+  // Legacy API that returns data in one format
+  const legacyAPI = {
+    fetchData: () => ({
+      temp_celsius: "22",
+      humid_percent: "65",
+      sky_condition: "sunny"
+    })
+  };
+
+  // Adapter that converts legacy format to modern format
+  const modernAdapter = {
+    getWeather: () => {
+      const legacy = legacyAPI.fetchData();
+      return {
+        temperature: parseInt(legacy.temp_celsius),
+        humidity: parseInt(legacy.humid_percent),
+        condition: legacy.sky_condition
+      };
+    }
+  };
+
+  const [usingAdapter, setUsingAdapter] = React.useState(false);
+  const [data, setData] = React.useState(null);
+
+  const handleFetchLegacy = () => {
+    setUsingAdapter(false);
+    setData(legacyAPI.fetchData());
+  };
+
+  const handleFetchAdapted = () => {
+    setUsingAdapter(true);
+    setData(modernAdapter.getWeather());
+  };
+
+  return (
+    <div style={{ fontFamily: "sans-serif" }}>
+      <h3>Adapter Pattern demo</h3>
+      <p>Fetch weather data using different interfaces</p>
+      
+      <button onClick={handleFetchLegacy} style={{ marginRight: 8 }}>
+        Fetch Legacy Format
+      </button>
+      <button onClick={handleFetchAdapted}>
+        Fetch via Adapter
+      </button>
+
+      {data && (
+        <div style={{ marginTop: 16, padding: 12, border: "1px solid #ccc", borderRadius: 4 }}>
+          <h4>{usingAdapter ? "✅ Modern Format (via Adapter)" : "⚠️ Legacy Format"}</h4>
+          <pre style={{ padding: 8, borderRadius: 4 }}>
+            {JSON.stringify(data, null, 2)}
+          </pre>
+        </div>
+      )}
+
+      <div style={{ marginTop: 16, fontSize: "0.9em", color: "#666" }}>
+        The adapter converts the legacy API's format (<code>temp_celsius</code>, <code>humid_percent</code>) 
+        into a modern format (<code>temperature</code>, <code>humidity</code>) that your app expects!
+      </div>
+    </div>
+  );
+}
+```
+
+## 🔗Relations to other patterns
+- [Bridge](/docs/structural/bridge.mdx) is usually designed up-front, letting you develop parts of an application independently of each other. On the other hand, [Adapter](/docs/structural/adapter.mdx) is commonly used with an existing app to make some otherwise-incompatible classes work together nicely.
+- [Adapter](/docs/structural/adapter.mdx) provides a completely different interface for accessing an existing object. On the other hand, with the [Decorator](/docs/structural/decorator.mdx) pattern the interface either stays the same or gets extended. In addition, [Decorator](/docs/structural/decorator.mdx) supports recursive composition, which isn't possible when you use [Adapter](/docs/structural/adapter.mdx).
+- With [Adapter](/docs/structural/adapter.mdx) you access an existing object via different interface. With [Proxy](/docs/structural/proxy.mdx), the interface stays the same. With [Decorator](/docs/structural/decorator.mdx) you access the object via an enhanced interface.
+- [Facade](/docs/structural/facade.mdx) defines a new interface for existing objects, whereas [Adapter](/docs/structural/adapter.mdx) tries to make the existing interface usable. [Adapter](/docs/structural/adapter.mdx) usually wraps just one object, while [Facade](/docs/structural/facade.mdx) works with an entire subsystem of objects.
+- [Bridge](/docs/structural/bridge.mdx), [State](/docs/behavioral/state.mdx), [Strategy](/docs/behavioral/strategy.mdx) (and to some degree [Adapter](/docs/structural/adapter.mdx)) have very similar structures. Indeed, all of these patterns are based on composition, which is delegating work to other objects. However, they all solve different problems. A pattern isn't just a recipe for structuring your code in a specific way. It can also communicate to other developers the problem the pattern solves.
+
+---
+
+## 📚Sources
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring Guru - Adapter](https://refactoring.guru/design-patterns/adapter)
+- [Wikipedia - Adapter Pattern](https://en.wikipedia.org/wiki/Adapter_pattern)
