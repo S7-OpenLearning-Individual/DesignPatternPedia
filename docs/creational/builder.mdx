@@ -19,9 +19,9 @@ The **Builder** pattern helps to break large, complex constructors and construct
 
 ## 🧩The problem
 
-Imagine an object or class that is getting increasingly more complex to create. This can include initializing many properties, fields, nested objects and core logic. Such initialization logic is often buried deep within a gigantic constructor with many parameters. This can lead to code that is hard to read, maintain and understand. Additionally, if the object can be created in different ways (e.g., with different configurations), the constructor can become overloaded with multiple parameters, leading to confusion and errors. 
+Imagine an object or class that is getting increasingly more complex to create. This can include initializing many properties, fields, nested objects and core logic. Such initialization logic is often buried deep within a gigantic constructor with many parameters. This can lead to code that is hard to read, maintain and understand. Additionally, if the object can be created in different ways (e.g., with different configurations), the constructor can become overloaded with multiple parameters, leading to confusion and errors.
 
-For example, consider a `Computer` class that can be built with various components like CPU, RAM, storage, graphics card, and peripherals. A constructor for such a class could easily become unwieldy and difficult to manage, as it has a lot of parameters you need to manage for each computer. Although they all might need storage, RAM or a graphics card, the specific types and configurations can vary widely per use-case. 
+For example, consider a `Computer` class that can be built with various components like CPU, RAM, storage, graphics card, and peripherals. A constructor for such a class could easily become unwieldy and difficult to manage, as it has a lot of parameters you need to manage for each computer. Although they all might need storage, RAM or a graphics card, the specific types and configurations can vary widely per use-case.
 
 ## 🛠️Solutions
 
@@ -36,6 +36,7 @@ This design pattern is often used with something called a **Director**. The `Dir
 Think of building a house. You have an architect (the Director) who designs the house and a construction team (the Builder) that follows the architect's plans to build it. The architect specifies what kind of house to build, while the construction team handles the actual building process step by step, such as laying the foundation, erecting walls, installing windows, and so on. The end result is a complete house built according to the architect's specifications, but the construction team takes care of the details.
 
 ### 💡Real-world examples
+
 Common practical scenarios for applying the Builder pattern include:
 
 - Creating a configuration object with numerous optional parameters.
@@ -43,20 +44,30 @@ Common practical scenarios for applying the Builder pattern include:
 
 ## ⚖️Pros and Cons
 
-<TwoColumnProsCons 
-  pros={["Allows you to construct complex objects step by step", "Improves code readability and maintainability", "Enables different representations of the same construction process","Works with the Single Responsibility Principle by separating construction logic from business logic"]}
-  cons={["Increases complexity of the code due to the increased number of classes required to construct",]}
+<TwoColumnProsCons
+  pros={[
+    "Allows you to construct complex objects step by step",
+    "Improves code readability and maintainability",
+    "Enables different representations of the same construction process",
+    "Works with the Single Responsibility Principle by separating construction logic from business logic",
+  ]}
+  cons={[
+    "Increases complexity of the code due to the increased number of classes required to construct",
+  ]}
 />
-
 
 ## 🔍Applicability
 
-<Applicability items={[
-  {
-    situation: "Use when you want to be able to create different representations of a complex object, using the same construction process",
-    context: "For example, building different type of cars (SUV, Sedan, Truck) using the same steps but different configurations."
-  },
-]} />
+<Applicability
+  items={[
+    {
+      situation:
+        "Use when you want to be able to create different representations of a complex object, using the same construction process",
+      context:
+        "For example, building different type of cars (SUV, Sedan, Truck) using the same steps but different configurations.",
+    },
+  ]}
+/>
 
 ## 🧭Implementation Plan
 
@@ -77,77 +88,88 @@ To implement a Builder manually:
 ```ts
 // Product class - the complex object to be built
 class Computer {
-    constructor(
-        public cpu: string,
-        public ram: string,
-        public storage: string,
-        public graphicsCard?: string,
-        public peripherals?: string[]
-    ) {}
+  constructor(
+    public cpu: string,
+    public ram: string,
+    public storage: string,
+    public graphicsCard?: string,
+    public peripherals?: string[]
+  ) {}
 
-    displaySpecs() {
-        console.log(`CPU: ${this.cpu}, RAM: ${this.ram}, Storage: ${this.storage}, Graphics Card: ${this.graphicsCard || 'None'}, Peripherals: ${this.peripherals?.join(', ') || 'None'}`);
-    }
-
+  displaySpecs() {
+    console.log(
+      `CPU: ${this.cpu}, RAM: ${this.ram}, Storage: ${
+        this.storage
+      }, Graphics Card: ${this.graphicsCard || "None"}, Peripherals: ${
+        this.peripherals?.join(", ") || "None"
+      }`
+    );
+  }
 }
 
 // Builder interface - defines the steps to build the product
 interface ComputerBuilder {
-    setCPU(cpu: string): ComputerBuilder;
-    setRAM(ram: string): ComputerBuilder;
-    setStorage(storage: string): ComputerBuilder;
-    setGraphicsCard(graphicsCard: string): ComputerBuilder;
-    addPeripheral(peripheral: string): ComputerBuilder;
-    build(): Computer;
+  setCPU(cpu: string): ComputerBuilder;
+  setRAM(ram: string): ComputerBuilder;
+  setStorage(storage: string): ComputerBuilder;
+  setGraphicsCard(graphicsCard: string): ComputerBuilder;
+  addPeripheral(peripheral: string): ComputerBuilder;
+  build(): Computer;
 }
 
 // Concrete Builder - implements the builder interface
 class GamingComputerBuilder implements ComputerBuilder {
-    private cpu!: string;
-    private ram!: string;
-    private storage!: string;
-    private graphicsCard!: string;
-    private peripherals: string[] = [];
+  private cpu!: string;
+  private ram!: string;
+  private storage!: string;
+  private graphicsCard!: string;
+  private peripherals: string[] = [];
 
-    setCPU(cpu: string): ComputerBuilder {
-        this.cpu = cpu;
-        return this;
-    }
+  setCPU(cpu: string): ComputerBuilder {
+    this.cpu = cpu;
+    return this;
+  }
 
-    setRAM(ram: string): ComputerBuilder {
-        this.ram = ram;
-        return this;
-    }
+  setRAM(ram: string): ComputerBuilder {
+    this.ram = ram;
+    return this;
+  }
 
-    setStorage(storage: string): ComputerBuilder {
-        this.storage = storage;
-        return this;
-    }
+  setStorage(storage: string): ComputerBuilder {
+    this.storage = storage;
+    return this;
+  }
 
-    setGraphicsCard(graphicsCard: string): ComputerBuilder {
-        this.graphicsCard = graphicsCard;
-        return this;
-    }
+  setGraphicsCard(graphicsCard: string): ComputerBuilder {
+    this.graphicsCard = graphicsCard;
+    return this;
+  }
 
-    addPeripheral(peripheral: string): ComputerBuilder {
-        this.peripherals.push(peripheral);
-        return this;
-    }
+  addPeripheral(peripheral: string): ComputerBuilder {
+    this.peripherals.push(peripheral);
+    return this;
+  }
 
-    build(): Computer {
-        return new Computer(this.cpu, this.ram, this.storage, this.graphicsCard, this.peripherals);
-    }
+  build(): Computer {
+    return new Computer(
+      this.cpu,
+      this.ram,
+      this.storage,
+      this.graphicsCard,
+      this.peripherals
+    );
+  }
 }
 
 // Client code - using the builder to create a complex object
 const gamingComputer = new GamingComputerBuilder()
-    .setCPU("Intel i9")
-    .setRAM("32GB")
-    .setStorage("1TB SSD")
-    .setGraphicsCard("NVIDIA RTX 3080")
-    .addPeripheral("Mechanical Keyboard")
-    .addPeripheral("Gaming Mouse")
-    .build();
+  .setCPU("Intel i9")
+  .setRAM("32GB")
+  .setStorage("1TB SSD")
+  .setGraphicsCard("NVIDIA RTX 3080")
+  .addPeripheral("Mechanical Keyboard")
+  .addPeripheral("Gaming Mouse")
+  .build();
 
 gamingComputer.displaySpecs();
 // Output: CPU: Intel i9, RAM: 32GB, Storage: 1TB SSD, Graphics Card: NVIDIA RTX 3080, Peripherals: Mechanical Keyboard, Gaming Mouse
@@ -254,165 +276,232 @@ This sample is to get a 'feel' for the pattern. The code itself may not reflect 
 
 ```jsx live
 function BuilderDemo() {
-    // Simple Product class
-    class Computer {
-        constructor(cpu, ram, storage, graphicsCard, peripherals = []) {
-            this.cpu = cpu;
-            this.ram = ram;
-            this.storage = storage;
-            this.graphicsCard = graphicsCard;
-            this.peripherals = peripherals;
-        }
-
-        specs() {
-            return `CPU: ${this.cpu}, RAM: ${this.ram}, Storage: ${this.storage}, Graphics: ${this.graphicsCard || 'None'}, Peripherals: ${this.peripherals.length ? this.peripherals.join(', ') : 'None'}`;
-        }
+  // Simple Product class
+  class Computer {
+    constructor(cpu, ram, storage, graphicsCard, peripherals = []) {
+      this.cpu = cpu;
+      this.ram = ram;
+      this.storage = storage;
+      this.graphicsCard = graphicsCard;
+      this.peripherals = peripherals;
     }
 
-    // Base fluent builder
-    class ComputerBuilder {
-        constructor() {
-            this.reset();
-        }
+    specs() {
+      return `CPU: ${this.cpu}, RAM: ${this.ram}, Storage: ${
+        this.storage
+      }, Graphics: ${this.graphicsCard || "None"}, Peripherals: ${
+        this.peripherals.length ? this.peripherals.join(", ") : "None"
+      }`;
+    }
+  }
 
-        reset() {
-            this._cpu = 'Intel i5';
-            this._ram = '8GB';
-            this._storage = '256GB SSD';
-            this._graphicsCard = '';
-            this._peripherals = [];
-            return this;
-        }
-
-        setCPU(cpu) { this._cpu = cpu; return this; }
-        setRAM(ram) { this._ram = ram; return this; }
-        setStorage(storage) { this._storage = storage; return this; }
-        setGraphicsCard(graphics) { this._graphicsCard = graphics; return this; }
-        addPeripheral(p) { this._peripherals.push(p); return this; }
-
-        build() {
-            const product = new Computer(this._cpu, this._ram, this._storage, this._graphicsCard, [...this._peripherals]);
-            this.reset(); // optional: make builder reusable
-            return product;
-        }
+  // Base fluent builder
+  class ComputerBuilder {
+    constructor() {
+      this.reset();
     }
 
-        // React UI to interact with the builder (manual-only)
-        const [cpu, setCpu] = React.useState('Intel i5');
-        const [ram, setRam] = React.useState('8GB');
-        const [storage, setStorage] = React.useState('256GB SSD');
-        const [graphics, setGraphics] = React.useState('');
-        const [peripheralInput, setPeripheralInput] = React.useState('');
-        const [peripherals, setPeripherals] = React.useState([]);
-        const [built, setBuilt] = React.useState(null);
-        // log entries are objects {type, message} so we can render colored badges reliably
-        const [log, setLog] = React.useState([]);
+    reset() {
+      this._cpu = "Intel i5";
+      this._ram = "8GB";
+      this._storage = "256GB SSD";
+      this._graphicsCard = "";
+      this._peripherals = [];
+      return this;
+    }
 
-        const typeColor = {
-            manual: '#1e88e5',
-            info: '#43a047',
-            warn: '#f57c00',
-            error: '#e53935'
-        };
+    setCPU(cpu) {
+      this._cpu = cpu;
+      return this;
+    }
+    setRAM(ram) {
+      this._ram = ram;
+      return this;
+    }
+    setStorage(storage) {
+      this._storage = storage;
+      return this;
+    }
+    setGraphicsCard(graphics) {
+      this._graphicsCard = graphics;
+      return this;
+    }
+    addPeripheral(p) {
+      this._peripherals.push(p);
+      return this;
+    }
 
-        function addLog(type, message) {
-            setLog(l => [...l, { type, message }]);
-        }
+    build() {
+      const product = new Computer(
+        this._cpu,
+        this._ram,
+        this._storage,
+        this._graphicsCard,
+        [...this._peripherals]
+      );
+      this.reset(); // optional: make builder reusable
+      return product;
+    }
+  }
 
-        function addPeripheral() {
-            if (!peripheralInput) return;
-            setPeripherals(p => [...p, peripheralInput]);
-            addLog('info', `Peripheral added: ${peripheralInput}`);
-            setPeripheralInput('');
-        }
+  // React UI to interact with the builder (manual-only)
+  const [cpu, setCpu] = React.useState("Intel i5");
+  const [ram, setRam] = React.useState("8GB");
+  const [storage, setStorage] = React.useState("256GB SSD");
+  const [graphics, setGraphics] = React.useState("");
+  const [peripheralInput, setPeripheralInput] = React.useState("");
+  const [peripherals, setPeripherals] = React.useState([]);
+  const [built, setBuilt] = React.useState(null);
+  // log entries are objects {type, message} so we can render colored badges reliably
+  const [log, setLog] = React.useState([]);
 
-        function buildManual() {
-            const b = new ComputerBuilder();
-            b.setCPU(cpu).setRAM(ram).setStorage(storage).setGraphicsCard(graphics || undefined);
-            peripherals.forEach(p => b.addPeripheral(p));
-            const c = b.build();
-            setBuilt(c);
-            addLog('manual', `Manual build → ${c.specs()}`);
-        }
+  const typeColor = {
+    manual: "#1e88e5",
+    info: "#43a047",
+    warn: "#f57c00",
+    error: "#e53935",
+  };
 
-        // Clear log and reset the manual form and last-built product
-        function clearAndReset() {
-            setLog([]);
-            setBuilt(null);
-            setPeripherals([]);
-            // reset fields to defaults
-            setCpu('Intel i5');
-            setRam('8GB');
-            setStorage('256GB SSD');
-            setGraphics('');
-        }
+  function addLog(type, message) {
+    setLog((l) => [...l, { type, message }]);
+  }
 
-    return (
-        <div style={{ fontFamily: 'sans-serif' }}>
-            <h3>Builder Pattern — Playground</h3>
+  function addPeripheral() {
+    if (!peripheralInput) return;
+    setPeripherals((p) => [...p, peripheralInput]);
+    addLog("info", `Peripheral added: ${peripheralInput}`);
+    setPeripheralInput("");
+  }
 
-            <div style={{ display: 'flex', gap: 12 }}>
-                <div style={{ minWidth: 320 }}>
-                    <h4>Manual Builder</h4>
-                    <div>
-                        <label>CPU: </label>
-                        <input value={cpu} onChange={e => setCpu(e.target.value)} />
-                    </div>
-                    <div>
-                        <label>RAM: </label>
-                        <input value={ram} onChange={e => setRam(e.target.value)} />
-                    </div>
-                    <div>
-                        <label>Storage: </label>
-                        <input value={storage} onChange={e => setStorage(e.target.value)} />
-                    </div>
-                    <div>
-                        <label>Graphics: </label>
-                        <input value={graphics} onChange={e => setGraphics(e.target.value)} placeholder="optional" />
-                    </div>
-                    <div style={{ marginTop: 6 }}>
-                        <input placeholder="Add peripheral" value={peripheralInput} onChange={e => setPeripheralInput(e.target.value)} />
-                        <button onClick={addPeripheral} style={{ marginLeft: 8 }}>Add</button>
-                    </div>
-                    <div style={{ marginTop: 8 }}>
-                        <strong>Peripherals:</strong> {peripherals.length ? peripherals.join(', ') : 'None'}
-                    </div>
-                    <div style={{ marginTop: 8 }}>
-                        <button onClick={buildManual}>Finalize Manual Build</button>
-                        <button onClick={clearAndReset} style={{ marginLeft: 8 }}>Clear & Reset</button>  
-                    </div>
-                </div>
+  function buildManual() {
+    const b = new ComputerBuilder();
+    b.setCPU(cpu)
+      .setRAM(ram)
+      .setStorage(storage)
+      .setGraphicsCard(graphics || undefined);
+    peripherals.forEach((p) => b.addPeripheral(p));
+    const c = b.build();
+    setBuilt(c);
+    addLog("manual", `Manual build → ${c.specs()}`);
+  }
 
-                <div style={{ minWidth: 320 }}>
-                    <h4>Last Built</h4>
-                    <div style={{ padding: 8, border: '1px solid #ddd', minHeight: 48 }}>
-                        {built ? built.specs() : <em>No build yet</em>}
-                    </div>
-                    <div style={{ marginTop: 12 }}>
-                      <p>This playground demonstrates manual construction using a Builder. There are no presets or Director in this simplified demo — try changing fields and finalizing a manual build.</p>
-                    </div>
-                </div>
-            </div>
+  // Clear log and reset the manual form and last-built product
+  function clearAndReset() {
+    setLog([]);
+    setBuilt(null);
+    setPeripherals([]);
+    // reset fields to defaults
+    setCpu("Intel i5");
+    setRam("8GB");
+    setStorage("256GB SSD");
+    setGraphics("");
+  }
 
-            <div style={{ marginTop: 16 }}>
-                <h4>Action Log</h4>
-                <div>
-                  <ol style={{ paddingLeft: 18, margin: 0 }}>
-                      {log.length ? log.map((entry, i) => (
-                          <li key={i} style={{ marginBottom: 6 }}>
-                              <span style={{ display: 'inline-block',  padding: '2px 8px', borderRadius: 12, background: typeColor[entry.type] || '#666', fontSize: 12, textTransform: 'capitalize', marginRight: 8 }}>{entry.type}</span>
-                              <span>{entry.message}</span>
-                          </li>
-                      )) : <li><em>No actions yet</em></li>}
-                  </ol>
-                </div>
-            </div>
+  return (
+    <div style={{ fontFamily: "sans-serif" }}>
+      <h3>Builder Pattern — Playground</h3>
+
+      <div style={{ display: "flex", gap: 12 }}>
+        <div style={{ minWidth: 320 }}>
+          <h4>Manual Builder</h4>
+          <div>
+            <label>CPU: </label>
+            <input value={cpu} onChange={(e) => setCpu(e.target.value)} />
+          </div>
+          <div>
+            <label>RAM: </label>
+            <input value={ram} onChange={(e) => setRam(e.target.value)} />
+          </div>
+          <div>
+            <label>Storage: </label>
+            <input
+              value={storage}
+              onChange={(e) => setStorage(e.target.value)}
+            />
+          </div>
+          <div>
+            <label>Graphics: </label>
+            <input
+              value={graphics}
+              onChange={(e) => setGraphics(e.target.value)}
+              placeholder="optional"
+            />
+          </div>
+          <div style={{ marginTop: 6 }}>
+            <input
+              placeholder="Add peripheral"
+              value={peripheralInput}
+              onChange={(e) => setPeripheralInput(e.target.value)}
+            />
+            <button onClick={addPeripheral} style={{ marginLeft: 8 }}>
+              Add
+            </button>
+          </div>
+          <div style={{ marginTop: 8 }}>
+            <strong>Peripherals:</strong>{" "}
+            {peripherals.length ? peripherals.join(", ") : "None"}
+          </div>
+          <div style={{ marginTop: 8 }}>
+            <button onClick={buildManual}>Finalize Manual Build</button>
+            <button onClick={clearAndReset} style={{ marginLeft: 8 }}>
+              Clear & Reset
+            </button>
+          </div>
         </div>
-    );
+
+        <div style={{ minWidth: 320 }}>
+          <h4>Last Built</h4>
+          <div style={{ padding: 8, border: "1px solid #ddd", minHeight: 48 }}>
+            {built ? built.specs() : <em>No build yet</em>}
+          </div>
+          <div style={{ marginTop: 12 }}>
+            <p>
+              This playground demonstrates manual construction using a Builder.
+              There are no presets or Director in this simplified demo — try
+              changing fields and finalizing a manual build.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ marginTop: 16 }}>
+        <h4>Action Log</h4>
+        <div>
+          <ol style={{ paddingLeft: 18, margin: 0 }}>
+            {log.length ? (
+              log.map((entry, i) => (
+                <li key={i} style={{ marginBottom: 6 }}>
+                  <span
+                    style={{
+                      display: "inline-block",
+                      padding: "2px 8px",
+                      borderRadius: 12,
+                      background: typeColor[entry.type] || "#666",
+                      fontSize: 12,
+                      textTransform: "capitalize",
+                      marginRight: 8,
+                    }}
+                  >
+                    {entry.type}
+                  </span>
+                  <span>{entry.message}</span>
+                </li>
+              ))
+            ) : (
+              <li>
+                <em>No actions yet</em>
+              </li>
+            )}
+          </ol>
+        </div>
+      </div>
+    </div>
+  );
 }
 ```
 
 ## 🔗Relations to other patterns
+
 - The Builder pattern is often used in conjunction with the [Factory Method](/docs/creational/factory-method) pattern, where the factory method creates a builder instance.
 - You can combine [Builder](/docs/creational/builder) with [Bridge](/docs/structural/bridge): the director class plays the role of the abstraction, while different builders act as implementations.
 - [Abstract Factories](/docs/creational/abstract-factory), [Builders](/docs/creational/builder), and [Prototype](/docs/creational/prototype) can be implemented as [Singleton](/docs/creational/singleton).
@@ -420,6 +509,7 @@ function BuilderDemo() {
 ---
 
 ## 📚Sources
+
 Information used in this page was collected from various reliable sources:
 
 - [Refactoring Guru - Builder](https://refactoring.guru/design-patterns/builder)

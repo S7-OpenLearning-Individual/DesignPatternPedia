@@ -9,7 +9,7 @@ import { CreationalPatternTag } from "@site/src/components/pattern-page-features
 import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
 import Applicability from "@site/src/components/pattern-page-features/applicability";
 
-<CreationalPatternTag title="Singleton" aliases={["Single Instance Pattern"]}/>
+<CreationalPatternTag title="Singleton" aliases={["Single Instance Pattern"]} />
 
 ---
 
@@ -43,6 +43,7 @@ one controlling authority, the government.
 In this example, the government is considered a Singleton.
 
 ### 💡Real-world examples
+
 Common practical scenarios for applying the Singleton pattern include:
 
 - Application configuration managers, ensuring consistent settings across the app.
@@ -52,35 +53,46 @@ Common practical scenarios for applying the Singleton pattern include:
 
 ## ⚖️ Pros and Cons
 
-<TwoColumnProsCons 
-  pros={["Guarantees that only one instance of a class exists", "Provides controlled global access point", "Helps coordinate shared resources"]}
-  cons={["Violates the Single Responsibility Principle", "Introduces hidden dependencies and tight coupling", "Complicates unit testing and parallel execution"]}
+<TwoColumnProsCons
+  pros={[
+    "Guarantees that only one instance of a class exists",
+    "Provides controlled global access point",
+    "Helps coordinate shared resources",
+  ]}
+  cons={[
+    "Violates the Single Responsibility Principle",
+    "Introduces hidden dependencies and tight coupling",
+    "Complicates unit testing and parallel execution",
+  ]}
 />
-
 
 ## 🔍Applicability
 
-<Applicability items={[
-  {
-    situation: "Use the Singleton pattern when a class should have just a single instance",
-    context: "For example, a single database object shared by different parts of the program."
-  },
-  {
-    situation: "Use the Singleton pattern when you need stricter control over global variables",
-    context: "Unlike global variables, the Singleton pattern guarantees that there's just one instance of a class. Nothing, except for the Singleton class itself, can replace the cached instance."
-  }
-]} />
-
+<Applicability
+  items={[
+    {
+      situation:
+        "Use the Singleton pattern when a class should have just a single instance",
+      context:
+        "For example, a single database object shared by different parts of the program.",
+    },
+    {
+      situation:
+        "Use the Singleton pattern when you need stricter control over global variables",
+      context:
+        "Unlike global variables, the Singleton pattern guarantees that there's just one instance of a class. Nothing, except for the Singleton class itself, can replace the cached instance.",
+    },
+  ]}
+/>
 
 ## 🧭Implementation Plan
 
 To implement a Singleton manually:
 
-1. Make the class constructor private so no external code can instantiate it directly.  
-2. Create a static field to hold the single instance.  
-3. Provide a static method that returns the existing instance or creates it lazily if it doesn't exist yet.  
+1. Make the class constructor private so no external code can instantiate it directly.
+2. Create a static field to hold the single instance.
+3. Provide a static method that returns the existing instance or creates it lazily if it doesn't exist yet.
 4. Handle thread-safety when the Singleton may be accessed concurrently.
-
 
 ### 💻Code samples
 
@@ -92,20 +104,20 @@ import TabItem from "@theme/TabItem";
 
 ```ts
 class Singleton {
-    // Static property to hold the single instance.
-    private static instance: Singleton;
+  // Static property to hold the single instance.
+  private static instance: Singleton;
 
-    // Private constructor to prevent direct instantiation.
-    private constructor() {}
+  // Private constructor to prevent direct instantiation.
+  private constructor() {}
 
-    // Static method to either retrieve the single instance or instantiate it if it doesn't exist.
-    public static getInstance(): Singleton {
-        if (!Singleton.instance) {
-            Singleton.instance = new Singleton();
-        }
-
-        return Singleton.instance;
+  // Static method to either retrieve the single instance or instantiate it if it doesn't exist.
+  public static getInstance(): Singleton {
+    if (!Singleton.instance) {
+      Singleton.instance = new Singleton();
     }
+
+    return Singleton.instance;
+  }
 }
 ```
 
@@ -123,7 +135,7 @@ class Singleton:
         if cls._instance is None:
             # Create and store the single instance.
             cls._instance = super().__new__(cls)
-        
+
         # Return the single instance.
         return cls._instance
 ```
@@ -147,25 +159,29 @@ function SingletonDemo() {
   const singletonRef = React.useRef(null);
 
   // Create a new singleton instance with a 6-digit id
-  const createInstance = () => ({ id: (Math.floor(100000 + Math.random() * 900000)).toString() });
+  const createInstance = () => ({
+    id: Math.floor(100000 + Math.random() * 900000).toString(),
+  });
 
   // Singleton API
   const getInstance = () => {
     if (!singletonRef.current) singletonRef.current = createInstance();
     return singletonRef.current;
   };
-  const resetInstance = () => { singletonRef.current = null; };
+  const resetInstance = () => {
+    singletonRef.current = null;
+  };
 
   // Button handlers
   const handleCreate = () => {
     const obj = getInstance();
     setInstance(obj);
-    setLog(l => [...l, `Create Instance → id: ${obj.id}`]);
+    setLog((l) => [...l, `Create Instance → id: ${obj.id}`]);
   };
   const handleReset = () => {
     resetInstance();
     setInstance(null);
-    setLog(l => [...l, 'Singleton reset']);
+    setLog((l) => [...l, "Singleton reset"]);
   };
   const handleClearLogs = () => setLog([]);
 
@@ -175,8 +191,12 @@ function SingletonDemo() {
       <h3>Singleton Instance Demo</h3>
       {/* Create, Reset, and Clear Logs buttons */}
       <button onClick={handleCreate}>Create Instance</button>
-      <button onClick={handleReset} style={{ marginLeft: 8 }}>Reset Singleton</button>
-      <button onClick={handleClearLogs} style={{ marginLeft: 8 }}>Clear Logs</button>
+      <button onClick={handleReset} style={{ marginLeft: 8 }}>
+        Reset Singleton
+      </button>
+      <button onClick={handleClearLogs} style={{ marginLeft: 8 }}>
+        Clear Logs
+      </button>
       {/* Show instance info if exists */}
       {instance && (
         <div style={{ marginTop: 10, padding: 10, border: "1px solid #ccc" }}>
@@ -198,6 +218,7 @@ function SingletonDemo() {
 ```
 
 ## 🔗Relations to other patterns
+
 - [Factory Method](/docs/creational/factory-method.mdx), [Abstract Factory](/docs/creational/abstract-factory.mdx), or [Builder](/docs/creational/builder.mdx) may rely on Singleton to ensure a single configuration or product source is used globally.
 - [Facade](/docs/structural/facade.mdx) objects can themselves be singletons that encapsulate a subsystem behind a single interface.
 - Unlike [Flyweight](/docs/structural/flyweight.mdx), which manages many shared objects, Singleton restricts creation to precisely one object.
@@ -205,6 +226,7 @@ function SingletonDemo() {
 ---
 
 ## 📚Sources
+
 Information used in this page was collected from various reliable sources:
 
 - [Refactoring Guru - Singleton](https://refactoring.guru/design-patterns/singleton)

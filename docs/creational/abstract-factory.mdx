@@ -2,26 +2,25 @@
 title: Abstract Factory
 hide_title: true
 description: >
- It's not a pyramid scheme, it's a factory scheme.
+  It's not a pyramid scheme, it's a factory scheme.
 ---
 
 import { CreationalPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
 import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
-import TOCInline from '@theme/TOCInline';
+import TOCInline from "@theme/TOCInline";
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import Applicability from "@site/src/components/pattern-page-features/applicability";
 
-<CreationalPatternTag title="Abstract Factory"/>
-
+<CreationalPatternTag title="Abstract Factory" />
 
 ---
 
-The **abstract factory** pattern is a creational pattern that can help create groups of related products without specifying their concrete implementations. 
+The **abstract factory** pattern is a creational pattern that can help create groups of related products without specifying their concrete implementations.
 
 ## 🧩The problem
 
-Let's say you are creating a armour shop, and you want to offer different styles of armour (e.g. medieval, modern and futuristic). Each style includes a set of related products like gloves, a chest plate and a helmet. You want to ensure that when a customer selects a particular style, all the armour pieces they receive are consistent in design and aesthetics. You  will need a way to create families of related armour products without tightly coupling your code to specific implementations. 
+Let's say you are creating a armour shop, and you want to offer different styles of armour (e.g. medieval, modern and futuristic). Each style includes a set of related products like gloves, a chest plate and a helmet. You want to ensure that when a customer selects a particular style, all the armour pieces they receive are consistent in design and aesthetics. You will need a way to create families of related armour products without tightly coupling your code to specific implementations.
 
 ## 🛠️Solutions
 
@@ -38,6 +37,7 @@ By applying this, the client can work with the factories and products via their 
 An abstract factory is like a car manufacturer that produces different models of cars (e.g., sedan, SUV, truck) without specifying the exact details of each model. The manufacturer provides a common interface for creating cars, and each model implements its own specific features and characteristics. This allows customers to choose a car model based on their preferences without needing to know the intricate details of how each car is built.
 
 ### 💡Real-world examples
+
 Common practical scenarios for applying the Abstract Factory pattern include:
 
 - GUI frameworks: Different operating systems have distinct UI components. An abstract factory can create families of related UI elements (buttons, text fields, menus) for different platforms (Windows, macOS, Linux) without specifying their concrete implementations.
@@ -45,21 +45,30 @@ Common practical scenarios for applying the Abstract Factory pattern include:
 
 ## ⚖️ Pros and Cons
 
-<TwoColumnProsCons 
-  pros={["Open/Closed Principle. You can introduce new variants of products without breaking existing client code.", "Single Responsibility Principle. You can extract the product creation code into one place, making the code easier to support.", "Ensures that products from the same factory always match expectations", "Avoids tightly coupling product to client code."]}
-  cons={["Code may become more cluttered and complicated then required, as a lot of new classes, relations, and interfaces are required."]}
+<TwoColumnProsCons
+  pros={[
+    "Open/Closed Principle. You can introduce new variants of products without breaking existing client code.",
+    "Single Responsibility Principle. You can extract the product creation code into one place, making the code easier to support.",
+    "Ensures that products from the same factory always match expectations",
+    "Avoids tightly coupling product to client code.",
+  ]}
+  cons={[
+    "Code may become more cluttered and complicated then required, as a lot of new classes, relations, and interfaces are required.",
+  ]}
 />
-
 
 ## 🔍Applicability
 
-<Applicability items={[
-  {
-    situation: "Use the abstract factory pattern when your system needs to be independent of how its products are created, composed, and represented.",
-    context: "The abstract factory pattern allows you to create families of related products without specifying their concrete implementations, furthermore it allows for future extension of the catalogue of products without breaking existing client code."
-  },
-]} />
-
+<Applicability
+  items={[
+    {
+      situation:
+        "Use the abstract factory pattern when your system needs to be independent of how its products are created, composed, and represented.",
+      context:
+        "The abstract factory pattern allows you to create families of related products without specifying their concrete implementations, furthermore it allows for future extension of the catalogue of products without breaking existing client code.",
+    },
+  ]}
+/>
 
 ## 🧭Implementation Plan
 
@@ -236,11 +245,11 @@ class ArmourFactory(ABC):
     @abstractmethod
     def create_helmet(self) -> Helmet:
         pass
-    
+
     @abstractmethod
     def create_chest_plate(self) -> ChestPlate:
         pass
-    
+
     @abstractmethod
     def create_gloves(self) -> Gloves:
         pass
@@ -249,20 +258,20 @@ class ArmourFactory(ABC):
 class MedievalArmourFactory(ArmourFactory):
     def create_helmet(self) -> Helmet:
         return MedievalHelmet()
-    
+
     def create_chest_plate(self) -> ChestPlate:
         return MedievalChestPlate()
-    
+
     def create_gloves(self) -> Gloves:
         return MedievalGloves()
 
 class FuturisticArmourFactory(ArmourFactory):
     def create_helmet(self) -> Helmet:
         return FuturisticHelmet()
-    
+
     def create_chest_plate(self) -> ChestPlate:
         return FuturisticChestPlate()
-    
+
     def create_gloves(self) -> Gloves:
         return FuturisticGloves()
 
@@ -271,7 +280,7 @@ def equip_warrior(factory: ArmourFactory) -> None:
     helmet = factory.create_helmet()
     chest_plate = factory.create_chest_plate()
     gloves = factory.create_gloves()
-    
+
     print(helmet.get_protection())
     print(chest_plate.get_protection())
     print(gloves.get_protection())
@@ -279,7 +288,7 @@ def equip_warrior(factory: ArmourFactory) -> None:
 # Usage
 if __name__ == "__main__":
     equip_warrior(MedievalArmourFactory())
-    
+
     equip_warrior(FuturisticArmourFactory())
 ```
 
@@ -303,25 +312,61 @@ function AbstractFactoryDemo() {
   const factories = {
     Medieval: {
       name: "Medieval Armoury",
-      createHelmet: () => ({ piece: "Helmet", description: "Iron helmet with nose guard", defense: 15 }),
-      createChestPlate: () => ({ piece: "Chest Plate", description: "Heavy chainmail armor", defense: 30 }),
-      createGloves: () => ({ piece: "Gloves", description: "Leather gauntlets", defense: 8 }),
-      emoji: "⚔️"
+      createHelmet: () => ({
+        piece: "Helmet",
+        description: "Iron helmet with nose guard",
+        defense: 15,
+      }),
+      createChestPlate: () => ({
+        piece: "Chest Plate",
+        description: "Heavy chainmail armor",
+        defense: 30,
+      }),
+      createGloves: () => ({
+        piece: "Gloves",
+        description: "Leather gauntlets",
+        defense: 8,
+      }),
+      emoji: "⚔️",
     },
     Futuristic: {
       name: "Futuristic Tech Lab",
-      createHelmet: () => ({ piece: "Helmet", description: "Energy shield with HUD", defense: 40 }),
-      createChestPlate: () => ({ piece: "Chest Plate", description: "Nano-fiber combat suit", defense: 55 }),
-      createGloves: () => ({ piece: "Gloves", description: "Smart-tech grip enhancers", defense: 20 }),
-      emoji: "🚀"
+      createHelmet: () => ({
+        piece: "Helmet",
+        description: "Energy shield with HUD",
+        defense: 40,
+      }),
+      createChestPlate: () => ({
+        piece: "Chest Plate",
+        description: "Nano-fiber combat suit",
+        defense: 55,
+      }),
+      createGloves: () => ({
+        piece: "Gloves",
+        description: "Smart-tech grip enhancers",
+        defense: 20,
+      }),
+      emoji: "🚀",
     },
     Elven: {
       name: "Elven Forge",
-      createHelmet: () => ({ piece: "Helmet", description: "Enchanted mithril circlet", defense: 25 }),
-      createChestPlate: () => ({ piece: "Chest Plate", description: "Blessed elven plate", defense: 45 }),
-      createGloves: () => ({ piece: "Gloves", description: "Silken battle gloves", defense: 12 }),
-      emoji: "🧝"
-    }
+      createHelmet: () => ({
+        piece: "Helmet",
+        description: "Enchanted mithril circlet",
+        defense: 25,
+      }),
+      createChestPlate: () => ({
+        piece: "Chest Plate",
+        description: "Blessed elven plate",
+        defense: 45,
+      }),
+      createGloves: () => ({
+        piece: "Gloves",
+        description: "Silken battle gloves",
+        defense: 12,
+      }),
+      emoji: "🧝",
+    },
   };
 
   // Equip a full set of armour from selected factory
@@ -330,34 +375,37 @@ function AbstractFactoryDemo() {
     const armourSet = [
       factory.createHelmet(),
       factory.createChestPlate(),
-      factory.createGloves()
+      factory.createGloves(),
     ];
     setEquippedArmour(armourSet);
   };
 
   // Calculate total defense
-  const totalDefense = equippedArmour.reduce((sum, item) => sum + item.defense, 0);
+  const totalDefense = equippedArmour.reduce(
+    (sum, item) => sum + item.defense,
+    0
+  );
   const currentFactory = factories[factoryType];
 
   return (
     <div>
       <h3>Abstract Factory — Armour Shop {currentFactory.emoji}</h3>
-      
+
       {/* Factory Selection */}
       <div style={{ marginBottom: 16 }}>
         <label style={{ marginRight: 8 }}>Select Factory:</label>
-        <select 
-          value={factoryType} 
+        <select
+          value={factoryType}
           onChange={(e) => setFactoryType(e.target.value)}
           style={{ marginRight: 8 }}
         >
-          {Object.keys(factories).map(type => (
-            <option key={type} value={type}>{factories[type].name}</option>
+          {Object.keys(factories).map((type) => (
+            <option key={type} value={type}>
+              {factories[type].name}
+            </option>
           ))}
         </select>
-        <button onClick={equipFullSet}>
-          Equip Full Set
-        </button>
+        <button onClick={equipFullSet}>Equip Full Set</button>
       </div>
 
       {/* Equipped Armour Display */}
@@ -367,7 +415,8 @@ function AbstractFactoryDemo() {
           <ul>
             {equippedArmour.map((item, i) => (
               <li key={i}>
-                <strong>{item.piece}:</strong> {item.description} (+{item.defense} defense)
+                <strong>{item.piece}:</strong> {item.description} (+
+                {item.defense} defense)
               </li>
             ))}
           </ul>
@@ -379,8 +428,9 @@ function AbstractFactoryDemo() {
 
       {/* Explanation */}
       <div style={{ marginTop: 16, fontSize: "0.9em" }}>
-        Each factory creates a <strong>family of related products</strong> (helmet, chest plate, gloves) 
-        that belong together. Try switching factories to see how the pattern ensures all pieces match!
+        Each factory creates a <strong>family of related products</strong>{" "}
+        (helmet, chest plate, gloves) that belong together. Try switching
+        factories to see how the pattern ensures all pieces match!
       </div>
     </div>
   );
@@ -398,6 +448,7 @@ function AbstractFactoryDemo() {
 ---
 
 ## 📚Sources
+
 Information used in this page was collected from various reliable sources:
 
 - [Refactoring Guru - Abstract Factory](https://refactoring.guru/design-patterns/abstract-factory)
