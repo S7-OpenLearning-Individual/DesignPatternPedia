@@ -1,5 +1,494 @@
 ---
 title: Facade
+hide_title: true
+description: >
+  See no complexity, hear no complexity, speak no complexity.
 ---
 
-This is Facade Pattern page
+import { StructuralPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from "@theme/TOCInline";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+
+<StructuralPatternTag title="Facade" aliases={["Façade"]} />
+
+---
+
+The **Facade** pattern is a way to simplify the interactivity of complex systems by providing a unified interface. It acts as a front that hides the complexity of the underlying components / systems and provides an easier way to interact with them.
+
+## 🧩The problem
+
+Let's say you have a complex system with many interdependent classes and components. Interacting with this system directly can be complicated and error-prone, as it requires understanding the intricate details of how each part works and how they interact with each other. This complexity can lead to increased development time, higher chances of bugs, and difficulty in maintaining the code.
+
+This then results in a tight coupling between the client code and the complex system, making it hard to change or replace parts of the system without affecting the client code.
+
+## 🛠️Solutions
+
+The Facade pattern addresses this problem by introducing a facade class that provides a simplified method to interact with the complex system. The facade class encapsulates the interactions with the underlying components, allowing clients to interact with the system through a singular, easy-to-use interface.
+
+Having a facade is extra nice to have when you need to integrate with a complex library or framework, as it can help to abstract away the complexities and provide a more developer-friendly interface for your application.
+
+### 🏛️Metaphors
+
+An example of a real life facade could be a barista, who acts as a facade between you and your coffee. Instead of needing to understand the complexities of coffee brewing, you simply tell the barista what you want, and they handle the rest. You don't need to grind beans, handle steam or hot coffee nor serve it with perfect latte art. You just get your coffee, hassle-free.
+
+### 💡Real-world examples
+
+Common practical scenarios for applying the Facade pattern include:
+
+- A facade can provide a simplified interface for database operations, abstracting away the complexities of SQL queries and connection management.
+- Unifying various payment gateways into a single interface, making it easier to process payments without dealing with the specifics of each gateway.
+- Simplify the interaction with complex media libraries, providing a straightforward way to play and transcode various multimedia files.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons
+  pros={["You can isolate business logic away from complex subsystems."]}
+  cons={[
+    "Facades can become god objects if you're not careful with the implementation.",
+  ]}
+/>
+
+## 🔍Applicability
+
+<Applicability
+  items={[
+    {
+      situation:
+        "Use the facade to simplify interactions with complex systems.",
+      context:
+        "When you have a complex system with many interdependent classes and components, and you want to provide a simplified interface for clients to interact with it.",
+    },
+  ]}
+/>
+
+## 🧭Implementation Plan
+
+To implement a Facade manually:
+
+1. Identify the complex system or subsystem that you want to simplify.
+2. Create a facade class that will provide a simplified interface to the complex system.
+3. Inside the facade class, implement methods that encapsulate the interactions with the underlying components of the complex system.
+4. Ensure that the facade methods provide a clear and easy-to-use interface for clients.
+5. Clients should interact with the complex system through the facade class, rather than directly accessing the underlying components.
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+// Complex subsystem components
+class VideoEncoder {
+  encode(filename: string, format: string): string {
+    return `Encoding ${filename} to ${format} format`;
+  }
+}
+
+class AudioMixer {
+  mix(filename: string): string {
+    return `Mixing audio tracks for ${filename}`;
+  }
+
+  adjustVolume(level: number): string {
+    return `Setting volume to ${level}%`;
+  }
+}
+
+class SubtitleGenerator {
+  generate(filename: string, language: string): string {
+    return `Generating ${language} subtitles for ${filename}`;
+  }
+}
+
+class FileCompressor {
+  compress(filename: string, quality: number): string {
+    return `Compressing ${filename} at ${quality}% quality`;
+  }
+}
+
+// Facade - provides a simple interface to the complex subsystem
+class MediaConverterFacade {
+  private videoEncoder: VideoEncoder;
+  private audioMixer: AudioMixer;
+  private subtitleGenerator: SubtitleGenerator;
+  private fileCompressor: FileCompressor;
+
+  constructor() {
+    this.videoEncoder = new VideoEncoder();
+    this.audioMixer = new AudioMixer();
+    this.subtitleGenerator = new SubtitleGenerator();
+    this.fileCompressor = new FileCompressor();
+  }
+
+  convertToWebFormat(filename: string): string[] {
+    const steps: string[] = [];
+
+    steps.push(this.videoEncoder.encode(filename, "WebM"));
+    steps.push(this.audioMixer.mix(filename));
+    steps.push(this.audioMixer.adjustVolume(85));
+    steps.push(this.fileCompressor.compress(filename, 75));
+
+    return steps;
+  }
+
+  convertToMobileFormat(
+    filename: string,
+    includeSubtitles: boolean = false
+  ): string[] {
+    const steps: string[] = [];
+
+    steps.push(this.videoEncoder.encode(filename, "MP4"));
+    steps.push(this.audioMixer.mix(filename));
+    steps.push(this.audioMixer.adjustVolume(90));
+
+    if (includeSubtitles) {
+      steps.push(this.subtitleGenerator.generate(filename, "English"));
+    }
+
+    steps.push(this.fileCompressor.compress(filename, 60));
+
+    return steps;
+  }
+}
+
+// Client code - simple interaction with complex system
+const converter = new MediaConverterFacade();
+
+console.log("Converting for web:");
+converter.convertToWebFormat("movie.avi").forEach((step) => console.log(step));
+
+console.log("\nConverting for mobile:");
+converter
+  .convertToMobileFormat("movie.avi", true)
+  .forEach((step) => console.log(step));
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+# Complex subsystem components
+class VideoEncoder:
+    def encode(self, filename: str, format: str) -> str:
+        return f"Encoding {filename} to {format} format"
+
+class AudioMixer:
+    def mix(self, filename: str) -> str:
+        return f"Mixing audio tracks for {filename}"
+
+    def adjust_volume(self, level: int) -> str:
+        return f"Setting volume to {level}%"
+
+class SubtitleGenerator:
+    def generate(self, filename: str, language: str) -> str:
+        return f"Generating {language} subtitles for {filename}"
+
+class FileCompressor:
+    def compress(self, filename: str, quality: int) -> str:
+        return f"Compressing {filename} at {quality}% quality"
+
+# Facade - provides a simple interface to the complex subsystem
+class MediaConverterFacade:
+    def __init__(self):
+        self.video_encoder = VideoEncoder()
+        self.audio_mixer = AudioMixer()
+        self.subtitle_generator = SubtitleGenerator()
+        self.file_compressor = FileCompressor()
+
+    def convert_to_web_format(self, filename: str) -> list[str]:
+        steps = []
+
+        steps.append(self.video_encoder.encode(filename, "WebM"))
+        steps.append(self.audio_mixer.mix(filename))
+        steps.append(self.audio_mixer.adjust_volume(85))
+        steps.append(self.file_compressor.compress(filename, 75))
+
+        return steps
+
+    def convert_to_mobile_format(self, filename: str, include_subtitles: bool = False) -> list[str]:
+        steps = []
+
+        steps.append(self.video_encoder.encode(filename, "MP4"))
+        steps.append(self.audio_mixer.mix(filename))
+        steps.append(self.audio_mixer.adjust_volume(90))
+
+        if include_subtitles:
+            steps.append(self.subtitle_generator.generate(filename, "English"))
+
+        steps.append(self.file_compressor.compress(filename, 60))
+
+        return steps
+
+# Client code - simple interaction with complex system
+if __name__ == "__main__":
+    converter = MediaConverterFacade()
+
+    print("Converting for web:")
+    for step in converter.convert_to_web_format("movie.avi"):
+        print(step)
+
+    print("\nConverting for mobile:")
+    for step in converter.convert_to_mobile_format("movie.avi", True):
+        print(step)
+```
+
+</TabItem> </Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function FacadeDemo() {
+  const [conversions, setConversions] = React.useState([]);
+  const [filename, setFilename] = React.useState("my-video.avi");
+  const [format, setFormat] = React.useState("web");
+
+  // Complex subsystem - many components working together
+  const complexSystem = {
+    videoEncoder: {
+      encode: (file, fmt) => `🎬 Encoded ${file} to ${fmt}`,
+    },
+    audioMixer: {
+      mix: (file) => `🎵 Mixed audio for ${file}`,
+      adjustVolume: (level) => `🔊 Volume set to ${level}%`,
+    },
+    subtitleGen: {
+      generate: (file, lang) => `💬 Generated ${lang} subtitles for ${file}`,
+    },
+    compressor: {
+      compress: (file, quality) =>
+        `📦 Compressed ${file} at ${quality}% quality`,
+    },
+  };
+
+  // Facade - simple interface to complex operations
+  const mediaFacade = {
+    convertToWeb: (file) => {
+      const steps = [
+        complexSystem.videoEncoder.encode(file, "WebM"),
+        complexSystem.audioMixer.mix(file),
+        complexSystem.audioMixer.adjustVolume(85),
+        complexSystem.compressor.compress(file, 75),
+      ];
+      return { format: "Web", steps };
+    },
+    convertToMobile: (file) => {
+      const steps = [
+        complexSystem.videoEncoder.encode(file, "MP4"),
+        complexSystem.audioMixer.mix(file),
+        complexSystem.audioMixer.adjustVolume(90),
+        complexSystem.subtitleGen.generate(file, "English"),
+        complexSystem.compressor.compress(file, 60),
+      ];
+      return { format: "Mobile", steps };
+    },
+    convertToTV: (file) => {
+      const steps = [
+        complexSystem.videoEncoder.encode(file, "MKV"),
+        complexSystem.audioMixer.mix(file),
+        complexSystem.audioMixer.adjustVolume(100),
+        complexSystem.subtitleGen.generate(file, "Multiple"),
+        complexSystem.compressor.compress(file, 95),
+      ];
+      return { format: "TV (4K)", steps };
+    },
+  };
+
+  const handleConvert = () => {
+    let result;
+    switch (format) {
+      case "web":
+        result = mediaFacade.convertToWeb(filename);
+        break;
+      case "mobile":
+        result = mediaFacade.convertToMobile(filename);
+        break;
+      case "tv":
+        result = mediaFacade.convertToTV(filename);
+        break;
+      default:
+        result = mediaFacade.convertToWeb(filename);
+    }
+
+    const conversion = {
+      id: Date.now(),
+      filename,
+      targetFormat: result.format,
+      steps: result.steps,
+      timestamp: new Date().toLocaleTimeString(),
+    };
+
+    setConversions([conversion, ...conversions]);
+  };
+
+  const handleReset = () => {
+    setConversions([]);
+    setFilename("my-video.avi");
+    setFormat("web");
+  };
+
+  return (
+    <div style={{ fontFamily: "sans-serif" }}>
+      <h3>Facade Pattern — Media Converter Demo</h3>
+
+      {/* Conversion Form */}
+      <div
+        style={{
+          marginBottom: 16,
+          padding: 12,
+          border: "1px solid var(--ifm-color-emphasis-300)",
+          borderRadius: 4,
+          backgroundColor: "var(--ifm-background-surface-color)",
+        }}
+      >
+        <div style={{ marginBottom: 8 }}>
+          <label style={{ display: "block", marginBottom: 4 }}>
+            Filename:
+            <input
+              type="text"
+              value={filename}
+              onChange={(e) => setFilename(e.target.value)}
+              style={{
+                marginLeft: 8,
+                padding: 4,
+                width: "200px",
+                backgroundColor: "var(--ifm-background-surface-color)",
+                color: "var(--ifm-font-color-base)",
+                border: "1px solid var(--ifm-color-emphasis-300)",
+              }}
+            />
+          </label>
+        </div>
+
+        <div style={{ marginBottom: 12 }}>
+          <label style={{ display: "block", marginBottom: 4 }}>
+            Target Format:
+            <select
+              value={format}
+              onChange={(e) => setFormat(e.target.value)}
+              style={{
+                marginLeft: 8,
+                padding: 4,
+                backgroundColor: "var(--ifm-background-surface-color)",
+                color: "var(--ifm-font-color-base)",
+                border: "1px solid var(--ifm-color-emphasis-300)",
+              }}
+            >
+              <option value="web">Web (WebM)</option>
+              <option value="mobile">Mobile (MP4)</option>
+              <option value="tv">TV (4K MKV)</option>
+            </select>
+          </label>
+        </div>
+
+        <button onClick={handleConvert} style={{ marginRight: 8 }}>
+          Convert via Facade
+        </button>
+        <button onClick={handleReset}>Reset</button>
+      </div>
+
+      {/* Conversions Display */}
+      <div>
+        <h4>Conversion History:</h4>
+        {conversions.length === 0 ? (
+          <p style={{ color: "var(--ifm-color-emphasis-600)" }}>
+            No conversions yet. Select a format and convert!
+          </p>
+        ) : (
+          <ul style={{ listStyle: "none", padding: 0 }}>
+            {conversions.map((conv) => (
+              <li
+                key={conv.id}
+                style={{
+                  marginBottom: 12,
+                  padding: 12,
+                  border: "1px solid var(--ifm-color-emphasis-300)",
+                  borderRadius: 4,
+                  backgroundColor: "var(--ifm-background-surface-color)",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "1.1em",
+                    marginBottom: 8,
+                    fontWeight: "bold",
+                  }}
+                >
+                  📹 {conv.filename} → {conv.targetFormat}
+                </div>
+                <div
+                  style={{
+                    fontSize: "0.85em",
+                    color: "var(--ifm-color-emphasis-600)",
+                    marginBottom: 8,
+                  }}
+                >
+                  ⏰ {conv.timestamp}
+                </div>
+                <div
+                  style={{
+                    fontSize: "0.9em",
+                    color: "var(--ifm-color-emphasis-700)",
+                  }}
+                >
+                  <strong>Processing steps:</strong>
+                  <ol
+                    style={{ marginTop: 4, marginBottom: 0, paddingLeft: 20 }}
+                  >
+                    {conv.steps.map((step, idx) => (
+                      <li key={idx}>{step}</li>
+                    ))}
+                  </ol>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div
+        style={{
+          marginTop: 16,
+          padding: 12,
+          backgroundColor: "var(--ifm-color-primary-lightest)",
+          borderRadius: 4,
+          color: "var(--ifm-font-color-base)",
+        }}
+      >
+        <strong>💡 Facade in Action:</strong> Instead of manually calling the
+        video encoder, audio mixer, subtitle generator, and compressor
+        separately, the facade provides simple methods like{" "}
+        <code>convertToWeb()</code> that handle all the complexity for you!
+      </div>
+    </div>
+  );
+}
+```
+
+## 🔗Relations to other patterns
+
+- [Facade](/docs/structural/facade) defines a new interface for existing objects, whereas [Adapter](/docs/structural/adapter) tries to make the existing interface usable. [Adapter](/docs/structural/adapter) usually wraps just one object, while [Facade](/docs/structural/facade) works with an entire subsystem of objects.
+- [Abstract Factory](/docs/creational/abstract-factory) can serve as an alternative to [Facade](/docs/structural/facade) when you only want to hide the way the subsystem objects are created from the client code.
+- [Flyweight](/docs/structural/flyweight) shows how to make lots of little objects, whereas [Facade](/docs/structural/facade) shows how to make a single object that represents an entire subsystem.
+- [Facade](/docs/structural/facade) and [Mediator](/docs/behavioral/mediator) have similar jobs: they try to organize collaboration between lots of tightly coupled classes.
+  - [Facade](/docs/structural/facade) defines a simplified interface to a subsystem of objects, but it doesn't introduce any new functionality. The subsystem itself is unaware of the facade. Objects within the subsystem can communicate directly.
+  - [Mediator](/docs/behavioral/mediator) centralizes communication between components of the system. The components only know about the mediator object and don't communicate directly.
+- A [Facade](/docs/structural/facade) class can often be transformed into a [Singleton](/docs/creational/singleton) since a single facade object is sufficient in most cases.
+- [Facade](/docs/structural/facade) is similar to [Proxy](/docs/structural/proxy) in that both buffer a complex entity and initialize it on its own. Unlike [Facade](/docs/structural/facade), [Proxy](/docs/structural/proxy) has the same interface as its service object, which makes them interchangeable.
+
+---
+
+## 📚Sources
+
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring Guru - Facade Pattern](https://refactoring.guru/design-patterns/facade)
+- [Wikipedia - Facade Pattern](https://en.wikipedia.org/wiki/Facade_pattern)
