@@ -30,7 +30,7 @@ Let's say you have a customer that wants to export the contents of a database to
 
 The customer comes back, they request to also supported `CSV` format for exporting. You create a new class called `CsvExporter` that handles exporting to CSV format. You'll know need to expand this class to handle both settings and friends exporting as well. As you can see, this approach quickly leads to a combinatorial explosion of classes as you add more export formats and data types. Each entity that the customer wants to export requires a new class for each format, leading to a maintenance nightmare.
 
-<div style={{ textAlign: "center" }}>
+<div style={{ textAlign: "center", padding: "2rem" }}>
   <BridgeProblemSvg />
 </div>
 
@@ -40,7 +40,7 @@ This is exactly where the **Bridge pattern** comes in. The Bridge pattern sugges
 
 In this structure, instead of having a single `IExporter` interface, we can have an `Exporter` abstraction that defines the export operation. Then, we can have concrete implementations for each export format, such as `JsonExporter` and `CsvExporter`. Each entity to be exported, like `Settings` and `Friends`, can then use an instance of the `Exporter` abstraction to perform the export operation.
 
-<div style={{ textAlign: "center" }}>
+<div style={{ textAlign: "center", padding: "2rem" }}>
   <BridgeSolutionSvg />
 </div>
 
