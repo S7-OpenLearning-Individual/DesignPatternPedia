@@ -56,6 +56,7 @@ Some extras, common elements may include;
 9. Directories follow the correct pattern structure.
 10. Each page is built using the [page structure](#page-structure).
 11. Custom components should not use a title, they should use the correct heading level in the page itself to ensure proper url based linking.
+12. Images need to have padding applied around them, optimally `2rem`.
 
 ## Installation
 

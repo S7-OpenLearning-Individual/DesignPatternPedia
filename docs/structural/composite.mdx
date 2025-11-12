@@ -1,5 +1,406 @@
 ---
 title: Composite
+hide_title: true
+description: >
+  describe the pattern in one sentence.
 ---
 
-This is Composite Pattern page
+import { StructuralPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from "@theme/TOCInline";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+import CompositeTreePCExample from "@site/static/img/patterns/composite-tree-pc-example.drawio.svg";
+import CompositeTreeFamilyMetaphor from "@site/static/img/patterns/composite-tree-family-metaphor.drawio.svg";
+
+<StructuralPatternTag title="Composite" aliases={["Object Tree"]} />
+
+---
+
+The **composite** pattern is a structural design pattern that helps compose objects into tree-like structures with branches, which then allows you to work with these structures as if they were individual objects.
+
+## 🧩The problem
+
+Using the composite pattern can help solve problems related to representing part-whole hierarchies, where clients need to treat individual objects and compositions of objects uniformly. It is only truly applicable if the structure of your model can be represented as a tree.
+
+For example, you might be building a gaming PC, and you want to represent the various components (like CPU, GPU, RAM) as individual objects, while also representing the entire PC as a composite object that contains these components. An example could be to calculate the price of power efficiency of your computer, you don't really want to go to the manufacturer of each component and ask for the price, you want to be able to just go 'how much will this set me back?'.
+
+## 🛠️Solutions
+
+This is exactly where the composite design pattern jumps in. The composite pattern allows you to treat both individual components and the entire PC as a whole, making it easier to manage and manipulate the structure. You'd have a common interface for both individual components and the composite PC, allowing you to perform operations like calculating total price or power consumption uniformly.
+
+In the composite pattern, you typically have the following set of objects;
+
+- **Component** — is the base interface for all the objects in the composition. It should be either an interface or an abstract class with the common methods to manage the child composites.
+- **Leaf** — implements the default behavior of the base component. It doesn't contain a reference to the other objects.
+- **Composite** — has leaf elements. It implements the base component methods and defines the child-related operations.
+
+<div style={{ textAlign: "center", padding: "2rem" }}>
+  <CompositeTreePCExample />
+</div>
+
+As visible in the diagram, you get an upside-down tree-like structure. The leaves of the tree are the individual components (like CPU, GPU, RAM), while the branches represent the composite objects (like the entire PC). This structure allows you to treat both individual components and composite objects uniformly, making it easier to manage and manipulate the entire system. Now instead of asking each component for its price, you can just ask the composite PC object for the total price, and it will internally calculate it by summing up the prices of its child components.
+
+### 🏛️Metaphors
+
+Think of the composite pattern like a family tree. Each individual family member is a leaf node, while the entire family unit (parents, children, grandparents) represents a composite node. You can interact with both individual family members and the entire family unit in a similar way, such as asking for their names or ages. Your mom for example, will likely know the age of her children, but you _can_ still directly ask her kids as well.
+
+<div style={{ textAlign: "center", padding: "2rem" }}>
+  <CompositeTreeFamilyMetaphor />
+</div>
+
+### 💡Real-world examples
+
+Common practical scenarios for applying the X pattern include:
+
+- In GUI frameworks, components like buttons, panels, and windows can be treated uniformly using the composite pattern. A window can contain multiple panels, and each panel can contain buttons or other components.
+- File systems often use the composite pattern to represent directories and files. A directory can contain multiple files and subdirectories, and both files and directories can be treated uniformly.
+- The DOM represents the structure of an HTML document as a tree of elements. Each element can contain child elements, and both individual elements and composite elements can be manipulated using the same interface.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons
+  pros={[
+    "You can work with complex tree structures more conveniently: use polymorphism and recursion to your advantage.",
+    "Open/Closed Principle. You can introduce new element types into the app without breaking the existing code, which now works with the object tree.",
+  ]}
+  cons={[
+    "Applying the composite pattern maybe make your design overly generic, thus complicating the code unnecessarily.",
+  ]}
+/>
+
+## 🔍Applicability
+
+<Applicability
+  items={[
+    {
+      situation:
+        "Use the pattern when you have to represent part-whole hierarchies of objects.",
+      context:
+        "The composite pattern allows you to create tree structures where individual objects and compositions of objects can be treated uniformly.",
+    },
+    {
+      situation:
+        "Use the pattern when clients need to treat individual objects and compositions of objects uniformly.",
+      context:
+        "The composite pattern provides a common interface for both individual objects and composite objects, allowing clients to interact with them in the same way.",
+    },
+  ]}
+/>
+
+## 🧭Implementation Plan
+
+To implement a Composite manually:
+
+1. Define a common interface or abstract class for both leaf and composite objects. This interface should include methods for adding, removing, and accessing child components, as well as any other operations that need to be performed on the components.
+2. Create concrete classes for leaf objects that implement the common interface. These classes should represent individual components in the hierarchy and should not contain references to other components.
+3. Create concrete classes for composite objects that also implement the common interface. These classes should represent composite components that can contain child components. Implement methods for adding, removing, and accessing child components in these classes.
+4. Implement the common operations in both leaf and composite classes. For leaf classes, these operations should perform the operation directly on the individual component. For composite classes, these operations should iterate over the child components and delegate the operation to each child.
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+// Component interface
+interface FileSystemComponent {
+  getName(): string;
+  getSize(): number;
+}
+
+// Leaf class
+class File implements FileSystemComponent {
+  constructor(private name: string, private size: number) {}
+
+  getName(): string {
+    return this.name;
+  }
+
+  getSize(): number {
+    return this.size;
+  }
+}
+
+// Composite class
+class Folder implements FileSystemComponent {
+  private children: FileSystemComponent[] = [];
+
+  constructor(private name: string) {}
+
+  add(component: FileSystemComponent): void {
+    this.children.push(component);
+  }
+
+  remove(component: FileSystemComponent): void {
+    const index = this.children.indexOf(component);
+    if (index !== -1) {
+      this.children.splice(index, 1);
+    }
+  }
+
+  getName(): string {
+    return this.name;
+  }
+
+  getSize(): number {
+    return this.children.reduce((total, child) => total + child.getSize(), 0);
+  }
+}
+
+// Usage
+const documents = new Folder("Documents");
+const photos = new Folder("Photos");
+
+documents.add(new File("resume.pdf", 500));
+documents.add(new File("cover-letter.pdf", 300));
+
+photos.add(new File("vacation.jpg", 2000));
+photos.add(new File("portrait.jpg", 1500));
+
+const root = new Folder("Root");
+root.add(documents);
+root.add(photos);
+root.add(new File("readme.txt", 100));
+
+console.log(`Total size: ${root.getSize()} KB`); // Total size: 4400 KB
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+from abc import ABC, abstractmethod
+
+# Component interface
+class FileSystemComponent(ABC):
+    @abstractmethod
+    def get_name(self) -> str:
+        pass
+
+    @abstractmethod
+    def get_size(self) -> int:
+        pass
+
+# Leaf class
+class File(FileSystemComponent):
+    def __init__(self, name: str, size: int):
+        self._name = name
+        self._size = size
+
+    def get_name(self) -> str:
+        return self._name
+
+    def get_size(self) -> int:
+        return self._size
+
+# Composite class
+class Folder(FileSystemComponent):
+    def __init__(self, name: str):
+        self._name = name
+        self._children = []
+
+    def add(self, component: FileSystemComponent):
+        self._children.append(component)
+
+    def remove(self, component: FileSystemComponent):
+        self._children.remove(component)
+
+    def get_name(self) -> str:
+        return self._name
+
+    def get_size(self) -> int:
+        return sum(child.get_size() for child in self._children)
+
+# Usage
+documents = Folder("Documents")
+photos = Folder("Photos")
+
+documents.add(File("resume.pdf", 500))
+documents.add(File("cover-letter.pdf", 300))
+
+photos.add(File("vacation.jpg", 2000))
+photos.add(File("portrait.jpg", 1500))
+
+root = Folder("Root")
+root.add(documents)
+root.add(photos)
+root.add(File("readme.txt", 100))
+
+print(f"Total size: {root.get_size()} KB")  # Total size: 4400 KB
+```
+
+</TabItem> </Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function CompositeDemo() {
+  const [tree, setTree] = React.useState({
+    type: "folder",
+    name: "Root",
+    children: [],
+  });
+  const [itemName, setItemName] = React.useState("");
+  const [itemSize, setItemSize] = React.useState(100);
+  const [selectedPath, setSelectedPath] = React.useState([]);
+
+  // Calculate total size recursively
+  const calculateSize = (node) => {
+    if (node.type === "file") return node.size;
+    return node.children.reduce((sum, child) => sum + calculateSize(child), 0);
+  };
+
+  // Add item to selected folder
+  const addItem = (itemType) => {
+    if (!itemName) return;
+
+    const newItem =
+      itemType === "file"
+        ? { type: "file", name: itemName, size: itemSize }
+        : { type: "folder", name: itemName, children: [] };
+
+    setTree((prev) => {
+      const newTree = JSON.parse(JSON.stringify(prev));
+      let target = newTree;
+      for (const idx of selectedPath) {
+        target = target.children[idx];
+      }
+      target.children.push(newItem);
+      return newTree;
+    });
+
+    setItemName("");
+  };
+
+  // Reset tree to default state
+  const resetTree = () => {
+    setTree({
+      type: "folder",
+      name: "Root",
+      children: [],
+    });
+    setSelectedPath([]);
+    setItemName("");
+  };
+
+  // Render tree node
+  const TreeNode = ({ node, path }) => {
+    const isSelected =
+      JSON.stringify(path) === JSON.stringify(selectedPath) &&
+      node.type === "folder";
+    const size = calculateSize(node);
+
+    return (
+      <div style={{ marginLeft: path.length > 0 ? 20 : 0 }}>
+        <div
+          onClick={() => node.type === "folder" && setSelectedPath(path)}
+          style={{
+            cursor: node.type === "folder" ? "pointer" : "default",
+            padding: 4,
+            backgroundColor: isSelected
+              ? "var(--ifm-color-primary-lightest)"
+              : "transparent",
+            borderRadius: 4,
+          }}
+        >
+          {node.type === "folder" ? "📁" : "📄"} <strong>{node.name}</strong>{" "}
+          <span
+            style={{
+              fontSize: "0.9em",
+              color: "var(--ifm-color-emphasis-600)",
+            }}
+          >
+            ({size} KB)
+          </span>
+        </div>
+        {node.type === "folder" &&
+          node.children.map((child, idx) => (
+            <TreeNode key={idx} node={child} path={[...path, idx]} />
+          ))}
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ fontFamily: "sans-serif" }}>
+      <h3>Composite Pattern — File System</h3>
+
+      <div style={{ marginBottom: 16 }}>
+        <input
+          value={itemName}
+          onChange={(e) => setItemName(e.target.value)}
+          placeholder="Item name"
+          style={{ marginRight: 8, padding: 4 }}
+        />
+        <input
+          type="number"
+          value={itemSize}
+          onChange={(e) => setItemSize(Number(e.target.value))}
+          placeholder="Size (KB)"
+          style={{ width: 80, marginRight: 8, padding: 4 }}
+        />
+        <button onClick={() => addItem("file")} style={{ marginRight: 4 }}>
+          Add File
+        </button>
+        <button onClick={() => addItem("folder")} style={{ marginRight: 4 }}>
+          Add Folder
+        </button>
+        <button onClick={resetTree}>Reset</button>
+      </div>
+
+      <div
+        style={{
+          border: "1px solid var(--ifm-color-emphasis-300)",
+          borderRadius: 8,
+          padding: 12,
+          backgroundColor: "var(--ifm-background-surface-color)",
+        }}
+      >
+        <TreeNode node={tree} path={[]} />
+      </div>
+
+      <div
+        style={{
+          marginTop: 12,
+          fontSize: "0.9em",
+          color: "var(--ifm-color-emphasis-600)",
+        }}
+      >
+        Click a folder to select it, then add files or subfolders. Notice how
+        folder sizes automatically include all their contents!
+      </div>
+    </div>
+  );
+}
+```
+
+## 🔗Relations to other patterns
+
+- You can use [Builder](/docs/creational/builder) when creating complex [Composite](/docs/structural/composite) trees because you can program its construction steps to work recursively.
+
+- [Chain of Responsibility](/docs/behavioral/chain-of-responsibility) is often used in conjunction with [Composite](/docs/structural/composite). In this case, when a leaf component gets a request, it may pass it through the chain of all of the parent components down to the root of the object tree.
+
+- You can use [Iterators](/docs/behavioral/iterator) to traverse [Composite](/docs/structural/composite) trees.
+
+- You can use [Visitor](/docs/behavioral/visitor) to execute an operation over an entire [Composite](/docs/structural/composite) tree.
+
+- You can implement shared leaf nodes of the [Composite](/docs/structural/composite) tree as [Flyweights](/docs/structural/flyweight) to save some RAM.
+
+- Designs that make heavy use of [Composite](/docs/structural/composite) and [Decorator](/docs/structural/decorator) can often benefit from using [Prototype](/docs/creational/prototype). Applying the pattern lets you clone complex structures instead of re-constructing them from scratch.
+
+---
+
+## 📚Sources
+
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring Guru - Composite Pattern](https://refactoring.guru/design-patterns/composite)
+- [Medium - Composite Design Pattern](https://medium.com/@akshatsharma0610/composite-design-pattern-b1ebd0756aa9)
