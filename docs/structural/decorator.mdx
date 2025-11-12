@@ -1,5 +1,362 @@
 ---
 title: Decorator
+hide_title: true
+description: >
+  Making objects overly detailed, the right way!
 ---
 
-This is Decorator Pattern page
+import { StructuralPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from "@theme/TOCInline";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+
+<StructuralPatternTag title="Decorator" aliases={["Wrapper"]} />
+
+---
+
+The **Decorator** pattern allows behavior to be added to individual objects, either statically or dynamically, without affecting the behavior of other objects from the same class.
+
+## 🧩The problem
+
+Let's say you've got a lovely cafe that primarily serves coffee. So you have a `Coffee` class. But then, customers start asking for extra features like milk, sugar, and whipped cream. You could create subclasses for every possible combination (e.g., `CoffeeWithMilk`, `CoffeeWithSugar`, `CoffeeWithMilkAndSugar`), but that would lead to a strong increase in the number of classes and make maintaining it all an absolute nightmare.
+
+## 🛠️Solutions
+
+This is where the Decorator pattern comes in quite handy. It allows existing objects to, dynamically or statically be expanded with more behavior. Instead of creating a new subclass for every combination, you create decorator classes that wrap the original object and add the desired features. You can look at it like adding enchantments to a basic item in a game. You keep the original properties, whilst expanding on them.
+
+### 🏛️Metaphors
+
+You'd love to go out for a walk, so you put on pants and a shirt, because otherwise you'd just freeze. But it's also still a little chilly, so you put a sweater on top of your shirt. And because it's raining, you grab a raincoat to wear over everything else. Each piece of clothing adds new functionality (warmth, dryness) without changing the basic function of your outfit (covering your body). You can remove one piece, e.g. the raincoat if it stops raining, without affecting the other layers.
+
+### 💡Real-world examples
+
+Common practical scenarios for applying the Decorator pattern include:
+
+- Coffee, as described above, where you can add various condiments to a base coffee object.
+- In GUIs, where visual components can be decorated with borders, scrollbars, or other visual enhancements without modifying the original component.
+- In logging systems, where log messages can be decorated with timestamps, severity levels, or other metadata before being output.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons
+  pros={[
+    "Single Responsibility Principle. You can separate a huge class into smaller, more manageable pieces.",
+    "You can add or remove functionality at runtime.",
+    "More flexibility than static inheritance.",
+    "You can combine several behaviors by wrapping an object into multiple decorators.",
+  ]}
+  cons={[
+    "Increased complexity due to many small classes.",
+    "Can lead to a lot of small objects that can be hard to manage.",
+    "It's hard to implement a decorator in such a way that its behavior doesn't depend on the order in the decorators stack.",
+  ]}
+/>
+
+## 🔍Applicability
+
+<Applicability
+  items={[
+    {
+      situation:
+        "Use the decorator pattern when you want to dynamically add responsibilities to objects without affecting other objects of the same class.",
+      context:
+        "This allows for flexible and reusable code by composing behaviors at runtime rather than through static inheritance.",
+    },
+    {
+      situation:
+        "Use the decorator pattern when you need to add functionality to objects in a way that can be easily combined or removed.",
+      context:
+        "This allows for greater flexibility in how objects are used and modified, enabling dynamic behavior changes.",
+    },
+  ]}
+/>
+
+## 🧭Implementation Plan
+
+To implement a Decorator manually:
+
+1. Define a common interface for both the core component and the decorators.
+2. Create the core component class that implements this interface.
+3. Create an abstract decorator class that also implements the interface and contains a reference to a component.
+4. Implement concrete decorator classes that extend the abstract decorator and add specific functionalities.
+5. Use the decorators to wrap the core component and add functionalities as needed.
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+// Component interface
+interface Coffee {
+  cost(): number;
+  description(): string;
+}
+
+// Concrete component
+class SimpleCoffee implements Coffee {
+  cost(): number {
+    return 2.0;
+  }
+
+  description(): string {
+    return "Simple coffee";
+  }
+}
+
+// Base decorator
+abstract class CoffeeDecorator implements Coffee {
+  protected coffee: Coffee;
+
+  constructor(coffee: Coffee) {
+    this.coffee = coffee;
+  }
+
+  abstract cost(): number;
+  abstract description(): string;
+}
+
+// Concrete decorators
+class MilkDecorator extends CoffeeDecorator {
+  cost(): number {
+    return this.coffee.cost() + 0.5;
+  }
+
+  description(): string {
+    return this.coffee.description() + ", milk";
+  }
+}
+
+class SugarDecorator extends CoffeeDecorator {
+  cost(): number {
+    return this.coffee.cost() + 0.2;
+  }
+
+  description(): string {
+    return this.coffee.description() + ", sugar";
+  }
+}
+
+class WhippedCreamDecorator extends CoffeeDecorator {
+  cost(): number {
+    return this.coffee.cost() + 0.7;
+  }
+
+  description(): string {
+    return this.coffee.description() + ", whipped cream";
+  }
+}
+
+// Usage
+let myCoffee: Coffee = new SimpleCoffee();
+myCoffee = new MilkDecorator(myCoffee);
+myCoffee = new SugarDecorator(myCoffee);
+myCoffee = new WhippedCreamDecorator(myCoffee);
+
+console.log(myCoffee.description()); // Simple coffee, milk, sugar, whipped cream
+console.log(`$${myCoffee.cost()}`); // $3.4
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+from abc import ABC, abstractmethod
+
+# Component interface
+class Coffee(ABC):
+    @abstractmethod
+    def cost(self) -> float:
+        pass
+
+    @abstractmethod
+    def description(self) -> str:
+        pass
+
+# Concrete component
+class SimpleCoffee(Coffee):
+    def cost(self) -> float:
+        return 2.0
+
+    def description(self) -> str:
+        return "Simple coffee"
+
+# Base decorator
+class CoffeeDecorator(Coffee):
+    def __init__(self, coffee: Coffee):
+        self._coffee = coffee
+
+    @abstractmethod
+    def cost(self) -> float:
+        pass
+
+    @abstractmethod
+    def description(self) -> str:
+        pass
+
+# Concrete decorators
+class MilkDecorator(CoffeeDecorator):
+    def cost(self) -> float:
+        return self._coffee.cost() + 0.5
+
+    def description(self) -> str:
+        return f"{self._coffee.description()}, milk"
+
+class SugarDecorator(CoffeeDecorator):
+    def cost(self) -> float:
+        return self._coffee.cost() + 0.2
+
+    def description(self) -> str:
+        return f"{self._coffee.description()}, sugar"
+
+class WhippedCreamDecorator(CoffeeDecorator):
+    def cost(self) -> float:
+        return self._coffee.cost() + 0.7
+
+    def description(self) -> str:
+        return f"{self._coffee.description()}, whipped cream"
+
+# Usage
+my_coffee = SimpleCoffee()
+my_coffee = MilkDecorator(my_coffee)
+my_coffee = SugarDecorator(my_coffee)
+my_coffee = WhippedCreamDecorator(my_coffee)
+
+print(my_coffee.description())  # Simple coffee, milk, sugar, whipped cream
+print(f"${my_coffee.cost()}")  # $3.4
+```
+
+</TabItem> </Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function DecoratorDemo() {
+  // Base coffee object
+  const baseCoffee = {
+    name: "Simple Coffee",
+    cost: 2.0,
+  };
+
+  // Available decorators
+  const decorators = [
+    { id: "milk", name: "Milk", cost: 0.5 },
+    { id: "sugar", name: "Sugar", cost: 0.2 },
+    { id: "whippedCream", name: "Whipped Cream", cost: 0.7 },
+    { id: "vanilla", name: "Vanilla Syrup", cost: 0.6 },
+  ];
+
+  const [selectedDecorators, setSelectedDecorators] = React.useState([]);
+
+  // Toggle decorator
+  const toggleDecorator = (decorator) => {
+    setSelectedDecorators((prev) => {
+      const exists = prev.find((d) => d.id === decorator.id);
+      if (exists) {
+        return prev.filter((d) => d.id !== decorator.id);
+      } else {
+        return [...prev, decorator];
+      }
+    });
+  };
+
+  // Calculate total cost
+  const totalCost = selectedDecorators.reduce(
+    (sum, d) => sum + d.cost,
+    baseCoffee.cost
+  );
+
+  // Build description
+  const description = [
+    baseCoffee.name,
+    ...selectedDecorators.map((d) => d.name),
+  ].join(" + ");
+
+  // Reset
+  const handleReset = () => setSelectedDecorators([]);
+
+  return (
+    <div style={{ fontFamily: "sans-serif" }}>
+      <h3>Coffee Decorator — Playground</h3>
+
+      <div style={{ marginBottom: 16 }}>
+        <strong>Base:</strong> {baseCoffee.name} (${baseCoffee.cost.toFixed(2)})
+      </div>
+
+      <div style={{ marginBottom: 16 }}>
+        <strong>Add decorators:</strong>
+        <div style={{ marginTop: 8 }}>
+          {decorators.map((decorator) => (
+            <label
+              key={decorator.id}
+              style={{ display: "block", marginBottom: 4, cursor: "pointer" }}
+            >
+              <input
+                type="checkbox"
+                checked={selectedDecorators.some((d) => d.id === decorator.id)}
+                onChange={() => toggleDecorator(decorator)}
+                style={{ marginRight: 8 }}
+              />
+              {decorator.name} (+${decorator.cost.toFixed(2)})
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div
+        style={{
+          padding: 12,
+          border: "1px solid var(--ifm-color-emphasis-300)",
+          borderRadius: 4,
+          backgroundColor: "var(--ifm-background-surface-color)",
+          marginBottom: 12,
+        }}
+      >
+        <div style={{ marginBottom: 8 }}>
+          <strong>Your Coffee:</strong>
+        </div>
+        <div style={{ marginBottom: 4 }}>{description}</div>
+        <div style={{ fontSize: "1.2em", fontWeight: "bold" }}>
+          Total: ${totalCost.toFixed(2)}
+        </div>
+      </div>
+
+      <button onClick={handleReset}>Reset</button>
+
+      <div style={{ marginTop: 16, fontSize: "0.9em", opacity: 0.8 }}>
+        Each checkbox represents a decorator that wraps the coffee object and
+        adds functionality. Try selecting different combinations!
+      </div>
+    </div>
+  );
+}
+```
+
+## 🔗Relations to other patterns
+
+- [Adapter](/docs/structural/adapter) provides a completely different interface for accessing an existing object. On the other hand, with the Decorator pattern the interface either stays the same or gets extended. In addition, Decorator supports recursive composition, which isn't possible when you use Adapter.
+
+- With [Adapter](/docs/structural/adapter) you access an existing object via different interface. With [Proxy](/docs/structural/proxy), the interface stays the same. With Decorator you access the object via an enhanced interface.
+
+- Designs that make heavy use of [Composite](/docs/structural/composite) and Decorator can often benefit from using [Prototype](/docs/creational/prototype). Applying the pattern lets you clone complex structures instead of re-constructing them from scratch.
+
+- Decorator lets you change the skin of an object, while [Strategy](/docs/behavioral/strategy) lets you change the guts.
+
+- Decorator and [Proxy](/docs/structural/proxy) have similar structures, but very different intents. Both patterns are built on the composition principle, where one object is supposed to delegate some of the work to another. The difference is that a Proxy usually manages the life cycle of its service object on its own, whereas the composition of Decorators is always controlled by the client.
+
+---
+
+## 📚Sources
+
+Information used in this page was collected from various reliable sources:
+
+- [Medium - Decorator Design Pattern](https://medium.com/@neeraj_swe/decorator-design-pattern-lld-febedf30915a)
+- [Refactoring Guru - Decorator Pattern](https://refactoring.guru/design-patterns/decorator)
