@@ -1,5 +1,473 @@
 ---
 title: Proxy
+hide_title: true
+description: >
+  Maintain a proxy distance from the service please.
 ---
 
-This is Proxy Pattern page
+import { StructuralPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from "@theme/TOCInline";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+
+<StructuralPatternTag title="Proxy" />
+
+---
+
+**Proxy** is a design pattern which can provide a substitute object that acts as a for a real service object used by a client, instead of relying on the actual service. A proxy receives client requests, does some work (e.g. access control, caching), and then passes the request to the substituted service object.
+
+## 🧩The problem
+
+Imagine you want to access a highly secure facility in a building. In order to get there you'd need to have a keycard to get into the right building. The problem here is that you can directly access the facility without going through the security checks. Maybe you don't have the right clearance, or maybe you want to avoid the long security lines. Either way, you need a way to access the facility without going through the proper channels. This creates various problems, such as:
+
+- Security risks: Unauthorized access to sensitive areas can lead to data breaches or other security incidents.
+- Resource management: Direct access to resources can lead to overuse or misuse, impacting performance and availability.
+- Complexity: Managing direct access can complicate system architecture and maintenance.
+
+## 🛠️Solutions
+
+This is where the proxy pattern comes in quite handy. A proxy can act as an intermediary between the client and the real service object, providing controlled access to the facility. The proxy can perform various tasks, such as:
+
+- Access control: The proxy can check if the client has the necessary permissions to access the facility before allowing entry.
+- Caching: The proxy can store frequently accessed data to reduce the load on the real service object.
+- Logging: The proxy can log access attempts for auditing purposes.
+
+This can not only help prevent the waste of resources, but also enhance security and simplify your software architecture. In our problem example you can think of it like a security guard at the entrance of the building who checks your credentials before allowing you to enter. If you want to add extra security checks you only need to modify the security guard's behavior, not the entire building's access system or everyone else who has a keycard.
+
+### 🏛️Metaphors
+
+Think of a proxy as a receptionist at an office building. The receptionist controls access to the building, ensuring that only authorized individuals can enter. They may also provide additional services, such as directing visitors to the appropriate office or answering questions.
+
+### 💡Real-world examples
+
+Common practical scenarios for applying the Proxy pattern include:
+
+- A database proxy, which manages connections to a database and can implement caching or connection pooling.
+- A third-party API proxy, which can add authentication or rate limiting to API requests to prevent overusing the API.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons
+  pros={[
+    "Allows you to control the source object without the clients knowing it",
+    "Open/Closed Principle. You can introduce new proxies without changing the service or clients.",
+    "The proxy can gracefully handle if the service is unavailable.",
+  ]}
+  cons={[
+    "Can introduce additional complexity and overhead due to the extra layer of abstraction.",
+    "May introduce latency if the proxy performs additional processing.",
+  ]}
+/>
+
+## 🔍Applicability
+
+<Applicability
+  items={[
+    {
+      situation:
+        "Use the Proxy pattern when you need to control access to another object",
+      context:
+        "The proxy acts as an intermediary that can enforce access control, validate requests, or restrict operations based on user permissions or other criteria.",
+    },
+    {
+      situation:
+        "Use the Proxy pattern to defer expensive operations or add functionality without modifying the real service",
+      context:
+        "A proxy can cache results, log access attempts, authenticate requests, or manage the lifecycle of the real service object without the client knowing about these additional operations.",
+    },
+  ]}
+/>
+
+## 🧭Implementation Plan
+
+To implement a Proxy manually:
+
+1. Define a common interface for both the real service object and the proxy.
+2. Create the real service object that implements the common interface.
+3. Create the proxy class that also implements the common interface and holds a reference to the real service object.
+4. In the proxy class, implement the methods defined in the common interface. Within these methods, add any additional behavior (e.g., access control, caching) before delegating the call to the real service object.
+5. Update the client code to use the proxy instead of directly interacting with the real service object.
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+// Subject interface - defines what both the real object and proxy must implement
+interface DocumentService {
+  openDocument(filename: string): string;
+  editDocument(filename: string, content: string): void;
+  saveDocument(filename: string): void;
+}
+
+// Real subject - the actual service that performs the work
+class RealDocumentService implements DocumentService {
+  openDocument(filename: string): string {
+    console.log(`Opening document: ${filename}`);
+    return `Content of ${filename}`;
+  }
+
+  editDocument(filename: string, content: string): void {
+    console.log(`Editing ${filename}: ${content}`);
+  }
+
+  saveDocument(filename: string): void {
+    console.log(`Saving document: ${filename}`);
+  }
+}
+
+// Proxy - controls access to the real service
+class DocumentProxy implements DocumentService {
+  private realService: RealDocumentService;
+  private userRole: string;
+
+  constructor(userRole: string) {
+    this.realService = new RealDocumentService();
+    this.userRole = userRole;
+  }
+
+  private hasPermission(operation: string): boolean {
+    if (this.userRole === "admin") return true;
+    if (this.userRole === "editor" && operation !== "delete") return true;
+    if (this.userRole === "viewer" && operation === "view") return true;
+    return false;
+  }
+
+  openDocument(filename: string): string {
+    if (!this.hasPermission("view")) {
+      throw new Error("Access denied: insufficient permissions");
+    }
+    return this.realService.openDocument(filename);
+  }
+
+  editDocument(filename: string, content: string): void {
+    if (!this.hasPermission("edit")) {
+      throw new Error("Access denied: cannot edit documents");
+    }
+    this.realService.editDocument(filename, content);
+  }
+
+  saveDocument(filename: string): void {
+    if (!this.hasPermission("edit")) {
+      throw new Error("Access denied: cannot save documents");
+    }
+    this.realService.saveDocument(filename);
+  }
+}
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+from abc import ABC, abstractmethod
+
+# Subject interface - defines what both the real object and proxy must implement
+class DocumentService(ABC):
+    @abstractmethod
+    def open_document(self, filename: str) -> str:
+        pass
+
+    @abstractmethod
+    def edit_document(self, filename: str, content: str) -> None:
+        pass
+
+    @abstractmethod
+    def save_document(self, filename: str) -> None:
+        pass
+
+# Real subject - the actual service that performs the work
+class RealDocumentService(DocumentService):
+    def open_document(self, filename: str) -> str:
+        print(f"Opening document: {filename}")
+        return f"Content of {filename}"
+
+    def edit_document(self, filename: str, content: str) -> None:
+        print(f"Editing {filename}: {content}")
+
+    def save_document(self, filename: str) -> None:
+        print(f"Saving document: {filename}")
+
+# Proxy - controls access to the real service
+class DocumentProxy(DocumentService):
+    def __init__(self, user_role: str):
+        self.real_service = RealDocumentService()
+        self.user_role = user_role
+
+    def _has_permission(self, operation: str) -> bool:
+        if self.user_role == "admin":
+            return True
+        if self.user_role == "editor" and operation != "delete":
+            return True
+        if self.user_role == "viewer" and operation == "view":
+            return True
+        return False
+
+    def open_document(self, filename: str) -> str:
+        if not self._has_permission("view"):
+            raise PermissionError("Access denied: insufficient permissions")
+        return self.real_service.open_document(filename)
+
+    def edit_document(self, filename: str, content: str) -> None:
+        if not self._has_permission("edit"):
+            raise PermissionError("Access denied: cannot edit documents")
+        self.real_service.edit_document(filename, content)
+
+    def save_document(self, filename: str) -> None:
+        if not self._has_permission("edit"):
+            raise PermissionError("Access denied: cannot save documents")
+        self.real_service.save_document(filename)
+```
+
+</TabItem> </Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function ProxyDemo() {
+  // State for user role, log, and document content
+  const [userRole, setUserRole] = React.useState("viewer");
+  const [documentName, setDocumentName] = React.useState("report.txt");
+  const [documentContent, setDocumentContent] =
+    React.useState("Sample content");
+  const [log, setLog] = React.useState([]);
+  const [currentContent, setCurrentContent] = React.useState("");
+
+  // Permissions based on role
+  const permissions = {
+    admin: { view: true, edit: true, save: true },
+    editor: { view: true, edit: true, save: true },
+    viewer: { view: true, edit: false, save: false },
+  };
+
+  const canPerform = (action) => permissions[userRole]?.[action] ?? false;
+
+  // Proxy-like operations
+  const handleOpenDocument = () => {
+    if (!canPerform("view")) {
+      setLog((l) => [...l, `❌ ${userRole}: Cannot view - access denied`]);
+      return;
+    }
+    setCurrentContent(documentContent);
+    setLog((l) => [...l, `✅ ${userRole}: Opened "${documentName}"`]);
+  };
+
+  const handleEditDocument = () => {
+    if (!canPerform("edit")) {
+      setLog((l) => [...l, `❌ ${userRole}: Cannot edit - access denied`]);
+      return;
+    }
+    setLog((l) => [...l, `✅ ${userRole}: Editing "${documentName}"`]);
+  };
+
+  const handleSaveDocument = () => {
+    if (!canPerform("save")) {
+      setLog((l) => [...l, `❌ ${userRole}: Cannot save - access denied`]);
+      return;
+    }
+    setDocumentContent(currentContent || documentContent);
+    setLog((l) => [...l, `✅ ${userRole}: Saved "${documentName}"`]);
+  };
+
+  const handleReset = () => {
+    setUserRole("viewer");
+    setDocumentName("report.txt");
+    setDocumentContent("Sample content");
+    setCurrentContent("");
+    setLog([]);
+  };
+
+  const handleClearLog = () => setLog([]);
+
+  return (
+    <div style={{ fontFamily: "sans-serif" }}>
+      <h3>Proxy Pattern — Access Control Demo</h3>
+
+      {/* Role Selection */}
+      <div
+        style={{
+          marginBottom: 16,
+          padding: 12,
+          border: "1px solid var(--ifm-color-emphasis-300)",
+          borderRadius: 4,
+          backgroundColor: "var(--ifm-background-surface-color)",
+        }}
+      >
+        <label style={{ display: "block", marginBottom: 8 }}>
+          <strong>Select User Role:</strong>
+        </label>
+        <div>
+          {["viewer", "editor", "admin"].map((role) => (
+            <label key={role} style={{ marginRight: 16 }}>
+              <input
+                type="radio"
+                name="role"
+                value={role}
+                checked={userRole === role}
+                onChange={(e) => setUserRole(e.target.value)}
+              />
+              {role.charAt(0).toUpperCase() + role.slice(1)}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Document Info */}
+      <div
+        style={{
+          marginBottom: 16,
+          padding: 12,
+          border: "1px solid var(--ifm-color-emphasis-300)",
+          borderRadius: 4,
+          backgroundColor: "var(--ifm-background-surface-color)",
+        }}
+      >
+        <div style={{ marginBottom: 8 }}>
+          <strong>Document:</strong> {documentName}
+        </div>
+        <div
+          style={{
+            marginBottom: 8,
+            fontSize: "0.9em",
+            color: "var(--ifm-color-emphasis-700)",
+          }}
+        >
+          <strong>Permissions:</strong>
+          <ul style={{ margin: "4px 0", paddingLeft: 20 }}>
+            {Object.entries(permissions[userRole]).map(([action, allowed]) => (
+              <li key={action}>
+                {action}: {allowed ? "✅ Allowed" : "❌ Denied"}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div style={{ marginBottom: 16 }}>
+        <button onClick={handleOpenDocument} style={{ marginRight: 8 }}>
+          Open Document
+        </button>
+        <button onClick={handleEditDocument} style={{ marginRight: 8 }}>
+          Edit Document
+        </button>
+        <button onClick={handleSaveDocument} style={{ marginRight: 8 }}>
+          Save Document
+        </button>
+        <button
+          onClick={handleReset}
+          style={{
+            marginRight: 8,
+            backgroundColor: "var(--ifm-color-emphasis-200)",
+          }}
+        >
+          Reset
+        </button>
+        <button
+          onClick={handleClearLog}
+          style={{ backgroundColor: "var(--ifm-color-emphasis-200)" }}
+        >
+          Clear Log
+        </button>
+      </div>
+
+      {/* Document Content Display */}
+      {currentContent && (
+        <div
+          style={{
+            marginBottom: 16,
+            padding: 12,
+            border: "1px solid var(--ifm-color-emphasis-300)",
+            borderRadius: 4,
+            backgroundColor: "var(--ifm-background-surface-color)",
+          }}
+        >
+          <strong>Document Content:</strong>
+          <div
+            style={{
+              marginTop: 8,
+              padding: 8,
+              backgroundColor: "var(--ifm-background-color)",
+              border: "1px solid var(--ifm-color-emphasis-300)",
+              borderRadius: 2,
+            }}
+          >
+            {currentContent}
+          </div>
+        </div>
+      )}
+
+      {/* Access Log */}
+      <div>
+        <h4>Access Log:</h4>
+        {log.length === 0 ? (
+          <p style={{ color: "var(--ifm-color-emphasis-700)" }}>
+            No actions yet. Try accessing the document!
+          </p>
+        ) : (
+          <ul style={{ listStyle: "none", padding: 0, fontSize: "0.9em" }}>
+            {log.map((entry, i) => (
+              <li
+                key={i}
+                style={{
+                  padding: 6,
+                  marginBottom: 4,
+                  backgroundColor: entry.includes("✅")
+                    ? "rgba(76, 175, 80, 0.2)"
+                    : "rgba(244, 67, 54, 0.2)",
+                  borderRadius: 2,
+                  fontFamily: "monospace",
+                }}
+              >
+                {entry}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div
+        style={{
+          marginTop: 16,
+          padding: 12,
+          backgroundColor: "rgba(51, 168, 224, 0.15)",
+          borderRadius: 4,
+          fontSize: "0.9em",
+          border: "1px solid var(--ifm-color-emphasis-300)",
+        }}
+      >
+        <strong>💡 Proxy in Action:</strong> The proxy controls access to the
+        document based on the user's role. Different roles have different
+        permissions, demonstrating how a proxy can add access control to an
+        object.
+      </div>
+    </div>
+  );
+}
+```
+
+## 🔗Relations to other patterns
+
+- [Adapter](/docs/structural/adapter) - With Adapter you access an existing object via different interface. With Proxy, the interface stays the same. With [Decorator](/docs/structural/decorator) you access the object via an enhanced interface.
+
+- [Facade](/docs/structural/facade) - Facade is similar to Proxy in that both buffer a complex entity and initialize it on its own. Unlike Facade, Proxy has the same interface as its service object, which makes them interchangeable.
+
+- [Decorator](/docs/structural/decorator) - Decorator and Proxy have similar structures, but very different intents. Both patterns are built on the composition principle, where one object is supposed to delegate some of the work to another. The difference is that a Proxy usually manages the life cycle of its service object on its own, whereas the composition of Decorators is always controlled by the client.
+
+---
+
+## 📚Sources
+
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring Guru - Proxy Pattern](https://refactoring.guru/design-patterns/proxy)
+- [Medium - Proxy Design Pattern](https://medium.com/@kalanamalshan98/proxy-design-pattern-a-comprehensive-guide-73688bbd8e93)
