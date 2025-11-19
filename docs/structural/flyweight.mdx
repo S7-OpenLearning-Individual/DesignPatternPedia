@@ -1,5 +1,414 @@
 ---
 title: Flyweight
+hide_title: true
+description: >
+  Saving memory, one object at a time.
 ---
 
-This is Flyweight Pattern page
+import { StructuralPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from "@theme/TOCInline";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+import FlyweightUnoptimized from "@site/static/img/patterns/structural/flyweight/flyweight-game-unoptimized.drawio.svg";
+import FlyweightOptimized from "@site/static/img/patterns/structural/flyweight/flyweight-game-optimized.drawio.svg";
+
+<StructuralPatternTag title="Flyweight" aliases={["Cache"]} />
+
+---
+
+The **Flyweight** pattern is a structural design pattern that allows the sharing of certain object properties to reduce memory consumption and improve performance in applications with a large number of similar objects.
+
+## 🧩The problem
+
+Let's say you've got a lovely side-project to create your own game. A single-player fishing in the woods type of game. Obviously you'd need to create well, woods. So you render a bunch of trees in the map the player is fishing in. You think your fishing game is awesome and thus send it to your mate to try it out. The problem is that the game runs fine on the main menu, but his game crashes a few minutes after he loads into the forest map.
+
+Your friend sadly does not have the best gaming PC, and thus ran out of RAM. This is due to your poorly optimized game, not some obscure bug in the game engine ([womp-womp](https://www.dictionary.com/browse/womp-womp)). This is your fault, but it is a common problem in the technical design aspects of a game. You have initialized each tree as if it were completely unique, which causes a ton of duplicate properties to be loaded into memory.
+
+<div style={{ textAlign: "center", padding: "2rem" }}>
+  <FlyweightUnoptimized />
+</div>
+
+## 🛠️Solutions
+
+Here's where the flyweight pattern comes in handy. Flyweight can help you save memory by keeping identical objects unique in memory by referencing them. Instead of each tree having it's own tree model, which is the same model because you only paid for one unique model. By having each try reference the tree model directly, you same having each tree initialize and save an identical copy of the tree in memory.
+
+<div style={{ textAlign: "center", padding: "2rem" }}>
+  <FlyweightOptimized />
+</div>
+
+### 🏛️Metaphors
+
+Think of a library where multiple readers want to read the same book. Instead of each reader having their own copy of the book, the library provides a single copy that all readers can share. This way, the library saves space and resources by avoiding duplicate copies of the same book.
+
+### 💡Real-world examples
+
+Common practical scenarios for applying the Flyweight pattern include:
+
+- Sharing character formatting information (like font style and size) among multiple characters to reduce memory usage.
+- Sharing graphical assets (like textures and models) among multiple game objects to optimize performance.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons
+  pros={[
+    "Saves a bunch of memory, assuming you have a lot of duplicate properties or identical objects. ",
+  ]}
+  cons={[
+    "The code becomes much more complicated to manage due to shared state and object references.",
+    "Code becomes harder to understand for new team members due to the indirection introduced by sharing objects.",
+  ]}
+/>
+
+## 🔍Applicability
+
+<Applicability
+  items={[
+    {
+      situation:
+        "Use Flyweight when your application has a large number of similar objects that consume a lot of memory.",
+      context:
+        "This helps reduce memory usage by sharing common data among these objects instead of duplicating it.",
+    },
+  ]}
+/>
+
+## 🧭Implementation Plan
+
+To implement a Flyweight manually:
+
+1. Identify the intrinsic (shared) and extrinsic (unique) properties of the objects you want to optimize.
+2. Create a Flyweight Factory that manages the shared objects. This factory should check if a requested object already exists; if it does, return the existing object; if not, create a new one and store it for future use.
+3. Modify your object creation process to use the Flyweight Factory for shared properties, while keeping unique properties separate.
+4. Ensure that the shared objects are immutable to prevent unintended side effects from shared state.
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+interface TreeType {
+  name: string;
+  color: string;
+  texture: string;
+}
+
+class TreeTypeFactory {
+  private types: Map<string, TreeType> = new Map();
+
+  getTreeType(name: string, color: string, texture: string): TreeType {
+    const key = `${name}-${color}-${texture}`;
+
+    if (!this.types.has(key)) {
+      this.types.set(key, { name, color, texture });
+    }
+
+    return this.types.get(key)!;
+  }
+
+  getInstanceCount(): number {
+    return this.types.size;
+  }
+}
+
+class Tree {
+  x: number;
+  y: number;
+  type: TreeType;
+
+  constructor(x: number, y: number, type: TreeType) {
+    this.x = x;
+    this.y = y;
+    this.type = type;
+  }
+
+  draw(): string {
+    return `Tree "${this.type.name}" at (${this.x}, ${this.y})`;
+  }
+}
+
+const factory = new TreeTypeFactory();
+const trees: Tree[] = [];
+
+for (let i = 0; i < 100; i++) {
+  const treeType = factory.getTreeType("Oak", "Green", "smooth");
+  trees.push(new Tree(Math.random() * 1000, Math.random() * 1000, treeType));
+}
+
+console.log(
+  `Created 100 trees with ${factory.getInstanceCount()} unique types`
+);
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+class TreeType:
+    def __init__(self, name: str, color: str, texture: str):
+        self.name = name
+        self.color = color
+        self.texture = texture
+
+class TreeTypeFactory:
+    _types = {}
+
+    @classmethod
+    def get_tree_type(cls, name: str, color: str, texture: str) -> TreeType:
+        key = f"{name}-{color}-{texture}"
+
+        if key not in cls._types:
+            cls._types[key] = TreeType(name, color, texture)
+
+        return cls._types[key]
+
+    @classmethod
+    def get_instance_count(cls) -> int:
+        return len(cls._types)
+
+class Tree:
+    def __init__(self, x: float, y: float, tree_type: TreeType):
+        self.x = x
+        self.y = y
+        self.type = tree_type
+
+    def draw(self) -> str:
+        return f"Tree \"{self.type.name}\" at ({self.x}, {self.y})"
+
+import random
+
+factory = TreeTypeFactory()
+trees = []
+
+for i in range(100):
+    tree_type = factory.get_tree_type("Oak", "Green", "smooth")
+    trees.append(Tree(random.random() * 1000, random.random() * 1000, tree_type))
+
+print(f"Created 100 trees with {factory.get_instance_count()} unique type(s)")
+```
+
+</TabItem> </Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function FlyweightDemo() {
+  const [trees, setTrees] = React.useState([]);
+  const [treeFactory, setTreeFactory] = React.useState({
+    types: {},
+    count: 0,
+  });
+
+  const isDarkMode =
+    document.documentElement.getAttribute("data-theme") === "dark";
+
+  const createTrees = (count) => {
+    const newFactory = { types: {}, count: 0 };
+    const newTrees = [];
+
+    for (let i = 0; i < count; i++) {
+      const treeTypeKey = Math.floor(Math.random() * 3);
+      const types = ["Oak", "Pine", "Birch"];
+      const type = types[treeTypeKey];
+
+      if (!newFactory.types[type]) {
+        newFactory.types[type] = true;
+        newFactory.count += 1;
+      }
+
+      newTrees.push({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        type: type,
+        color:
+          treeTypeKey === 0
+            ? "#8B4513"
+            : treeTypeKey === 1
+            ? "#2D5016"
+            : "#D2B48C",
+      });
+    }
+
+    setTrees(newTrees);
+    setTreeFactory(newFactory);
+  };
+
+  const reset = () => {
+    setTrees([]);
+    setTreeFactory({ types: {}, count: 0 });
+  };
+
+  const containerStyle = {
+    fontFamily: "sans-serif",
+    padding: "20px",
+    backgroundColor: isDarkMode ? "#1a1a1a" : "#f5f5f5",
+    borderRadius: "8px",
+  };
+
+  const buttonStyle = {
+    padding: "8px 16px",
+    marginRight: "8px",
+    marginBottom: "12px",
+    backgroundColor: isDarkMode ? "#0e639c" : "#0078d4",
+    color: "white",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontSize: "14px",
+  };
+
+  const canvasStyle = {
+    width: "100%",
+    height: "400px",
+    backgroundColor: isDarkMode ? "#2d2d2d" : "#ffffff",
+    border: `2px solid ${isDarkMode ? "#404040" : "#ddd"}`,
+    borderRadius: "4px",
+    marginBottom: "12px",
+    position: "relative",
+    overflow: "hidden",
+  };
+
+  const treeStyle = (tree) => ({
+    position: "absolute",
+    left: `${tree.x}%`,
+    top: `${tree.y}%`,
+    width: "30px",
+    height: "30px",
+    fontSize: "24px",
+    cursor: "default",
+  });
+
+  const statsStyle = {
+    marginTop: "12px",
+    padding: "12px",
+    backgroundColor: isDarkMode ? "#2d2d2d" : "#e8f4f8",
+    borderRadius: "4px",
+    border: `1px solid ${isDarkMode ? "#404040" : "#b3d9e8"}`,
+  };
+
+  const statItemStyle = {
+    marginBottom: "6px",
+    color: isDarkMode ? "#e0e0e0" : "#333",
+  };
+
+  return (
+    <div style={containerStyle}>
+      <h3>Flyweight Pattern Demo</h3>
+      <p>Create multiple tree objects sharing the same tree types</p>
+
+      <button onClick={() => createTrees(50)} style={buttonStyle}>
+        Create 50 Trees
+      </button>
+      <button onClick={() => createTrees(500)} style={buttonStyle}>
+        Create 500 Trees
+      </button>
+      <button onClick={() => createTrees(1000)} style={buttonStyle}>
+        Create 1000 Trees
+      </button>
+      <button
+        onClick={reset}
+        style={{
+          ...buttonStyle,
+          backgroundColor: isDarkMode ? "#a0522d" : "#d83b01",
+        }}
+      >
+        Reset
+      </button>
+
+      <div style={canvasStyle}>
+        {trees.map((tree) => (
+          <div key={tree.id} style={treeStyle(tree)} title={tree.type}>
+            🌲
+          </div>
+        ))}
+      </div>
+
+      <div style={statsStyle}>
+        <div style={statItemStyle}>
+          <strong>Total Trees Created:</strong> {trees.length}
+        </div>
+        <div style={statItemStyle}>
+          <strong>Unique Tree Types:</strong> {treeFactory.count}
+        </div>
+
+        <div
+          style={{
+            ...statItemStyle,
+            marginTop: "16px",
+            borderTop: `1px solid ${isDarkMode ? "#404040" : "#ccc"}`,
+            paddingTop: "12px",
+          }}
+        >
+          <strong>📊 Per-Tree Size:</strong>
+        </div>
+        <div style={statItemStyle}>
+          Tree size <strong>without Flyweight:</strong> 5 MB
+        </div>
+        <div style={statItemStyle}>
+          Tree size <strong>with Flyweight:</strong> 2 MB
+        </div>
+
+        <div
+          style={{
+            ...statItemStyle,
+            marginTop: "16px",
+            borderTop: `1px solid ${isDarkMode ? "#404040" : "#ccc"}`,
+            paddingTop: "12px",
+          }}
+        >
+          <strong>💾 Total Memory Usage:</strong>
+        </div>
+        <div style={statItemStyle}>
+          Without Flyweight: {trees.length} trees × 5 MB ={" "}
+          {(trees.length * 5).toFixed(2)} MB
+        </div>
+        <div style={statItemStyle}>
+          With Flyweight: {trees.length} trees × 2 MB ={" "}
+          {(trees.length * 2).toFixed(2)} MB
+        </div>
+
+        <div
+          style={{
+            ...statItemStyle,
+            marginTop: "16px",
+            padding: "12px",
+            backgroundColor: isDarkMode ? "#1a3a1a" : "#e8f5e9",
+            borderRadius: "4px",
+            color: isDarkMode ? "#4ade80" : "#22863a",
+            fontWeight: "bold",
+            borderLeft: `4px solid ${isDarkMode ? "#4ade80" : "#22863a"}`,
+          }}
+        >
+          💚 Memory Saved: {(trees.length * 5 - trees.length * 2).toFixed(2)} MB
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+## 🔗Relations to other patterns
+
+- You can implement shared leaf nodes of the [Composite](/docs/structural/composite) tree as [Flyweights](/docs/structural/flyweight) to save some RAM.
+- [Flyweight](/docs/structural/flyweight) shows how to make lots of little objects, whereas [Facade](/docs/structural/facade) shows how to make a single object that represents an entire subsystem.
+- [Flyweight](/docs/structural/flyweight) would resemble [Singleton](/docs/creational/singleton) if you somehow managed to reduce all shared states of the objects to just one flyweight object. But there are two fundamental differences between these patterns:
+  - Singleton restricts creation to precisely one object throughout the application lifetime.
+  - Flyweight manages many shared objects, each representing a specific instance of shared state.
+
+---
+
+## 📚Sources
+
+Information used in this page was collected from various reliable sources:
+
+- [Game Programming Patterns - Flyweight](https://gameprogrammingpatterns.com/flyweight.html)
+- [Refactoring Guru - Flyweight Pattern](https://refactoring.guru/design-patterns/flyweight)
