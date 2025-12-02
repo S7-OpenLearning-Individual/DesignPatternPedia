@@ -1,5 +1,443 @@
 ---
 title: Chain of Responsibility
+hide_title: true
+description: >
+  Many links make a strong chain.
 ---
 
-This is Chain of Responsibility Pattern page
+import { BehavioralPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from "@theme/TOCInline";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+
+<BehavioralPatternTag
+  title="Chain of Responsibility"
+  aliases={["Chain of Command, CoR"]}
+/>
+
+---
+
+The **Chain of Responsibility** pattern allows you to 'chain' different handlers together, each handler in turn does their part and then passes the request along the chain until it is definitely handled.
+
+## 🧩The problem
+
+Let's say you're setting up a customer support system where different types of requests need to be handled by different departments. You want to ensure that each request is processed by the appropriate handler without tightly coupling the request sender to the specific handlers. This sounds simple enough, you take in the request, determine its type, and send it to the right department.
+
+But it turns out that there was a problem with shipping around christmas, so you need every order to be explicitly checked by the shipping department as well. Suddenly your simple if-else structure becomes a tangled mess of conditions, making it hard to maintain and extend. You need a more flexible way to handle requests that can easily adapt to changes in the processing logic.
+
+As you keep adding new features, expanding on existing pieces of functionality or otherwise make any changes, it becomes increasingly more difficult to maintain the code.
+
+## 🛠️Solutions
+
+This is exactly where the Chain of Responsibility pattern shines. This pattern suggests splitting these tasks or pieces of validation into their own separate pieces of code called 'Handlers'. Each handler is responsible for it's own task, and can even pause or stop the chain if something goes wrong.
+
+When a request comes in, it is passed to the first handler in the chain. If that handler can process the request, it does so. If not, it passes the request to the next handler in the chain. This continues until a handler processes the request or the end of the chain is reached.
+
+In our original example, we could have separate handlers for validating the request, checking inventory, processing payment, and arranging shipping. Each handler focuses on its specific task, making the code more modular and easier to maintain.
+
+### 🏛️Metaphors
+
+You can think of the Chain of Responsibility pattern like calling customer service, your call is originally routed to a tape to select the right department. This request is then passed to said department, tech support perhaps in this instance, they can then call the relevant specialist team if they are unable to help you directly. Each 'handler' in this case is a different department or team, each with their own specific expertise.
+
+If the customer service representative can help you directly, they do so. If not, they pass your request along to the next appropriate team until your issue is resolved.
+
+### 💡Real-world examples
+
+Common practical scenarios for applying the Chain of Responsibility pattern include:
+
+- Logging frameworks where multiple loggers (console, file, remote server) can handle log messages.
+- Event handling systems where events are passed through a chain of handlers until one processes it.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons
+  pros={[
+    "Allows control over the order of processing requests",
+    "Single Responsibility Principle. You can decouple classes that invoke operations from classes that perform operations.",
+    "Open/Closed Principle. You can introduce new handlers into the app without breaking the existing client code.",
+  ]}
+  cons={[
+    "Some requests may go unhandled if no handler in the chain can process them.",
+  ]}
+/>
+
+## 🔍Applicability
+
+<Applicability
+  items={[
+    {
+      situation:
+        "Use when your use-case wants you to process multiple, different kinds of requests in a particular order. But the exact types of requests are not known beforehand.",
+      context:
+        "This pattern lets you link various systems and processes together into a chain, this way you can easily add or remove handlers as needed.",
+    },
+    {
+      situation:
+        "Use when it is crucial to execute steps in a particular order.",
+      context:
+        "This pattern ensures that each step is executed in the correct sequence, maintaining the integrity of the overall process.",
+    },
+  ]}
+/>
+
+## 🧭Implementation Plan
+
+To implement a Chain of Responsibility manually:
+
+1. Define a Handler interface with a method to set the next handler and a method to handle requests.
+2. Create concrete handler classes that implement the Handler interface, each responsible for a specific type of request.
+3. In each concrete handler, implement the logic to process the request or pass it to the next handler if it cannot be processed.
+4. Set up the chain by linking the handlers together in the desired order.
+5. When a request comes in, pass it to the first handler in the chain.
+6. Each handler will either process the request or pass it along to the next handler until the request is handled or the end of the chain is reached. Keep in mind that one of three outcomes will occur: the chain is only 1 link long, the request may not fully go through the chain, or the request is not handled at all.
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+interface Handler {
+  setNext(handler: Handler): Handler;
+  handle(request: Request): string;
+}
+
+interface Request {
+  type: string;
+  content: string;
+}
+
+abstract class BaseHandler implements Handler {
+  private nextHandler: Handler | null = null;
+
+  setNext(handler: Handler): Handler {
+    this.nextHandler = handler;
+    return handler;
+  }
+
+  handle(request: Request): string {
+    if (this.canHandle(request)) {
+      return this.process(request);
+    }
+
+    if (this.nextHandler) {
+      return this.nextHandler.handle(request);
+    }
+
+    return "Request not handled";
+  }
+
+  protected abstract canHandle(request: Request): boolean;
+  protected abstract process(request: Request): string;
+}
+
+class ValidationHandler extends BaseHandler {
+  protected canHandle(request: Request): boolean {
+    return request.type === "validation";
+  }
+
+  protected process(request: Request): string {
+    return `✓ Validation passed for: ${request.content}`;
+  }
+}
+
+class PaymentHandler extends BaseHandler {
+  protected canHandle(request: Request): boolean {
+    return request.type === "payment";
+  }
+
+  protected process(request: Request): string {
+    return `💳 Payment processed: ${request.content}`;
+  }
+}
+
+class ShippingHandler extends BaseHandler {
+  protected canHandle(request: Request): boolean {
+    return request.type === "shipping";
+  }
+
+  protected process(request: Request): string {
+    return `📦 Shipping arranged for: ${request.content}`;
+  }
+}
+
+const validation = new ValidationHandler();
+const payment = new PaymentHandler();
+const shipping = new ShippingHandler();
+
+validation.setNext(payment).setNext(shipping);
+
+console.log(validation.handle({ type: "shipping", content: "Order #123" }));
+console.log(validation.handle({ type: "payment", content: "$99.99" }));
+console.log(validation.handle({ type: "validation", content: "Product data" }));
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+from abc import ABC, abstractmethod
+
+class Handler(ABC):
+    def __init__(self):
+        self._next_handler = None
+
+    def set_next(self, handler):
+        self._next_handler = handler
+        return handler
+
+    def handle(self, request):
+        if self.can_handle(request):
+            return self.process(request)
+
+        if self._next_handler:
+            return self._next_handler.handle(request)
+
+        return "Request not handled"
+
+    @abstractmethod
+    def can_handle(self, request):
+        pass
+
+    @abstractmethod
+    def process(self, request):
+        pass
+
+class ValidationHandler(Handler):
+    def can_handle(self, request):
+        return request["type"] == "validation"
+
+    def process(self, request):
+        return f"✓ Validation passed for: {request['content']}"
+
+class PaymentHandler(Handler):
+    def can_handle(self, request):
+        return request["type"] == "payment"
+
+    def process(self, request):
+        return f"💳 Payment processed: {request['content']}"
+
+class ShippingHandler(Handler):
+    def can_handle(self, request):
+        return request["type"] == "shipping"
+
+    def process(self, request):
+        return f"📦 Shipping arranged for: {request['content']}"
+
+validation = ValidationHandler()
+payment = PaymentHandler()
+shipping = ShippingHandler()
+
+validation.set_next(payment).set_next(shipping)
+
+print(validation.handle({"type": "shipping", "content": "Order #123"}))
+print(validation.handle({"type": "payment", "content": "$99.99"}))
+print(validation.handle({"type": "validation", "content": "Product data"}))
+```
+
+</TabItem> </Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function ChainOfResponsibilityDemo() {
+  const initialRequests = [
+    { id: 1, type: "validation", content: "Product data", status: "pending" },
+    { id: 2, type: "payment", content: "$99.99", status: "pending" },
+    { id: 3, type: "shipping", content: "Order #123", status: "pending" },
+  ];
+
+  const [requests, setRequests] = React.useState(initialRequests);
+  const [log, setLog] = React.useState([]);
+
+  const handlers = {
+    validation: (content) => `✓ Validation passed for: ${content}`,
+    payment: (content) => `💳 Payment processed: ${content}`,
+    shipping: (content) => `📦 Shipping arranged for: ${content}`,
+  };
+
+  const processRequest = (requestId) => {
+    const request = requests.find((r) => r.id === requestId);
+    if (!request || request.status !== "pending") return;
+
+    const handler = handlers[request.type];
+    const result = handler
+      ? handler(request.content)
+      : "⚠️ Unknown request type";
+
+    setRequests(
+      requests.map((r) =>
+        r.id === requestId ? { ...r, status: "handled", result } : r
+      )
+    );
+
+    setLog((l) => [...l, result]);
+  };
+
+  const resetDemo = () => {
+    setRequests(initialRequests);
+    setLog([]);
+  };
+
+  const isDarkMode =
+    typeof window !== "undefined"
+      ? document.documentElement.getAttribute("data-theme") === "dark"
+      : false;
+
+  const styles = {
+    container: {
+      fontFamily: "sans-serif",
+      padding: "16px",
+      borderRadius: "8px",
+      backgroundColor: isDarkMode ? "#1e1e1e" : "#f5f5f5",
+      color: isDarkMode ? "#e0e0e0" : "#333",
+    },
+    requestCard: {
+      padding: "12px",
+      margin: "8px 0",
+      border: `2px solid ${isDarkMode ? "#444" : "#ddd"}`,
+      borderRadius: "6px",
+      backgroundColor: isDarkMode ? "#2a2a2a" : "#fff",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    button: {
+      padding: "8px 16px",
+      margin: "4px",
+      borderRadius: "4px",
+      border: "none",
+      backgroundColor: isDarkMode ? "#0d47a1" : "#1976d2",
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: "14px",
+    },
+    resetButton: {
+      padding: "8px 16px",
+      margin: "4px",
+      borderRadius: "4px",
+      border: "none",
+      backgroundColor: isDarkMode ? "#c62828" : "#d32f2f",
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: "14px",
+    },
+    logContainer: {
+      marginTop: "16px",
+      padding: "12px",
+      borderRadius: "6px",
+      backgroundColor: isDarkMode ? "#2a2a2a" : "#f9f9f9",
+      border: `1px solid ${isDarkMode ? "#444" : "#e0e0e0"}`,
+    },
+    pending: {
+      backgroundColor: isDarkMode ? "#3c3c00" : "#fff3cd",
+      borderColor: isDarkMode ? "#666400" : "#ffc107",
+    },
+    handled: {
+      backgroundColor: isDarkMode ? "#0d3a0d" : "#d4edda",
+      borderColor: isDarkMode ? "#1a6b1a" : "#28a745",
+    },
+  };
+
+  return (
+    <div style={styles.container}>
+      <h3>Chain of Responsibility Demo</h3>
+
+      <div>
+        <h4>Requests:</h4>
+        {requests.map((request) => (
+          <div
+            key={request.id}
+            style={{
+              ...styles.requestCard,
+              ...(request.status === "pending"
+                ? styles.pending
+                : styles.handled),
+            }}
+          >
+            <div>
+              <strong>[{request.type.toUpperCase()}]</strong> {request.content}
+              {request.status === "handled" && (
+                <div
+                  style={{
+                    fontSize: "0.9em",
+                    marginTop: "4px",
+                    color: isDarkMode ? "#90ee90" : "#155724",
+                  }}
+                >
+                  ✓ {request.result}
+                </div>
+              )}
+            </div>
+            {request.status === "pending" && (
+              <button
+                onClick={() => processRequest(request.id)}
+                style={styles.button}
+              >
+                Process
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginTop: "12px" }}>
+        <button onClick={resetDemo} style={styles.resetButton}>
+          Reset Demo
+        </button>
+      </div>
+
+      <div style={styles.logContainer}>
+        <h4 style={{ marginTop: 0 }}>Processing Log:</h4>
+        {log.length === 0 ? (
+          <p style={{ color: isDarkMode ? "#999" : "#999" }}>
+            Process requests to see the chain in action
+          </p>
+        ) : (
+          <ul style={{ margin: "0", paddingLeft: "20px" }}>
+            {log.map((entry, i) => (
+              <li key={i} style={{ margin: "4px 0" }}>
+                {entry}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+## 🔗Relations to other patterns
+
+- [Chain of Responsibility](/docs/behavioral/chain-of-responsibility), [Command](/docs/behavioral/command), [Mediator](/docs/behavioral/mediator), and [Observer](/docs/behavioral/observer) address various ways of connecting senders and receivers of requests:
+
+  - [Chain of Responsibility](/docs/behavioral/chain-of-responsibility) passes a request sequentially along a dynamic chain of potential receivers until one of them handles it.
+  - [Command](/docs/behavioral/command) establishes unidirectional connections between senders and receivers.
+  - [Mediator](/docs/behavioral/mediator) eliminates direct connections between senders and receivers, forcing them to communicate indirectly via a mediator object.
+
+  - [Observer](/docs/behavioral/observer) lets receivers dynamically subscribe to and unsubscribe from receiving requests.
+
+- [Chain of Responsibility](/docs/behavioral/chain-of-responsibility) is often used in conjunction with [Composite](/docs/structural/composite). In this case, when a leaf component gets a request, it may pass it through the chain of all of the parent components down to the root of the object tree.
+
+- Handlers in [Chain of Responsibility](/docs/behavioral/chain-of-responsibility) can be implemented as [Command](/docs/behavioral/command)s. In this case, you can execute a lot of different operations over the same context object, represented by a request.
+
+- [Chain of Responsibility](/docs/behavioral/chain-of-responsibility) and [Decorator](/docs/structural/decorator) have very similar class structures. Both patterns rely on recursive composition to pass the execution through a series of objects. However, there are several crucial differences.
+
+  The [Chain of Responsibility](/docs/behavioral/chain-of-responsibility) handlers can execute arbitrary operations independently of each other. They can also stop passing the request further at any point. On the other hand, various [Decorator](/docs/structural/decorator)s can extend the object's behavior while keeping it consistent with the base interface. In addition, decorators aren't allowed to break the flow of the request.
+
+---
+
+## 📚Sources
+
+Information used in this page was collected from various reliable sources:
+
+- [Test link here](https://www.google.com)
