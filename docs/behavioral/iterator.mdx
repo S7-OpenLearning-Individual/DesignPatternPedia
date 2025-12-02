@@ -1,5 +1,484 @@
 ---
 title: Iterator
+hide_title: true
+description: >
+  One element at a time, no shortcuts allowed.
 ---
 
-This is Iterator Pattern page
+import { BehavioralPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from "@theme/TOCInline";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+
+<BehavioralPatternTag title="Iterator" aliases={["Cursor"]} />
+
+---
+
+The **Iterator** pattern provides a way to access the elements of a collection sequentially without exposing the underlying representation. This pattern allows you to traverse different collection types using the same interface, regardless of whether the collection is a list, set, tree, or any other data structure.
+
+## 🧩The problem
+
+Imagine you have different types of collections in your application—some stored as arrays, others as linked lists, and some as trees. If you want to traverse through these collections, you'd typically need to know their internal structure. You might write one loop for arrays using indices, another for linked lists using pointers, and yet another for trees using recursion. This couples your client code tightly to the collection's implementation, making it difficult to switch between different collection types or add new ones.
+
+Additionally, if multiple parts of your code need to iterate through the same collection in different ways (forward, backward, or in a custom order), you'd need to expose the collection's internal structure or implement multiple traversal methods directly in the collection class, violating the Single Responsibility Principle.
+
+## 🛠️Solutions
+
+The Iterator pattern solves this by extracting the traversal logic from the collection into a separate iterator object. The iterator provides a uniform interface for accessing elements sequentially, regardless of the collection's internal structure. This way:
+
+- Client code doesn't need to know how the collection stores its data.
+- You can support multiple ways of traversing the same collection by creating different iterators.
+- New collection types can be added without modifying existing client code.
+- The collection and iteration logic are cleanly separated.
+
+### 🏛️Metaphors
+
+Think of a bookshelf with books arranged in different ways—some standing upright, some lying flat, and some grouped by genre. To read the books in order, you could ask the bookshelf keeper (iterator) to give you the next book, regardless of how it's arranged internally. The bookshelf keeper knows the internal layout and can navigate it, so you don't have to. You simply ask for the next book and move forward through the collection without worrying about the underlying organization.
+
+### 💡Real-world examples
+
+Common practical scenarios for applying the Iterator pattern include:
+
+- File system traversal, iterating through files in directories without knowing the storage structure.
+- Database query results, providing a uniform way to fetch rows from different database engines.
+- Graph traversal, iterating through nodes in depth-first, breadth-first, or other custom orders.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons
+  pros={[
+    "Single Responsibility Principle. You can extract traversal logic from collections into separate iterator classes.",
+    "Open/Closed Principle. You can introduce new types of collections and iterators without breaking existing client code.",
+    "You can implement different traversal strategies (forward, backward, random access) on the same collection.",
+    "Allows you to delay iteration or skip elements without loading the entire collection into memory.",
+  ]}
+  cons={[
+    "The pattern may be overkill for simple collections that don't require complex traversal logic.",
+    "Using iterators can be slightly less efficient than directly accessing collection elements in some cases.",
+  ]}
+/>
+
+## 🔍Applicability
+
+<Applicability
+  items={[
+    {
+      situation:
+        "Use the Iterator pattern when you want to access elements of a collection sequentially without exposing its underlying representation.",
+      context:
+        "This allows you to support multiple collection types with a uniform interface and keeps the client code independent of the collection's internal structure.",
+    },
+    {
+      situation:
+        "Use the Iterator pattern when you need to support multiple ways of traversing a collection.",
+      context:
+        "For example, iterating forward, backward, or in a specific order. Each traversal strategy can be implemented as a separate iterator.",
+    },
+    {
+      situation:
+        "Use the Iterator pattern when you want to provide a common interface for iterating over different types of collections.",
+      context:
+        "This makes it easier to write generic algorithms that work with any collection type, improving code reusability.",
+    },
+    {
+      situation:
+        "Use the Iterator pattern when you want to support lazy iteration.",
+      context:
+        "Iterators can compute values on-the-fly without loading the entire collection into memory, which is useful for large or infinite datasets.",
+    },
+  ]}
+/>
+
+## 🧭Implementation Plan
+
+To implement the Iterator pattern manually:
+
+1. Define an Iterator interface that specifies methods like `hasNext()`, `next()`, and optionally `reset()` or `remove()`.
+2. Create a concrete iterator class for each collection type that implements the Iterator interface.
+3. Each concrete iterator should maintain the current position within the collection and implement the traversal logic.
+4. Update your collection class to provide a method that returns an iterator instance.
+5. Client code uses the iterator's interface to traverse the collection without knowing its internal structure.
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+// Iterator interface
+interface Iterator<T> {
+  hasNext(): boolean;
+  next(): T;
+}
+
+// Collection interface
+interface Collection<T> {
+  createIterator(): Iterator<T>;
+}
+
+// Concrete Iterator for arrays
+class ArrayIterator<T> implements Iterator<T> {
+  private position: number = 0;
+
+  constructor(private collection: T[]) {}
+
+  hasNext(): boolean {
+    return this.position < this.collection.length;
+  }
+
+  next(): T {
+    if (!this.hasNext()) {
+      throw new Error("No more elements");
+    }
+    return this.collection[this.position++];
+  }
+}
+
+// Concrete Collection
+class BookCollection implements Collection<string> {
+  private books: string[] = [];
+
+  addBook(book: string): void {
+    this.books.push(book);
+  }
+
+  createIterator(): Iterator<string> {
+    return new ArrayIterator(this.books);
+  }
+}
+
+// Usage
+const library = new BookCollection();
+library.addBook("Clean Code");
+library.addBook("Design Patterns");
+library.addBook("The Pragmatic Programmer");
+
+const iterator = library.createIterator();
+while (iterator.hasNext()) {
+  console.log(iterator.next());
+}
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+from abc import ABC, abstractmethod
+
+# Iterator interface
+class Iterator(ABC):
+    @abstractmethod
+    def has_next(self):
+        pass
+
+    @abstractmethod
+    def next(self):
+        pass
+
+# Collection interface
+class Collection(ABC):
+    @abstractmethod
+    def create_iterator(self):
+        pass
+
+# Concrete Iterator for lists
+class ListIterator(Iterator):
+    def __init__(self, collection):
+        self.collection = collection
+        self.position = 0
+
+    def has_next(self):
+        return self.position < len(self.collection)
+
+    def next(self):
+        if not self.has_next():
+            raise StopIteration("No more elements")
+        value = self.collection[self.position]
+        self.position += 1
+        return value
+
+# Concrete Collection
+class BookCollection(Collection):
+    def __init__(self):
+        self.books = []
+
+    def add_book(self, book):
+        self.books.append(book)
+
+    def create_iterator(self):
+        return ListIterator(self.books)
+
+# Usage
+library = BookCollection()
+library.add_book("Clean Code")
+library.add_book("Design Patterns")
+library.add_book("The Pragmatic Programmer")
+
+iterator = library.create_iterator()
+while iterator.has_next():
+    print(iterator.next())
+```
+
+</TabItem> </Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function IteratorDemo() {
+  // Simple collection class
+  class PlaylistCollection {
+    constructor() {
+      this.songs = [];
+    }
+
+    addSong(song) {
+      this.songs.push(song);
+    }
+
+    createIterator() {
+      return new PlaylistIterator(this.songs);
+    }
+
+    createReverseIterator() {
+      return new ReversePlaylistIterator(this.songs);
+    }
+  }
+
+  // Forward iterator
+  class PlaylistIterator {
+    constructor(songs) {
+      this.songs = songs;
+      this.position = 0;
+    }
+
+    hasNext() {
+      return this.position < this.songs.length;
+    }
+
+    next() {
+      if (!this.hasNext()) return null;
+      return this.songs[this.position++];
+    }
+
+    reset() {
+      this.position = 0;
+    }
+  }
+
+  // Reverse iterator
+  class ReversePlaylistIterator {
+    constructor(songs) {
+      this.songs = songs;
+      this.position = songs.length - 1;
+    }
+
+    hasNext() {
+      return this.position >= 0;
+    }
+
+    next() {
+      if (!this.hasNext()) return null;
+      return this.songs[this.position--];
+    }
+
+    reset() {
+      this.position = this.songs.length - 1;
+    }
+  }
+
+  const [playlist] = React.useState(() => {
+    const p = new PlaylistCollection();
+    p.addSong("Song 1");
+    p.addSong("Song 2");
+    p.addSong("Song 3");
+    return p;
+  });
+
+  const [currentSong, setCurrentSong] = React.useState(null);
+  const [direction, setDirection] = React.useState("forward");
+  const [iteratorRef] = React.useState(() => ({
+    current: null,
+  }));
+  const [log, setLog] = React.useState([]);
+
+  const isDarkMode =
+    typeof window !== "undefined"
+      ? document.documentElement.getAttribute("data-theme") === "dark"
+      : false;
+
+  const styles = {
+    container: {
+      fontFamily: "sans-serif",
+      padding: "16px",
+      borderRadius: "8px",
+      backgroundColor: isDarkMode ? "#1e1e1e" : "#f5f5f5",
+      color: isDarkMode ? "#e0e0e0" : "#333",
+    },
+    button: {
+      padding: "8px 16px",
+      margin: "4px",
+      borderRadius: "4px",
+      border: "none",
+      backgroundColor: isDarkMode ? "#0d47a1" : "#1976d2",
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: "14px",
+    },
+    outputBox: {
+      padding: "12px",
+      margin: "12px 0",
+      borderRadius: "6px",
+      border: `2px solid ${isDarkMode ? "#444" : "#ddd"}`,
+      backgroundColor: isDarkMode ? "#2a2a2a" : "#fff",
+      minHeight: "40px",
+      fontSize: "16px",
+      fontWeight: "bold",
+    },
+  };
+
+  const initIterator = (dir) => {
+    setDirection(dir);
+    iteratorRef.current =
+      dir === "forward"
+        ? playlist.createIterator()
+        : playlist.createReverseIterator();
+    setCurrentSong(null);
+    setLog([]);
+    setLog((l) => [...l, `Iterator started (${dir})`]);
+  };
+
+  const playNext = () => {
+    if (!iteratorRef.current) {
+      setLog((l) => [...l, "⚠️ Initialize iterator first"]);
+      return;
+    }
+
+    if (iteratorRef.current.hasNext()) {
+      const song = iteratorRef.current.next();
+      setCurrentSong(song);
+      setLog((l) => [...l, `▶️ Playing: ${song}`]);
+    } else {
+      setCurrentSong(null);
+      setLog((l) => [...l, "✓ End of playlist"]);
+    }
+  };
+
+  const resetIterator = () => {
+    if (iteratorRef.current && iteratorRef.current.reset) {
+      iteratorRef.current.reset();
+      setCurrentSong(null);
+      setLog((l) => [...l, "↻ Iterator reset"]);
+    }
+  };
+
+  const clearLog = () => setLog([]);
+
+  return (
+    <div style={styles.container}>
+      <h3>Iterator Pattern Demo</h3>
+
+      <div style={styles.outputBox}>
+        {currentSong ? `♪ ${currentSong}` : "No song playing..."}
+      </div>
+
+      <div>
+        <h4>Controls:</h4>
+        <button onClick={() => initIterator("forward")} style={styles.button}>
+          Start Forward
+        </button>
+        <button onClick={() => initIterator("reverse")} style={styles.button}>
+          Start Reverse
+        </button>
+        <button onClick={playNext} style={styles.button}>
+          Next Song
+        </button>
+        <button
+          onClick={resetIterator}
+          style={{
+            ...styles.button,
+            backgroundColor: isDarkMode ? "#666" : "#757575",
+          }}
+        >
+          Reset
+        </button>
+        <button
+          onClick={clearLog}
+          style={{
+            ...styles.button,
+            backgroundColor: isDarkMode ? "#c62828" : "#d32f2f",
+          }}
+        >
+          Clear Log
+        </button>
+      </div>
+
+      <div style={{ marginTop: "16px" }}>
+        <h4>Playlist:</h4>
+        <ul>
+          {playlist.songs.map((song, i) => (
+            <li key={i} style={{ margin: "4px 0" }}>
+              {song}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div
+        style={{
+          marginTop: "16px",
+          padding: "12px",
+          borderRadius: "6px",
+          backgroundColor: isDarkMode ? "#2a2a2a" : "#f9f9f9",
+          border: `1px solid ${isDarkMode ? "#444" : "#e0e0e0"}`,
+          maxHeight: "150px",
+          overflowY: "auto",
+        }}
+      >
+        <h4 style={{ marginTop: 0 }}>Action Log:</h4>
+        {log.length === 0 ? (
+          <p
+            style={{
+              color: isDarkMode ? "#999" : "#999",
+              margin: 0,
+            }}
+          >
+            Initialize an iterator to start
+          </p>
+        ) : (
+          <ul style={{ margin: "0", paddingLeft: "20px" }}>
+            {log.map((entry, i) => (
+              <li key={i} style={{ margin: "4px 0" }}>
+                {entry}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+## 🔗Relations to other patterns
+
+- [Iterator](/docs/behavioral/iterator) and [Strategy](/docs/behavioral/strategy) have similar structures as they both encapsulate behavior, but they solve different problems. Strategy encapsulates algorithms, while Iterator encapsulates traversal logic.
+- [Iterator](/docs/behavioral/iterator) can be used in conjunction with [Factory Method](/docs/creational/factory-method) to create different iterator instances for different collection types.
+- [Composite](/docs/structural/composite) can be used with [Iterator](/docs/behavioral/iterator) to provide a uniform way to traverse complex tree structures.
+- [Iterator](/docs/behavioral/iterator) and [Observer](/docs/behavioral/observer) can work together where observers are notified as the iterator traverses a collection.
+- [Memento](/docs/behavioral/memento) can store the iterator's state to allow resuming iteration from a previous point.
+
+---
+
+## 📚Sources
+
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring Guru - Iterator](https://refactoring.guru/design-patterns/iterator)
