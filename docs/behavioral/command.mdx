@@ -1,5 +1,480 @@
 ---
 title: Command
+hide_title: true
+description: >
+  For when you want structure (and an undo button).
 ---
 
-This is Command Pattern page
+import { BehavioralPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from "@theme/TOCInline";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+
+<BehavioralPatternTag title="Command" aliases={["Action", "Transaction"]} />
+
+---
+
+The **Command** pattern allows you to encapsulate a request as a standalone object that contains all the information about the request. This transformation lets you parameterize methods with different requests, delay or queue a request's execution, and support performing 'undo' and 'redo' operations.
+
+## 🧩The problem
+
+Imagine you're building a text editor with multiple operations like cut, copy, paste, and undo. Typically, you might call these methods directly from buttons or menus. However, this creates tight coupling between the user interface and the actual operations. If you want to add logging, undo functionality, or execute commands at a later time, your code becomes increasingly complex and difficult to maintain.
+
+Additionally, if you want to queue commands, execute them in batches, or reverse their effects, you're forced to write custom logic scattered throughout your application. This violates the Single Responsibility Principle and makes it hard to extend the system with new features.
+
+## 🛠️Solutions
+
+The Command pattern solves this by wrapping requests into objects called commands. Each command encapsulates a specific action, including the object that performs the action (the receiver) and any parameters needed. This allows you to:
+
+- Decouple the object that invokes the operation from the one that performs it.
+- Queue commands and execute them later or in a specific order.
+- Implement undo and redo functionality by storing command history.
+- Log and audit operations.
+- Support transactions and batch processing.
+
+By treating commands as first-class objects, you gain flexibility and control over how and when operations are executed.
+
+### 🏛️Metaphors
+
+Think of a restaurant where customers place orders. The customer (client) doesn't cook the food themselves. Instead, they write down their request on a piece of paper (command object), which is then passed to the kitchen (receiver). The kitchen staff (invoker) receives the order and executes it whenever they're ready. If the customer needs to cancel or modify the order before it's prepared, they can do so because the request is captured as an object. The waiter doesn't need to know how to cook; they just need to deliver the command.
+
+### 💡Real-world examples
+
+Common practical scenarios for applying the Command pattern include:
+
+- Text editors with undo/redo functionality, where each edit operation is a command that can be reversed.
+- Remote controls that queue and execute multiple device commands in sequence.
+- Task schedulers that execute jobs at specified times or in response to events.
+- GUI buttons and menus that trigger different operations without knowing implementation details.
+- Transaction systems that need to log, queue, or rollback operations.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons
+  pros={[
+    "Single Responsibility Principle. You can decouple classes that invoke operations from classes that perform these operations.",
+    "Open/Closed Principle. You can introduce new commands into the app without breaking existing client code.",
+    "Allows you to implement undo/redo, command queuing, and deferred execution.",
+    "Allows you to assemble a set of simple commands into a complex one.",
+  ]}
+  cons={[
+    "The code may become more complicated because you're introducing a new layer of abstraction between senders and receivers.",
+  ]}
+/>
+
+## 🔍Applicability
+
+<Applicability
+  items={[
+    {
+      situation:
+        "Use the Command pattern when you want to parameterize objects with operations.",
+      context:
+        "Instead of passing method references directly, you can pass command objects, allowing operations to be executed at any time, in any order, or with different contexts.",
+    },
+    {
+      situation:
+        "Use the Command pattern when you want to queue operations or execute them at specified times.",
+      context:
+        "Commands can be stored in collections and executed later, making it ideal for task schedulers and batch processing.",
+    },
+    {
+      situation:
+        "Use the Command pattern when you need to implement undo and redo functionality.",
+      context:
+        "By storing command history, you can reverse operations and re-apply them as needed.",
+    },
+    {
+      situation:
+        "Use the Command pattern when you want to log changes or implement reversible operations.",
+      context:
+        "Commands can be serialized, logged, and replayed for auditing and recovery purposes.",
+    },
+  ]}
+/>
+
+## 🧭Implementation Plan
+
+To implement the Command pattern manually:
+
+1. Create a Command interface or abstract class that defines a method to execute the command (e.g., `execute()`).
+2. Create concrete command classes for each specific operation, implementing the Command interface.
+3. Each concrete command should store a reference to the receiver object and the parameters needed to execute the operation.
+4. Create an invoker class that accepts and stores commands, and provides a method to execute them.
+5. Optionally, add undo functionality by implementing an `undo()` method and maintaining a command history.
+6. Connect the client code to pass commands to the invoker instead of calling methods directly.
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+// Command interface
+interface Command {
+  execute(): void;
+  undo(): void;
+}
+
+// Receiver class
+class TextEditor {
+  private content: string = "";
+
+  write(text: string): void {
+    this.content += text;
+    console.log(`Content: ${this.content}`);
+  }
+
+  deleteText(length: number): void {
+    this.content = this.content.slice(0, -length);
+    console.log(`Content: ${this.content}`);
+  }
+
+  getContent(): string {
+    return this.content;
+  }
+}
+
+// Concrete commands
+class WriteCommand implements Command {
+  constructor(private editor: TextEditor, private text: string) {}
+
+  execute(): void {
+    this.editor.write(this.text);
+  }
+
+  undo(): void {
+    this.editor.deleteText(this.text.length);
+  }
+}
+
+class DeleteCommand implements Command {
+  private deletedText: string = "";
+
+  constructor(private editor: TextEditor, private length: number) {}
+
+  execute(): void {
+    this.deletedText = this.editor.getContent().slice(-this.length);
+    this.editor.deleteText(this.length);
+  }
+
+  undo(): void {
+    this.editor.write(this.deletedText);
+  }
+}
+
+// Invoker class
+class CommandInvoker {
+  private history: Command[] = [];
+
+  execute(command: Command): void {
+    command.execute();
+    this.history.push(command);
+  }
+
+  undo(): void {
+    const command = this.history.pop();
+    if (command) {
+      command.undo();
+    }
+  }
+}
+
+// Usage
+const editor = new TextEditor();
+const invoker = new CommandInvoker();
+
+invoker.execute(new WriteCommand(editor, "Hello "));
+invoker.execute(new WriteCommand(editor, "World!"));
+invoker.undo();
+invoker.execute(new WriteCommand(editor, "TypeScript!"));
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+from abc import ABC, abstractmethod
+
+# Command interface
+class Command(ABC):
+    @abstractmethod
+    def execute(self):
+        pass
+
+    @abstractmethod
+    def undo(self):
+        pass
+
+# Receiver class
+class TextEditor:
+    def __init__(self):
+        self.content = ""
+
+    def write(self, text):
+        self.content += text
+        print(f"Content: {self.content}")
+
+    def delete_text(self, length):
+        self.content = self.content[:-length]
+        print(f"Content: {self.content}")
+
+    def get_content(self):
+        return self.content
+
+# Concrete commands
+class WriteCommand(Command):
+    def __init__(self, editor, text):
+        self.editor = editor
+        self.text = text
+
+    def execute(self):
+        self.editor.write(self.text)
+
+    def undo(self):
+        self.editor.delete_text(len(self.text))
+
+class DeleteCommand(Command):
+    def __init__(self, editor, length):
+        self.editor = editor
+        self.length = length
+        self.deleted_text = ""
+
+    def execute(self):
+        self.deleted_text = self.editor.get_content()[-self.length:]
+        self.editor.delete_text(self.length)
+
+    def undo(self):
+        self.editor.write(self.deleted_text)
+
+# Invoker class
+class CommandInvoker:
+    def __init__(self):
+        self.history = []
+
+    def execute(self, command):
+        command.execute()
+        self.history.append(command)
+
+    def undo(self):
+        if self.history:
+            command = self.history.pop()
+            command.undo()
+
+# Usage
+editor = TextEditor()
+invoker = CommandInvoker()
+
+invoker.execute(WriteCommand(editor, "Hello "))
+invoker.execute(WriteCommand(editor, "World!"))
+invoker.undo()
+invoker.execute(WriteCommand(editor, "TypeScript!"))
+```
+
+</TabItem> </Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function CommandDemo() {
+  const [content, setContent] = React.useState("");
+  const [history, setHistory] = React.useState([]);
+  const [log, setLog] = React.useState([]);
+
+  const executeCommand = (command) => {
+    const newContent = command.execute(content);
+    setContent(newContent);
+    setHistory([...history, command]);
+    setLog((l) => [...l, `Execute: ${command.name}`]);
+  };
+
+  const undo = () => {
+    if (history.length === 0) return;
+    const commands = [...history];
+    const lastCommand = commands.pop();
+    const newContent = lastCommand.undo(content);
+    setContent(newContent);
+    setHistory(commands);
+    setLog((l) => [...l, `Undo: ${lastCommand.name}`]);
+  };
+
+  const clearLog = () => setLog([]);
+  const resetDemo = () => {
+    setContent("");
+    setHistory([]);
+    setLog([]);
+  };
+
+  const commands = [
+    {
+      name: "Add 'Hello'",
+      execute: (c) => c + "Hello ",
+      undo: (c) => c.replace("Hello ", ""),
+    },
+    {
+      name: "Add 'World'",
+      execute: (c) => c + "World",
+      undo: (c) => c.replace("World", ""),
+    },
+    {
+      name: "Add '!'",
+      execute: (c) => c + "!",
+      undo: (c) => c.slice(0, -1),
+    },
+  ];
+
+  const isDarkMode =
+    typeof window !== "undefined"
+      ? document.documentElement.getAttribute("data-theme") === "dark"
+      : false;
+
+  const styles = {
+    container: {
+      fontFamily: "sans-serif",
+      padding: "16px",
+      borderRadius: "8px",
+      backgroundColor: isDarkMode ? "#1e1e1e" : "#f5f5f5",
+      color: isDarkMode ? "#e0e0e0" : "#333",
+    },
+    output: {
+      padding: "12px",
+      margin: "12px 0",
+      borderRadius: "6px",
+      border: `2px solid ${isDarkMode ? "#444" : "#ddd"}`,
+      backgroundColor: isDarkMode ? "#2a2a2a" : "#fff",
+      minHeight: "40px",
+      fontSize: "16px",
+      fontWeight: "bold",
+    },
+    button: {
+      padding: "8px 16px",
+      margin: "4px",
+      borderRadius: "4px",
+      border: "none",
+      backgroundColor: isDarkMode ? "#0d47a1" : "#1976d2",
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: "14px",
+    },
+    undoButton: {
+      padding: "8px 16px",
+      margin: "4px",
+      borderRadius: "4px",
+      border: "none",
+      backgroundColor: isDarkMode ? "#666" : "#757575",
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: "14px",
+      opacity: history.length === 0 ? 0.5 : 1,
+    },
+    resetButton: {
+      padding: "8px 16px",
+      margin: "4px",
+      borderRadius: "4px",
+      border: "none",
+      backgroundColor: isDarkMode ? "#c62828" : "#d32f2f",
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: "14px",
+    },
+    logContainer: {
+      marginTop: "16px",
+      padding: "12px",
+      borderRadius: "6px",
+      backgroundColor: isDarkMode ? "#2a2a2a" : "#f9f9f9",
+      border: `1px solid ${isDarkMode ? "#444" : "#e0e0e0"}`,
+      maxHeight: "150px",
+      overflowY: "auto",
+    },
+  };
+
+  return (
+    <div style={styles.container}>
+      <h3>Command Pattern Demo</h3>
+
+      <div style={styles.output}>{content || "Output will appear here..."}</div>
+
+      <div>
+        <h4>Commands:</h4>
+        {commands.map((cmd, i) => (
+          <button
+            key={i}
+            onClick={() => executeCommand(cmd)}
+            style={styles.button}
+          >
+            {cmd.name}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ marginTop: "12px" }}>
+        <button
+          onClick={undo}
+          disabled={history.length === 0}
+          style={styles.undoButton}
+        >
+          ↶ Undo {history.length > 0 ? `(${history.length} available)` : ""}
+        </button>
+        <button onClick={resetDemo} style={styles.resetButton}>
+          Reset
+        </button>
+        <button
+          onClick={clearLog}
+          style={{
+            ...styles.button,
+            backgroundColor: isDarkMode ? "#555" : "#999",
+          }}
+        >
+          Clear Log
+        </button>
+      </div>
+
+      <div style={styles.logContainer}>
+        <h4 style={{ marginTop: 0 }}>Command Log:</h4>
+        {log.length === 0 ? (
+          <p style={{ color: isDarkMode ? "#999" : "#999", margin: 0 }}>
+            Click commands above to build the log
+          </p>
+        ) : (
+          <ul style={{ margin: "0", paddingLeft: "20px" }}>
+            {log.map((entry, i) => (
+              <li key={i} style={{ margin: "4px 0" }}>
+                {entry}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+## 🔗Relations to other patterns
+
+- [Command](/docs/behavioral/command) and [Strategy](/docs/behavioral/strategy) share a similar structure, but they solve different problems. Command encapsulates a request as an object, while Strategy encapsulates an algorithm. Commands are often used for operations that can be queued or undone, whereas strategies are used for interchangeable algorithms.
+
+- [Command](/docs/behavioral/command) can use [Memento](/docs/behavioral/memento) to capture the state of an object so that it can be restored later. This is useful for implementing undo functionality.
+
+- [Command](/docs/behavioral/command) is often used in conjunction with [Chain of Responsibility](/docs/behavioral/chain-of-responsibility) to pass commands through a chain of handlers.
+
+- [Composite](/docs/structural/composite) can be used to group commands together and execute them as a single composite command, allowing for complex command sequences.
+
+- [Command](/docs/behavioral/command) and [Observer](/docs/behavioral/observer) can work together where observers are notified when commands are executed.
+
+---
+
+## 📚Sources
+
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring Guru - Command Pattern](https://refactoring.guru/design-patterns/command)
+- [Wikipedia - Command pattern](https://en.wikipedia.org/wiki/Command_pattern)
