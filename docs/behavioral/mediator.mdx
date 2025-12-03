@@ -74,19 +74,44 @@ Common practical scenarios for applying the Mediator pattern include:
 <Applicability
   items={[
     {
-      situation: "when to use",
-      context: "example or how it helps",
+      situation:
+        "Use the Mediator pattern when you have a system with multiple interacting components that have complex communication patterns.",
+      context:
+        "The mediator centralizes the interaction logic, making it easier to understand and modify how components communicate with each other.",
+    },
+    {
+      situation:
+        "Use the Mediator pattern when you want to reduce coupling between components in a complex system.",
+      context:
+        "Instead of each component maintaining references to many other components, they only interact through the mediator, reducing interdependencies.",
+    },
+    {
+      situation:
+        "Use the Mediator pattern when the logic for coordinating component interactions is becoming difficult to maintain.",
+      context:
+        "By extracting this logic into a dedicated mediator, you can more easily modify and test coordination behavior without affecting individual components.",
+    },
+    {
+      situation:
+        "Use the Mediator pattern when you need to reuse components in different contexts with different interaction patterns.",
+      context:
+        "Since components don't depend directly on each other, they can be reused with different mediators that coordinate their interactions differently.",
     },
   ]}
 />
 
 ## 🧭Implementation Plan
 
-To implement a Mediator manually:
+To implement the Mediator pattern manually:
 
-1. Here's various steps
-2. To follow
-3. When implementing this pattern
+1. Define a Mediator interface that declares methods for communicating between colleagues (components).
+2. Create a concrete mediator class that implements the Mediator interface and encapsulates the interaction logic between components.
+3. Define a Colleague interface that contains a reference to the mediator and methods for sending and receiving notifications.
+4. Create concrete colleague classes that implement the Colleague interface and represent the components that need to communicate.
+5. In each concrete colleague, implement the logic to notify the mediator when something changes, and implement methods to respond to mediator notifications.
+6. Set up the system by creating instances of colleagues and passing the mediator instance to each colleague.
+7. When a colleague needs to communicate with others, it notifies the mediator instead of calling other colleagues directly.
+8. The mediator coordinates the response by calling appropriate methods on the relevant colleagues.
 
 ### 💻Code samples
 
@@ -94,14 +119,127 @@ To implement a Mediator manually:
 <TabItem value="ts" label="TypeScript">
 
 ```ts
-//ts code here
+// Mediator interface
+interface ChatMediator {
+  sendMessage(message: string, sender: ChatUser): void;
+}
+
+// Colleague interface
+abstract class ChatUser {
+  protected name: string;
+  protected mediator: ChatMediator;
+
+  constructor(name: string, mediator: ChatMediator) {
+    this.name = name;
+    this.mediator = mediator;
+  }
+
+  send(message: string): void {
+    console.log(`${this.name} sends: ${message}`);
+    this.mediator.sendMessage(message, this);
+  }
+
+  abstract receive(message: string, sender: ChatUser): void;
+}
+
+// Concrete mediator
+class ChatRoom implements ChatMediator {
+  private users: ChatUser[] = [];
+
+  addUser(user: ChatUser): void {
+    this.users.push(user);
+  }
+
+  sendMessage(message: string, sender: ChatUser): void {
+    for (const user of this.users) {
+      if (user !== sender) {
+        user.receive(message, sender);
+      }
+    }
+  }
+}
+
+// Concrete colleagues
+class ConcreteUser extends ChatUser {
+  receive(message: string, sender: ChatUser): void {
+    console.log(`${this.name} receives from ${sender.name}: ${message}`);
+  }
+}
+
+// Usage
+const chatRoom = new ChatRoom();
+
+const user1 = new ConcreteUser("Alice", chatRoom);
+const user2 = new ConcreteUser("Bob", chatRoom);
+const user3 = new ConcreteUser("Charlie", chatRoom);
+
+chatRoom.addUser(user1);
+chatRoom.addUser(user2);
+chatRoom.addUser(user3);
+
+user1.send("Hello everyone!");
+user2.send("Hi Alice!");
+user3.send("Hey, how are you all?");
 ```
 
 </TabItem>
 <TabItem value="py" label="Python">
 
 ```python
-#python code here
+from abc import ABC, abstractmethod
+
+# Mediator interface
+class ChatMediator(ABC):
+    @abstractmethod
+    def send_message(self, message, sender):
+        pass
+
+# Colleague interface
+class ChatUser(ABC):
+    def __init__(self, name, mediator):
+        self.name = name
+        self.mediator = mediator
+
+    def send(self, message):
+        print(f"{self.name} sends: {message}")
+        self.mediator.send_message(message, self)
+
+    @abstractmethod
+    def receive(self, message, sender):
+        pass
+
+# Concrete mediator
+class ChatRoom(ChatMediator):
+    def __init__(self):
+        self.users = []
+
+    def add_user(self, user):
+        self.users.append(user)
+
+    def send_message(self, message, sender):
+        for user in self.users:
+            if user != sender:
+                user.receive(message, sender)
+
+# Concrete colleagues
+class ConcreteUser(ChatUser):
+    def receive(self, message, sender):
+        print(f"{self.name} receives from {sender.name}: {message}")
+
+# Usage
+chat_room = ChatRoom()
+
+user1 = ConcreteUser("Alice", chat_room)
+user2 = ConcreteUser("Bob", chat_room)
+user3 = ConcreteUser("Charlie", chat_room)
+
+chat_room.add_user(user1)
+chat_room.add_user(user2)
+chat_room.add_user(user3)
+
+user1.send("Hello everyone!")
+user2.send("Hi Alice!")
+user3.send("Hey, how are you all?")
 ```
 
 </TabItem> </Tabs>
@@ -115,12 +253,247 @@ This sample is to get a 'feel' for the pattern. The code itself may not reflect 
 :::
 
 ```jsx live
-// code
+function MediatorDemo() {
+  const [messages, setMessages] = React.useState([]);
+  const [inputValue, setInputValue] = React.useState("");
+  const [selectedSender, setSelectedSender] = React.useState("Alice");
+  const [userStatus, setUserStatus] = React.useState({
+    Alice: "online",
+    Bob: "online",
+    Charlie: "online",
+  });
+
+  const users = ["Alice", "Bob", "Charlie"];
+
+  const sendMessage = () => {
+    if (inputValue.trim() === "") return;
+
+    const recipients = users.filter((u) => u !== selectedSender);
+    const newMessages = [];
+
+    recipients.forEach((recipient) => {
+      newMessages.push({
+        id: Date.now() + Math.random(),
+        sender: selectedSender,
+        recipient: recipient,
+        text: inputValue,
+        timestamp: new Date().toLocaleTimeString(),
+      });
+    });
+
+    setMessages([...messages, ...newMessages]);
+    setInputValue("");
+  };
+
+  const toggleUserStatus = (user) => {
+    setUserStatus({
+      ...userStatus,
+      [user]: userStatus[user] === "online" ? "offline" : "online",
+    });
+  };
+
+  const resetDemo = () => {
+    setMessages([]);
+    setInputValue("");
+    setSelectedSender("Alice");
+  };
+
+  const isDarkMode =
+    typeof window !== "undefined"
+      ? document.documentElement.getAttribute("data-theme") === "dark"
+      : false;
+
+  const styles = {
+    container: {
+      fontFamily: "sans-serif",
+      padding: "16px",
+      borderRadius: "8px",
+      backgroundColor: isDarkMode ? "#1e1e1e" : "#f5f5f5",
+      color: isDarkMode ? "#e0e0e0" : "#333",
+    },
+    userList: {
+      display: "flex",
+      gap: "12px",
+      marginBottom: "16px",
+      flexWrap: "wrap",
+    },
+    userBadge: {
+      padding: "8px 12px",
+      borderRadius: "6px",
+      backgroundColor: isDarkMode ? "#2a2a2a" : "#fff",
+      border: `2px solid ${isDarkMode ? "#444" : "#ddd"}`,
+      cursor: "pointer",
+      transition: "all 0.3s",
+    },
+    userBadgeActive: {
+      backgroundColor: isDarkMode ? "#0d47a1" : "#1976d2",
+      color: "#fff",
+      borderColor: isDarkMode ? "#0d47a1" : "#1976d2",
+    },
+    statusIndicator: {
+      display: "inline-block",
+      width: "8px",
+      height: "8px",
+      borderRadius: "50%",
+      marginRight: "4px",
+      verticalAlign: "middle",
+    },
+    messageContainer: {
+      maxHeight: "300px",
+      overflowY: "auto",
+      marginBottom: "16px",
+      padding: "12px",
+      borderRadius: "6px",
+      backgroundColor: isDarkMode ? "#2a2a2a" : "#fff",
+      border: `1px solid ${isDarkMode ? "#444" : "#ddd"}`,
+    },
+    messageBubble: {
+      padding: "10px 12px",
+      margin: "8px 0",
+      borderRadius: "6px",
+      backgroundColor: isDarkMode ? "#3a3a3a" : "#f0f0f0",
+      borderLeft: `4px solid ${isDarkMode ? "#0d47a1" : "#1976d2"}`,
+    },
+    inputGroup: {
+      display: "flex",
+      gap: "8px",
+      marginBottom: "12px",
+    },
+    input: {
+      flex: 1,
+      padding: "10px",
+      borderRadius: "4px",
+      border: `1px solid ${isDarkMode ? "#444" : "#ddd"}`,
+      backgroundColor: isDarkMode ? "#2a2a2a" : "#fff",
+      color: isDarkMode ? "#e0e0e0" : "#333",
+    },
+    button: {
+      padding: "10px 20px",
+      borderRadius: "4px",
+      border: "none",
+      backgroundColor: isDarkMode ? "#0d47a1" : "#1976d2",
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: "14px",
+    },
+    resetButton: {
+      padding: "10px 20px",
+      borderRadius: "4px",
+      border: "none",
+      backgroundColor: isDarkMode ? "#c62828" : "#d32f2f",
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: "14px",
+    },
+  };
+
+  return (
+    <div style={styles.container}>
+      <h3>Mediator Pattern Demo - Chat Room</h3>
+
+      <div>
+        <h4>Users Status:</h4>
+        <div style={styles.userList}>
+          {users.map((user) => (
+            <div
+              key={user}
+              onClick={() => {
+                setSelectedSender(user);
+              }}
+              style={{
+                ...styles.userBadge,
+                ...(selectedSender === user ? styles.userBadgeActive : {}),
+              }}
+            >
+              <span
+                style={{
+                  ...styles.statusIndicator,
+                  backgroundColor:
+                    userStatus[user] === "online"
+                      ? "#4caf50"
+                      : isDarkMode
+                      ? "#666"
+                      : "#999",
+                }}
+              />
+              {user} ({userStatus[user]})
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h4>Chat Messages:</h4>
+        <div style={styles.messageContainer}>
+          {messages.length === 0 ? (
+            <p style={{ color: isDarkMode ? "#999" : "#999", margin: 0 }}>
+              No messages yet. Send one to get started!
+            </p>
+          ) : (
+            messages.map((msg) => (
+              <div key={msg.id} style={styles.messageBubble}>
+                <strong>{msg.sender}</strong> → <strong>{msg.recipient}</strong>
+                <br />
+                <span style={{ fontSize: "0.9em" }}>{msg.text}</span>
+                <div
+                  style={{
+                    fontSize: "0.8em",
+                    marginTop: "4px",
+                    color: isDarkMode ? "#aaa" : "#666",
+                  }}
+                >
+                  {msg.timestamp}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      <div>
+        <h4>Send Message from {selectedSender}:</h4>
+        <div style={styles.inputGroup}>
+          <input
+            type="text"
+            placeholder="Type your message..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") sendMessage();
+            }}
+            style={styles.input}
+          />
+          <button onClick={sendMessage} style={styles.button}>
+            Send
+          </button>
+        </div>
+      </div>
+
+      <button onClick={resetDemo} style={styles.resetButton}>
+        Reset Demo
+      </button>
+    </div>
+  );
+}
 ```
 
 ## 🔗Relations to other patterns
 
-- Another pattern wiki link here
+- [Chain of Responsibility](/docs/behavioral/chain-of-responsibility), [Command](/docs/behavioral/command), [Mediator](/docs/behavioral/mediator), and [Observer](/docs/behavioral/observer) address various ways of connecting senders and receivers of requests:
+
+  - [Chain of Responsibility](/docs/behavioral/chain-of-responsibility) passes a request sequentially along a dynamic chain of potential receivers until one of them handles it.
+  - [Command](/docs/behavioral/command) establishes unidirectional connections between senders and receivers.
+  - [Mediator](/docs/behavioral/mediator) eliminates direct connections between senders and receivers, forcing them to communicate indirectly via a mediator object.
+  - [Observer](/docs/behavioral/observer) lets receivers dynamically subscribe to and unsubscribe from receiving requests.
+
+- [Mediator](/docs/behavioral/mediator) and [Observer](/docs/behavioral/observer) have similar structures but solve different problems:
+
+  - [Observer](/docs/behavioral/observer) is often used when you need to distribute events to many subscribers dynamically.
+  - [Mediator](/docs/behavioral/mediator) is useful when you need to coordinate complex interactions between a fixed set of components.
+
+- [Mediator](/docs/behavioral/mediator) can sometimes be used with [Command](/docs/behavioral/command) to encapsulate complex communication sequences as command objects that the mediator can execute.
+
+- [Mediator](/docs/behavioral/mediator) can be combined with [Strategy](/docs/behavioral/strategy) to allow different mediation strategies to be plugged in without changing the colleague classes.
 
 ---
 
