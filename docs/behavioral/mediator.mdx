@@ -1,5 +1,131 @@
 ---
 title: Mediator
+hide_title: true
+description: >
+  The one true communicator.
 ---
 
-This is Mediator Pattern page
+import { BehavioralPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from "@theme/TOCInline";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+import MediatorProblem from "@site/static/img/patterns/behavioral/mediator/mediator-problem.drawio.svg";
+import MediatorSolution from "@site/static/img/patterns/behavioral/mediator/mediator-solution.drawio.svg";
+
+<BehavioralPatternTag
+  title="Mediator"
+  aliases={["Controller", "Intermediary"]}
+/>
+
+---
+
+The **mediator** pattern allows you to reduce problematic interconnected code by introducing a single object that handles communication between different components. This object forces these components to interact through it, promoting loose coupling, enhancing maintainability, and reducing messy dependencies.
+
+## 🧩The problem
+
+In a complex system with multiple components, each component often needs to communicate with many other components. This creates a chaotic web of direct dependencies, where each component holds references to every other component it needs to interact with. As the system grows, this becomes increasingly problematic: every component becomes tightly coupled to many others, changes to one component's interface affect all its communicating partners, and the system becomes difficult to test and maintain.
+
+The core issue is that each component is burdened with the logic of knowing about and communicating with every other component it interacts with, creating a tangled mess of interdependencies that violates the Single Responsibility Principle.
+
+## 🛠️Solutions
+
+The Mediator pattern solves this by introducing a centralized mediator object that encapsulates all the interaction logic between components. Instead of components communicating directly with each other, they only communicate with the mediator. The mediator receives requests from one component, determines which other components need to be involved, and coordinates their interactions.
+
+This approach decouples the communicating components from each other. Each component only needs to know about the mediator interface, not about every other component it might interact with. The mediator centralizes the complex interaction logic, making it easier to understand, modify, and test. Changes to one component's behavior don't directly affect other components, as long as they continue to adhere to the mediator's communication protocol.
+
+### 🏛️Metaphors
+
+Consider an air traffic control system: when multiple aircraft are approaching an airport, each pilot doesn't directly coordinate with every other pilot in the area. That'd create a huge confusing mess of communication and increase the risk of collisions.
+
+<div style={{ textAlign: "center", padding: "2rem" }}>
+  <MediatorProblem />
+</div>
+
+Instead, each pilot communicates exclusively with the air traffic controller. The controller receives information about each aircraft's position, altitude, and flight plan, then directs them to appropriate landing slots and altitudes. The pilots follow the controller's instructions, ensuring safe separation and preventing collisions. This is how the mediator pattern works, by letting the controller act as a mediator, you can manage all interactions between aircraft in a centralized manner.
+
+<div style={{ textAlign: "center", padding: "2rem" }}>
+  <MediatorSolution />
+</div>
+
+### 💡Real-world examples
+
+Common practical scenarios for applying the Mediator pattern include:
+
+- Chat applications where a central server manages message exchanges between clients.
+- Air traffic control systems where the controller coordinates communication between multiple aircraft.
+- Multiplayer online games where a game server handles interactions between players.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons
+  pros={[
+    "Single Responsibility Principle. You can extract the communications between various components into a single place, making it easier to comprehend and maintain.",
+    "Open/Closed Principle. You can introduce new mediators without having to change the actual components.",
+    "Reduces coupling between components.",
+    "Creates more reusable code.",
+  ]}
+  cons={["A mediator can become a god object if applied improperly."]}
+/>
+
+## 🔍Applicability
+
+<Applicability
+  items={[
+    {
+      situation: "when to use",
+      context: "example or how it helps",
+    },
+  ]}
+/>
+
+## 🧭Implementation Plan
+
+To implement a Mediator manually:
+
+1. Here's various steps
+2. To follow
+3. When implementing this pattern
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+//ts code here
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+#python code here
+```
+
+</TabItem> </Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+// code
+```
+
+## 🔗Relations to other patterns
+
+- Another pattern wiki link here
+
+---
+
+## 📚Sources
+
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring Guru - Mediator pattern](https://refactoring.guru/design-patterns/mediator)

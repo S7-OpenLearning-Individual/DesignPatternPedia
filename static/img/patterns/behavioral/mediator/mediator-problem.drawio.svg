@@ -1,0 +1,33 @@
+<svg host="65bd71144e" xmlns="http://www.w3.org/2000/svg" style="background: transparent; background-color: transparent;" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="312px" height="239px" viewBox="-0.5 -0.5 312 239" content="&lt;mxfile&gt;&lt;diagram id=&quot;pu_lRC3i4X3fINRqdQ_N&quot; name=&quot;Page-1&quot;&gt;zZbBjpswEIafhmsUIDjk2Kbp7qGVKu2hx8rAAFYNg8wkIX36mmVYoElWK1UKXJD5ZmzPzD8GO/6+aJ6MrPLvmIB2vHXSOP4Xx/M2G2GfLbgw8LYdyIxKOuQO4EX9AYZrpkeVQD1xJERNqprCGMsSYpowaQyep24p6umulczgCrzEUl/TnyqhvKNhsB74M6gs73d212wpZO/MoM5lgucR8g+OvzeI1I2KZg+6rV1fl27e1zvWt8AMlPSRCUE34ST1kXPjuOjSJ2tDrNph0WStmKtaZWW9IiPLukJDkhSWK6lMpWUJvzaO/zmnQtsJrh1WqEoCczjZeGpmqdJ6jxrN6/p+mqZeHFtek8HfMLIkIhKBsJYTGFK2/N9kBPoH1qrd0/pESITFyOGTtsFZA2FlqeS3GNoYLLiuDhesnQ/NCHG1ngALIHOxLn3vsnDcuV6v7Hnogx0vmo9aYBdy93HnZW8LD+LYAetzWyuxBK1A3NFqu4tsLRallSfmE2s7v1iJhDC9KZaIQ4jSZYnlBvOJtbvSBhL7wedXq0WOGZZSHwY61uJu9jUeTcwrcpgkTQY0+fi2e71bIQPaNsNp+vP5n3xdd56ExVwJhws4jQGEyebWaQy9yBcL+839exrF4w5jf8l7dHNuH9Sc9nW4373aRpdk//AX&lt;/diagram&gt;&lt;/mxfile&gt;">
+    <defs/>
+    <g>
+        <g>
+            <rect x="0" y="140" width="91" height="98" fill="none" stroke="none" pointer-events="all"/>
+            <path d="M 51.68 172.79 L 51.68 154.36 L 46.47 140.69 L 45.5 140 L 45.5 140 L 45.5 140 L 44.53 140.69 L 39.31 154.36 L 39.31 172.79 L 0 201.26 L 0 211.51 L 24.81 197.18 L 39.31 197.18 L 43.03 221.66 L 28.96 227.77 L 28.96 233.91 L 44.26 229.83 L 45.5 238 L 45.5 238 L 45.5 238 L 46.73 229.83 L 62.03 233.91 L 62.03 227.77 L 47.97 221.66 L 51.68 197.18 L 66.18 197.18 L 91 211.51 L 91 201.26 Z" fill="#fff2cc" stroke="#d6b656" stroke-miterlimit="10" pointer-events="all" style="fill: light-dark(rgb(255, 242, 204), rgb(40, 29, 0)); stroke: light-dark(rgb(214, 182, 86), rgb(109, 81, 0));"/>
+        </g>
+        <g>
+            <rect x="220" y="140" width="91" height="98" fill="none" stroke="none" pointer-events="all"/>
+            <path d="M 271.68 172.79 L 271.68 154.36 L 266.47 140.69 L 265.5 140 L 265.5 140 L 265.5 140 L 264.53 140.69 L 259.31 154.36 L 259.31 172.79 L 220 201.26 L 220 211.51 L 244.81 197.18 L 259.31 197.18 L 263.03 221.66 L 248.96 227.77 L 248.96 233.91 L 264.26 229.83 L 265.5 238 L 265.5 238 L 265.5 238 L 266.73 229.83 L 282.03 233.91 L 282.03 227.77 L 267.97 221.66 L 271.68 197.18 L 286.18 197.18 L 311 211.51 L 311 201.26 Z" fill="#ffe6cc" stroke="#d79b00" stroke-miterlimit="10" pointer-events="all" style="fill: light-dark(rgb(255, 230, 204), rgb(54, 33, 10)); stroke: light-dark(rgb(215, 155, 0), rgb(153, 101, 0));"/>
+        </g>
+        <g>
+            <rect x="110" y="140" width="91" height="98" fill="none" stroke="none" pointer-events="all"/>
+            <path d="M 161.68 172.79 L 161.68 154.36 L 156.47 140.69 L 155.5 140 L 155.5 140 L 155.5 140 L 154.53 140.69 L 149.31 154.36 L 149.31 172.79 L 110 201.26 L 110 211.51 L 134.81 197.18 L 149.31 197.18 L 153.03 221.66 L 138.96 227.77 L 138.96 233.91 L 154.26 229.83 L 155.5 238 L 155.5 238 L 155.5 238 L 156.73 229.83 L 172.03 233.91 L 172.03 227.77 L 157.97 221.66 L 161.68 197.18 L 176.18 197.18 L 201 211.51 L 201 201.26 Z" fill="#dae8fc" stroke="#6c8ebf" stroke-miterlimit="10" pointer-events="all" style="fill: light-dark(rgb(218, 232, 252), rgb(29, 41, 59)); stroke: light-dark(rgb(108, 142, 191), rgb(92, 121, 163));"/>
+        </g>
+        <g>
+            <path d="M 110 49 L 55.5 49 Q 45.5 49 45.5 59 L 45.5 133.63" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));"/>
+            <path d="M 45.5 138.88 L 42 131.88 L 45.5 133.63 L 49 131.88 Z" fill="#000000" stroke="#000000" stroke-miterlimit="10" pointer-events="all" style="fill: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); stroke: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));"/>
+        </g>
+        <g>
+            <path d="M 201 49 L 255.5 49 Q 265.5 49 265.5 59 L 265.5 133.63" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));"/>
+            <path d="M 265.5 138.88 L 262 131.88 L 265.5 133.63 L 269 131.88 Z" fill="#000000" stroke="#000000" stroke-miterlimit="10" pointer-events="all" style="fill: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); stroke: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));"/>
+        </g>
+        <g>
+            <rect x="110" y="0" width="91" height="98" fill="none" stroke="none" pointer-events="all"/>
+            <path d="M 161.68 32.79 L 161.68 14.36 L 156.47 0.69 L 155.5 0 L 155.5 0 L 155.5 0 L 154.53 0.69 L 149.31 14.36 L 149.31 32.79 L 110 61.26 L 110 71.51 L 134.81 57.18 L 149.31 57.18 L 153.03 81.66 L 138.96 87.77 L 138.96 93.91 L 154.26 89.83 L 155.5 98 L 155.5 98 L 155.5 98 L 156.73 89.83 L 172.03 93.91 L 172.03 87.77 L 157.97 81.66 L 161.68 57.18 L 176.18 57.18 L 201 71.51 L 201 61.26 Z" fill="#d5e8d4" stroke="#82b366" stroke-miterlimit="10" pointer-events="all" style="fill: light-dark(rgb(213, 232, 212), rgb(31, 47, 30)); stroke: light-dark(rgb(130, 179, 102), rgb(68, 110, 44));"/>
+        </g>
+        <g>
+            <path d="M 155.5 98 L 155.5 133.63" fill="none" stroke="#000000" stroke-miterlimit="10" pointer-events="stroke" style="stroke: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));"/>
+            <path d="M 155.5 138.88 L 152 131.88 L 155.5 133.63 L 159 131.88 Z" fill="#000000" stroke="#000000" stroke-miterlimit="10" pointer-events="all" style="fill: light-dark(rgb(0, 0, 0), rgb(255, 255, 255)); stroke: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));"/>
+        </g>
+    </g>
+</svg>
