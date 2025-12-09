@@ -20,25 +20,26 @@ The **Memento** pattern allows you to capture and store an object's internal sta
 
 ## 🧩The problem
 
-Imagine you're building a text editor where users can undo their changes. A straightforward approach would be to expose the internal state of the editor (like storing the current text in a public field) so you can save and restore it. However, this violates encapsulation—it exposes internal details that should remain private, and any external code could accidentally modify the saved state.
+Imagine you're building a text editor where users can undo their changes. A straightforward approach would be to expose the internal state of the editor (like storing the current text in a public field) so you can save and restore it. However, this violates encapsulation by exposing internal details that should remain private, and any external code could accidentally modify the saved state.
 
-Additionally, if an object has many private fields or complex internal structures, capturing its state becomes messy. You'd need to copy all these fields manually, and the external code would need to understand the object's internals to do so. If the object's structure changes, all the code that saves and restores state would break.
-
-Furthermore, maintaining a history of states can quickly become unmanageable. You need a clean way to store multiple snapshots of an object's state and manage that history without cluttering the object itself or the client code.
+Additionally, if an object has many private fields or complex internal structures, capturing its state becomes incredibly messy. You'd need to copy all these fields manually, and the external code would need to understand the object's internals to do so. If the object's structure changes, all the code that saves and restores state would break. Furthermore, maintaining a history of states can quickly become unmanageable. You need a clean way to store multiple snapshots of an object's state and manage that history without cluttering the object itself or the client code.
 
 ## 🛠️Solutions
 
-The Memento pattern solves this by introducing three key players:
+Instead of exposing an object's internals, the pattern creates a snapshot object (the memento) that the originator controls. The originator knows how to create these snapshots and how to restore itself from them. A caretaker then manages a collection of these snapshots without ever needing to understand what's inside them.
 
-- **Originator**: The object whose state needs to be saved and restored. It creates mementos containing snapshots of its current state and can restore itself from a memento.
-- **Memento**: An immutable object that stores a snapshot of the originator's state. It's typically read-only from the outside world.
-- **Caretaker**: Manages the collection of mementos and decides when to save and restore states, but never modifies the memento's contents.
+The key insight is that the memento acts as a "safe deposit box"—it holds the data but doesn't expose it to the outside world. This allows you to...
 
-This approach maintains encapsulation—the memento doesn't expose the originator's internal structure, and only the originator knows how to interpret the memento's data.
+- Capture object state without exposing internal details.
+- Restore objects to previous states with a single method call.
+- Build a complete history system without cluttering your object or client code.
+- Maintain true encapsulation—the snapshot is sealed and immutable from external access.
+
+By separating the snapshot creation (originator's responsibility), storage (caretaker's responsibility), and the snapshot itself (memento's responsibility), each component has a single, clear job to do.
 
 ### 🏛️Metaphors
 
-Think of taking a photograph of someone. The photograph (memento) captures their appearance at a specific moment in time without changing them. The person (originator) can later look at the photograph to remember what they looked like at that moment. The photographer (caretaker) manages the collection of photographs, deciding when to take a new one and which one to look at. The photograph is sealed and protected—you can't modify it to change the past, and it doesn't expose how the person's body actually works internally.
+Think of taking a photograph of someone. The photograph (memento) captures their appearance at a specific moment in time without changing them. The person (originator) can later look at the photograph to remember what they looked like at that moment. The photographer (caretaker) manages the collection of photographs, deciding when to take a new one and which one to look at. Due to the protection levels you can't modify it to change the past, and it doesn't expose how the person's body actually works internally.
 
 ### 💡Real-world examples
 
@@ -585,4 +586,3 @@ function MementoDemo() {
 Information used in this page was collected from various reliable sources:
 
 - [Refactoring Guru - Memento Pattern](https://refactoring.guru/design-patterns/memento)
-- [Wikipedia - Memento pattern](https://en.wikipedia.org/wiki/Memento_pattern)
