@@ -1,5 +1,588 @@
 ---
 title: Memento
+hide_title: true
+description: >
+  Save and restore without spilling the secrets.
 ---
 
-This is Memento Pattern page
+import { BehavioralPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from "@theme/TOCInline";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+
+<BehavioralPatternTag title="Memento" aliases={["Snapshot", "Token"]} />
+
+---
+
+The **Memento** pattern allows you to capture and store an object's internal state at a given point in time, without violating encapsulation. This pattern lets you restore the object to that state later, enabling undo/redo functionality and state recovery without exposing the object's internal structure.
+
+## 🧩The problem
+
+Imagine you're building a text editor where users can undo their changes. A straightforward approach would be to expose the internal state of the editor (like storing the current text in a public field) so you can save and restore it. However, this violates encapsulation—it exposes internal details that should remain private, and any external code could accidentally modify the saved state.
+
+Additionally, if an object has many private fields or complex internal structures, capturing its state becomes messy. You'd need to copy all these fields manually, and the external code would need to understand the object's internals to do so. If the object's structure changes, all the code that saves and restores state would break.
+
+Furthermore, maintaining a history of states can quickly become unmanageable. You need a clean way to store multiple snapshots of an object's state and manage that history without cluttering the object itself or the client code.
+
+## 🛠️Solutions
+
+The Memento pattern solves this by introducing three key players:
+
+- **Originator**: The object whose state needs to be saved and restored. It creates mementos containing snapshots of its current state and can restore itself from a memento.
+- **Memento**: An immutable object that stores a snapshot of the originator's state. It's typically read-only from the outside world.
+- **Caretaker**: Manages the collection of mementos and decides when to save and restore states, but never modifies the memento's contents.
+
+This approach maintains encapsulation—the memento doesn't expose the originator's internal structure, and only the originator knows how to interpret the memento's data.
+
+### 🏛️Metaphors
+
+Think of taking a photograph of someone. The photograph (memento) captures their appearance at a specific moment in time without changing them. The person (originator) can later look at the photograph to remember what they looked like at that moment. The photographer (caretaker) manages the collection of photographs, deciding when to take a new one and which one to look at. The photograph is sealed and protected—you can't modify it to change the past, and it doesn't expose how the person's body actually works internally.
+
+### 💡Real-world examples
+
+Common practical scenarios for applying the Memento pattern include:
+
+- Text editors with undo/redo functionality, where each edit state is captured as a memento.
+- Games that support save/load mechanics, capturing the entire game state at a specific point.
+- Database transactions that need to rollback to a previous state if something goes wrong.
+- Version control systems that store snapshots of file contents.
+- Configuration managers that can revert to previous settings.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons
+  pros={[
+    "Single Responsibility Principle. You can split the complex logic of creating and restoring object snapshots into separate objects (originator, caretaker, and memento).",
+    "Preserves encapsulation. The memento captures the state without exposing the object's internal structure to external code.",
+    "Allows you to implement undo/redo functionality with a clean separation of concerns.",
+    "You can create snapshots without modifying the original object.",
+  ]}
+  cons={[
+    "The application may consume lots of RAM if clients create mementos too frequently or store too many of them.",
+    "Caretaker classes should track the originator's lifecycle to be able to delete obsolete mementos when they're no longer needed.",
+  ]}
+/>
+
+## 🔍Applicability
+
+<Applicability
+  items={[
+    {
+      situation:
+        "Use the Memento pattern when you need to implement undo/redo functionality.",
+      context:
+        "By capturing state snapshots, you can easily restore an object to any previous state without exposing its internal details.",
+    },
+    {
+      situation:
+        "Use the Memento pattern when you need to save and restore object state while preserving encapsulation.",
+      context:
+        "Instead of exposing internal fields, the originator controls how its state is captured and restored.",
+    },
+    {
+      situation:
+        "Use the Memento pattern when you need to maintain a history of state changes.",
+      context:
+        "Mementos can be stored in a collection and used to replay or navigate through different states.",
+    },
+    {
+      situation:
+        "Use the Memento pattern when you need to implement transaction rollback or recovery mechanisms.",
+      context:
+        "Mementos can capture state before an operation, allowing you to restore the previous state if the operation fails.",
+    },
+  ]}
+/>
+
+## 🧭Implementation Plan
+
+To implement the Memento pattern manually:
+
+1. Create a Memento class that stores a snapshot of the object's state. Make it immutable from the outside.
+2. Modify the Originator class to include methods to create mementos (`createMemento()`) and restore from mementos (`restore(memento)`).
+3. Create a Caretaker class to manage the collection of mementos and provide methods to save and load states.
+4. When you need to save state, call the originator's `createMemento()` method and store it in the caretaker.
+5. When you need to restore state, retrieve a memento from the caretaker and pass it to the originator's `restore()` method.
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+// Memento class - stores immutable state
+class EditorMemento {
+  constructor(private content: string, private fontSize: number) {}
+
+  getContent(): string {
+    return this.content;
+  }
+
+  getFontSize(): number {
+    return this.fontSize;
+  }
+}
+
+// Originator class - creates and restores mementos
+class TextEditor {
+  private content: string = "";
+  private fontSize: number = 12;
+
+  setContent(content: string): void {
+    this.content = content;
+  }
+
+  getContent(): string {
+    return this.content;
+  }
+
+  setFontSize(size: number): void {
+    this.fontSize = size;
+  }
+
+  getFontSize(): number {
+    return this.fontSize;
+  }
+
+  // Create a memento of the current state
+  createMemento(): EditorMemento {
+    return new EditorMemento(this.content, this.fontSize);
+  }
+
+  // Restore state from a memento
+  restore(memento: EditorMemento): void {
+    this.content = memento.getContent();
+    this.fontSize = memento.getFontSize();
+  }
+}
+
+// Caretaker class - manages mementos
+class EditorHistory {
+  private history: EditorMemento[] = [];
+  private currentIndex: number = -1;
+
+  save(memento: EditorMemento): void {
+    // Remove any redo history when a new action is taken
+    this.history = this.history.slice(0, this.currentIndex + 1);
+    this.history.push(memento);
+    this.currentIndex++;
+  }
+
+  undo(): EditorMemento | null {
+    if (this.currentIndex > 0) {
+      this.currentIndex--;
+      return this.history[this.currentIndex];
+    }
+    return null;
+  }
+
+  redo(): EditorMemento | null {
+    if (this.currentIndex < this.history.length - 1) {
+      this.currentIndex++;
+      return this.history[this.currentIndex];
+    }
+    return null;
+  }
+}
+
+// Usage
+const editor = new TextEditor();
+const history = new EditorHistory();
+
+// Save initial state
+editor.setContent("Hello");
+editor.setFontSize(12);
+history.save(editor.createMemento());
+
+// Make changes
+editor.setContent("Hello World");
+editor.setFontSize(14);
+history.save(editor.createMemento());
+
+// Undo
+const memento = history.undo();
+if (memento) {
+  editor.restore(memento);
+  console.log(editor.getContent()); // "Hello"
+}
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+# Memento class - stores immutable state
+class EditorMemento:
+    def __init__(self, content, font_size):
+        self._content = content
+        self._font_size = font_size
+
+    def get_content(self):
+        return self._content
+
+    def get_font_size(self):
+        return self._font_size
+
+# Originator class - creates and restores mementos
+class TextEditor:
+    def __init__(self):
+        self.content = ""
+        self.font_size = 12
+
+    def set_content(self, content):
+        self.content = content
+
+    def get_content(self):
+        return self.content
+
+    def set_font_size(self, size):
+        self.font_size = size
+
+    def get_font_size(self):
+        return self.font_size
+
+    # Create a memento of the current state
+    def create_memento(self):
+        return EditorMemento(self.content, self.font_size)
+
+    # Restore state from a memento
+    def restore(self, memento):
+        self.content = memento.get_content()
+        self.font_size = memento.get_font_size()
+
+# Caretaker class - manages mementos
+class EditorHistory:
+    def __init__(self):
+        self.history = []
+        self.current_index = -1
+
+    def save(self, memento):
+        # Remove any redo history when a new action is taken
+        self.history = self.history[:self.current_index + 1]
+        self.history.append(memento)
+        self.current_index += 1
+
+    def undo(self):
+        if self.current_index > 0:
+            self.current_index -= 1
+            return self.history[self.current_index]
+        return None
+
+    def redo(self):
+        if self.current_index < len(self.history) - 1:
+            self.current_index += 1
+            return self.history[self.current_index]
+        return None
+
+# Usage
+editor = TextEditor()
+history = EditorHistory()
+
+# Save initial state
+editor.set_content("Hello")
+editor.set_font_size(12)
+history.save(editor.create_memento())
+
+# Make changes
+editor.set_content("Hello World")
+editor.set_font_size(14)
+history.save(editor.create_memento())
+
+# Undo
+memento = history.undo()
+if memento:
+    editor.restore(memento)
+    print(editor.get_content())  # "Hello"
+```
+
+</TabItem> </Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function MementoDemo() {
+  const [text, setText] = React.useState("Start typing...");
+  const [fontSize, setFontSize] = React.useState(16);
+  const [history, setHistory] = React.useState([
+    { text: "Start typing...", fontSize: 16 },
+  ]);
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [log, setLog] = React.useState(["Initial state saved"]);
+
+  const isDarkMode =
+    typeof window !== "undefined"
+      ? document.documentElement.getAttribute("data-theme") === "dark"
+      : false;
+
+  const saveState = () => {
+    const newHistory = history.slice(0, currentIndex + 1);
+    newHistory.push({ text, fontSize });
+    setHistory(newHistory);
+    setCurrentIndex(newHistory.length - 1);
+    setLog((l) => [...l, `💾 Saved: "${text}" (${fontSize}px)`]);
+  };
+
+  const undo = () => {
+    if (currentIndex > 0) {
+      const newIndex = currentIndex - 1;
+      const memento = history[newIndex];
+      setText(memento.text);
+      setFontSize(memento.fontSize);
+      setCurrentIndex(newIndex);
+      setLog((l) => [...l, `↶ Undo: restored to "${memento.text}"`]);
+    }
+  };
+
+  const redo = () => {
+    if (currentIndex < history.length - 1) {
+      const newIndex = currentIndex + 1;
+      const memento = history[newIndex];
+      setText(memento.text);
+      setFontSize(memento.fontSize);
+      setCurrentIndex(newIndex);
+      setLog((l) => [...l, `↷ Redo: restored to "${memento.text}"`]);
+    }
+  };
+
+  const resetDemo = () => {
+    setText("Start typing...");
+    setFontSize(16);
+    setHistory([{ text: "Start typing...", fontSize: 16 }]);
+    setCurrentIndex(0);
+    setLog(["Initial state saved"]);
+  };
+
+  const clearLog = () => setLog([]);
+
+  const styles = {
+    container: {
+      fontFamily: "sans-serif",
+      padding: "16px",
+      borderRadius: "8px",
+      backgroundColor: isDarkMode ? "#1e1e1e" : "#f5f5f5",
+      color: isDarkMode ? "#e0e0e0" : "#333",
+    },
+    editor: {
+      padding: "12px",
+      margin: "12px 0",
+      borderRadius: "6px",
+      border: `2px solid ${isDarkMode ? "#444" : "#ddd"}`,
+      backgroundColor: isDarkMode ? "#2a2a2a" : "#fff",
+      minHeight: "80px",
+      fontSize: `${fontSize}px`,
+      fontWeight: "bold",
+      resize: "vertical",
+      color: isDarkMode ? "#e0e0e0" : "#333",
+      fontFamily: "monospace",
+    },
+    button: {
+      padding: "8px 16px",
+      margin: "4px",
+      borderRadius: "4px",
+      border: "none",
+      backgroundColor: isDarkMode ? "#0d47a1" : "#1976d2",
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: "14px",
+    },
+    disabledButton: {
+      opacity: 0.5,
+      cursor: "not-allowed",
+    },
+    resetButton: {
+      padding: "8px 16px",
+      margin: "4px",
+      borderRadius: "4px",
+      border: "none",
+      backgroundColor: isDarkMode ? "#c62828" : "#d32f2f",
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: "14px",
+    },
+    sliderContainer: {
+      margin: "12px 0",
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+    },
+    slider: {
+      flex: 1,
+      height: "6px",
+      borderRadius: "3px",
+      backgroundColor: isDarkMode ? "#444" : "#ddd",
+      outline: "none",
+      cursor: "pointer",
+    },
+    logContainer: {
+      marginTop: "16px",
+      padding: "12px",
+      borderRadius: "6px",
+      backgroundColor: isDarkMode ? "#2a2a2a" : "#f9f9f9",
+      border: `1px solid ${isDarkMode ? "#444" : "#e0e0e0"}`,
+      maxHeight: "150px",
+      overflowY: "auto",
+    },
+  };
+
+  return (
+    <div style={styles.container}>
+      <h3>Memento Pattern Demo</h3>
+
+      <div>
+        <h4>Text Editor:</h4>
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          style={styles.editor}
+        />
+      </div>
+
+      <div style={styles.sliderContainer}>
+        <label>Font Size: {fontSize}px</label>
+        <input
+          type="range"
+          min="12"
+          max="32"
+          value={fontSize}
+          onChange={(e) => setFontSize(Number(e.target.value))}
+          style={styles.slider}
+        />
+      </div>
+
+      <div>
+        <button onClick={saveState} style={styles.button}>
+          💾 Save State
+        </button>
+        <button
+          onClick={undo}
+          disabled={currentIndex <= 0}
+          style={{
+            ...styles.button,
+            ...(currentIndex <= 0 ? styles.disabledButton : {}),
+          }}
+        >
+          ↶ Undo {currentIndex > 0 ? `(${currentIndex} available)` : ""}
+        </button>
+        <button
+          onClick={redo}
+          disabled={currentIndex >= history.length - 1}
+          style={{
+            ...styles.button,
+            ...(currentIndex >= history.length - 1
+              ? styles.disabledButton
+              : {}),
+          }}
+        >
+          ↷ Redo{" "}
+          {currentIndex < history.length - 1
+            ? `(${history.length - 1 - currentIndex} available)`
+            : ""}
+        </button>
+        <button onClick={resetDemo} style={styles.resetButton}>
+          Reset Demo
+        </button>
+      </div>
+
+      <div style={{ marginTop: "12px" }}>
+        <h4>State History:</h4>
+        <p style={{ fontSize: "0.9em", color: isDarkMode ? "#999" : "#666" }}>
+          Total snapshots: {history.length} | Current: {currentIndex + 1}
+        </p>
+        <div
+          style={{
+            display: "flex",
+            gap: "4px",
+            flexWrap: "wrap",
+          }}
+        >
+          {history.map((snapshot, idx) => (
+            <button
+              key={idx}
+              onClick={() => {
+                setCurrentIndex(idx);
+                setText(snapshot.text);
+                setFontSize(snapshot.fontSize);
+                setLog((l) => [
+                  ...l,
+                  `🔄 Jumped to snapshot ${idx + 1}: "${snapshot.text}"`,
+                ]);
+              }}
+              style={{
+                ...styles.button,
+                backgroundColor:
+                  idx === currentIndex
+                    ? isDarkMode
+                      ? "#1976d2"
+                      : "#1565c0"
+                    : isDarkMode
+                    ? "#444"
+                    : "#bbb",
+              }}
+            >
+              {idx + 1}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={styles.logContainer}>
+        <h4 style={{ marginTop: 0 }}>Action Log:</h4>
+        {log.length === 0 ? (
+          <p style={{ color: isDarkMode ? "#999" : "#999", margin: 0 }}>
+            Perform actions to see the log
+          </p>
+        ) : (
+          <ul style={{ margin: "0", paddingLeft: "20px" }}>
+            {log.map((entry, i) => (
+              <li key={i} style={{ margin: "4px 0" }}>
+                {entry}
+              </li>
+            ))}
+          </ul>
+        )}
+        {log.length > 0 && (
+          <button
+            onClick={clearLog}
+            style={{
+              ...styles.button,
+              backgroundColor: isDarkMode ? "#555" : "#999",
+              marginTop: "8px",
+            }}
+          >
+            Clear Log
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+## 🔗Relations to other patterns
+
+- [Memento](/docs/behavioral/memento) is often used in conjunction with [Command](/docs/behavioral/command) to implement undo/redo functionality. Commands can save the state of an object before executing, and restore it if needed.
+
+- [Memento](/docs/behavioral/memento) works well with [Iterator](/docs/behavioral/iterator) to capture the iterator's position and state, allowing you to pause and resume iteration.
+
+- [Memento](/docs/behavioral/memento) and [Prototype](/docs/creational/prototype) both involve copying object states, but they serve different purposes. Prototype is about creating new objects through cloning, while Memento is about capturing and restoring historical states.
+
+- [Memento](/docs/behavioral/memento) can be used with [Observer](/docs/behavioral/observer) to notify observers when state changes are saved or restored.
+
+- [Facade](/docs/structural/facade) can be used to provide a simplified interface for managing mementos and state history.
+
+---
+
+## 📚Sources
+
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring Guru - Memento Pattern](https://refactoring.guru/design-patterns/memento)
+- [Wikipedia - Memento pattern](https://en.wikipedia.org/wiki/Memento_pattern)
