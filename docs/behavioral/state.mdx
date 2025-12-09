@@ -1,5 +1,288 @@
 ---
 title: State
+hide_title: true
+description: >
+  Making changes without any knowledge.
 ---
 
-This is State Pattern page
+import { BehavioralPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from "@theme/TOCInline";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+
+<BehavioralPatternTag title="State" />
+
+---
+
+The **State** pattern allows an object to alter its behavior when its internal state changes, appearing to change its class. Instead of using large, complex conditional statements, the pattern delegates the behavior to different state objects that encapsulate the state-specific logic.
+
+## 🧩The problem
+
+Imagine you're building a document editor where documents have different states (e.g. draft, review, and published). Each state allows different operations. For example, a document in draft can be edited or sent for review, a document in review can be approved or rejected, and a published document can only be archived.
+
+As you implement this, you end up with a massive `Document` class filled with conditional logic checking the current state before allowing any operation. Adding a new state means modifying the class and updating all the conditional statements. The code becomes difficult to maintain, and the `Document` class violates the Single Responsibility Principle by being responsible for both managing the document itself and handling state-specific behavior. Making a small change to one state's logic can inadvertently break another state's behavior.
+
+## 🛠️Solutions
+
+The **State** pattern solves this by extracting state-specific behavior into separate state classes. Each state class encapsulates the behavior that corresponds to a specific state of the context object. Instead of the context object checking its state and deciding what to do, it delegates the behavior to its current state object.
+
+When the context's state changes, it simply switches to a different state object. This approach has several advantages:
+
+- The context object no longer needs to know about all possible states and their behaviors.
+- State-specific logic is isolated in its own class, making it easier to understand and modify.
+- Adding a new state is as simple as creating a new state class without modifying existing code.
+
+### 🏛️Metaphors
+
+Think of a TCP connection as an analogy. A connection can be in different states: `Established`, `Listen`, or `Closed`. When you send data through the connection, the behavior is completely different depending on which state the connection is in. If the connection is in the `Established` state, data is transmitted. If it's in the `Listen` state, it waits for incoming connections. If it's `Closed`, the connection won't transmit any data. The connection object doesn't decide how to handle data; it delegates the decision to the current state object. When the connection transitions from one state to another, the behavior changes automatically because a different state object is now handling the requests.
+
+### 💡Real-world examples
+
+Common practical scenarios for applying the State pattern include:
+
+- User interface components with different interaction states (enabled, disabled, focused).
+- Workflow systems where documents or tasks move through different stages (draft, review, approved, archived).
+- Media players with states like playing, paused, and stopped, each with different button behaviors.
+- Authentication systems with states like logged in, logged out, and session expired.
+- Order processing systems where orders transition through states like pending, shipped, and delivered.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons
+  pros={[
+    "Single Responsibility Principle. State-specific logic is isolated in its own classes rather than scattered throughout the context object.",
+    "Open/Closed Principle. You can introduce new states without modifying existing state classes or the context.",
+    "Eliminates large, complex conditional statements that check the current state before executing behavior.",
+    "Makes state transitions explicit and easier to understand.",
+    "Simplifies the context object by delegating state-specific behavior to state objects.",
+  ]}
+  cons={[
+    "Can increase the number of classes if there are many states, potentially making the codebase more complex.",
+    "May introduce overhead if states are simple and don't require object-oriented abstraction.",
+    "Requires careful management of state transitions to avoid inconsistent states.",
+  ]}
+/>
+
+## 🔍Applicability
+
+<Applicability
+  items={[
+    {
+      situation:
+        "Use the State pattern when an object's behavior depends on its state, and it must change this behavior at runtime based on that state.",
+      context:
+        "Instead of using large conditional statements to handle different states, you can encapsulate state-specific behavior in separate state classes.",
+    },
+    {
+      situation:
+        "Use the State pattern when you have a class with large conditional statements that switch based on the current state.",
+      context:
+        "This pattern helps eliminate these conditionals by moving state-specific logic into dedicated state classes.",
+    },
+    {
+      situation:
+        "Use the State pattern when you want to make state transitions explicit and easier to manage.",
+      context:
+        "Each state class can define which other states it can transition to, making the state machine's behavior clearer.",
+    },
+    {
+      situation:
+        "Use the State pattern when you anticipate adding new states to your system frequently.",
+      context:
+        "New states can be added without modifying existing code, following the Open/Closed Principle.",
+    },
+  ]}
+/>
+
+## 🧭Implementation Plan
+
+To implement the State pattern manually:
+
+1. Create a State interface or abstract class that defines methods for behavior that varies by state.
+2. Create concrete state classes that implement the State interface, each encapsulating the behavior for a specific state.
+3. Create a context class that maintains a reference to the current state object and delegates behavior to it.
+4. In the context class, implement methods to set the current state and forward requests to the state object.
+5. State objects can reference the context to trigger state transitions when needed.
+6. Client code interacts with the context object, and the context forwards requests to the appropriate state object based on its current state.
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+// State interface
+interface State {
+  handle(context: Context): void;
+}
+
+// Concrete states
+class DraftState implements State {
+  handle(context: Context): void {
+    console.log(
+      "Document is in Draft state. You can edit and submit for review."
+    );
+    context.setState(new ReviewState());
+  }
+}
+
+class ReviewState implements State {
+  handle(context: Context): void {
+    console.log("Document is in Review state. You can approve or reject it.");
+    context.setState(new PublishedState());
+  }
+}
+
+class PublishedState implements State {
+  handle(context: Context): void {
+    console.log("Document is Published. You can only archive it now.");
+    context.setState(new ArchivedState());
+  }
+}
+
+class ArchivedState implements State {
+  handle(context: Context): void {
+    console.log("Document is Archived. No further actions allowed.");
+  }
+}
+
+// Context class
+class Document {
+  private state: State;
+
+  constructor(state: State) {
+    this.state = state;
+  }
+
+  setState(state: State): void {
+    this.state = state;
+  }
+
+  request(): void {
+    this.state.handle(this);
+  }
+}
+
+// Usage
+const document = new Document(new DraftState());
+
+document.request();
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+from abc import ABC, abstractmethod
+
+# State interface
+class State(ABC):
+    @abstractmethod
+    def handle(self, context):
+        pass
+
+# Concrete states
+class DraftState(State):
+    def handle(self, context):
+        print("Document is in Draft state. You can edit and submit for review.")
+        context.set_state(ReviewState())
+
+class ReviewState(State):
+    def handle(self, context):
+        print("Document is in Review state. You can approve or reject it.")
+        context.set_state(PublishedState())
+
+class PublishedState(State):
+    def handle(self, context):
+        print("Document is Published. You can only archive it now.")
+        context.set_state(ArchivedState())
+
+class ArchivedState(State):
+    def handle(self, context):
+        print("Document is Archived. No further actions allowed.")
+
+# Context class
+class Document:
+    def __init__(self, state):
+        self._state = state
+
+    def set_state(self, state):
+        self._state = state
+
+    def request(self):
+        self._state.handle(self)
+
+# Usage
+document = Document(DraftState())
+
+document.request()
+```
+
+</TabItem>
+</Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function TrafficLight() {
+  const [state, setState] = React.useState("red");
+
+  const handleClick = () => {
+    if (state === "red") {
+      setState("green");
+    } else if (state === "green") {
+      setState("yellow");
+    } else if (state === "yellow") {
+      setState("red");
+    }
+  };
+
+  return (
+    <div style={{ textAlign: "center", padding: "20px" }}>
+      <div
+        style={{
+          width: "100px",
+          height: "100px",
+          borderRadius: "50%",
+          backgroundColor: state,
+          margin: "0 auto 20px",
+        }}
+      ></div>
+      <p style={{ fontSize: "18px", fontWeight: "bold" }}>
+        Current State: {state.toUpperCase()}
+      </p>
+      <button
+        onClick={handleClick}
+        style={{
+          padding: "10px 20px",
+          fontSize: "16px",
+          cursor: "pointer",
+        }}
+      >
+        Change State
+      </button>
+    </div>
+  );
+}
+```
+
+## 🔗Relations to other patterns
+
+- The [Strategy](/docs/behavioral/strategy) pattern is similar to State, but in Strategy, different algorithms are encapsulated and selected by the client, whereas in State, the context itself changes its behavior based on its internal state.
+- The [State](/docs/behavioral/state) pattern and [Template Method](/docs/behavioral/template-method) pattern both use polymorphism to vary behavior, but State varies behavior at runtime by switching objects, while Template Method defines the structure at class definition time.
+
+---
+
+## 📚Sources
+
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring Guru - State Pattern](https://refactoring.guru/design-patterns/state)
