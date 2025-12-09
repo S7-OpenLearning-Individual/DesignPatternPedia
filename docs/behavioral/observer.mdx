@@ -23,7 +23,7 @@ The **Observer** pattern defines a one-to-many dependency between objects so tha
 
 ## 🧩The problem
 
-Imagine you're building a stock market trading application. When a stock changes in price, the relevant parties need to be notified immediately right way. People such as advisors, trading algorithms, risk management systems, and user dashboards rely on the latest data. If you hardcode these notifications into the stock price update logic, you create tight coupling. Adding a new subscriber means modifying the stock class, and removing one requires more changes. Moreover, the stock class becomes bloated with notification logic that has nothing to do with tracking price data. If you need to notify different groups of observers in different ways, the complexity multiplies significantly.
+Imagine you're building a stock market trading application. When a stock changes in price, the relevant parties need to be notified right away. People such as advisors, trading algorithms, risk management systems, and user dashboards rely on the latest data. If you hardcode these notifications into the stock price update logic, you create tight coupling. Adding a new subscriber means modifying the stock class, and removing one requires more changes. Moreover, the stock class becomes bloated with notification logic that has nothing to do with tracking price data. If you need to notify different groups of observers in different ways, the complexity multiplies significantly.
 
 ## 🛠️Solutions
 
