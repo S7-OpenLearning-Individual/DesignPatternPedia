@@ -1,5 +1,455 @@
 ---
 title: Strategy
+hide_title: true
+description: >
+  Pick your plan and stick with it.
 ---
 
-This is Strategy Pattern page
+import { BehavioralPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from "@theme/TOCInline";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+
+<BehavioralPatternTag title="Strategy" aliases={["Policy", "Algorithm"]} />
+
+---
+
+The **Strategy** pattern allows you to define a family of algorithms, encapsulate each one independently, and make them interchangeable. This pattern lets the client choose an algorithm at runtime without altering the code structure.
+
+## 🧩The problem
+
+Imagine you're building a payment processing system for an e-commerce platform. You need to support multiple payment methods such as credit cards, PayPal, cryptocurrency, and more. You might start with a single class that handles all payment logic using a series of if-else statements checking which payment method is being used.
+
+As your application grows and you add more payment methods, your payment processing class becomes increasingly complex and difficult to maintain. Every time you add a new payment method, you must modify the existing class, violating the Open/Closed Principle. Testing becomes harder because you have to test all payment methods together, and switching between algorithms requires changing the conditional logic. This approach creates tight coupling between the payment processor and the specific payment implementations.
+
+## 🛠️Solutions
+
+The Strategy pattern solves this by extracting each algorithm into its own separate class called a strategy. Each strategy encapsulates a specific way of doing something and implements a common interface. The client (payment processor) doesn't need to know the details of how each payment method works—it simply calls the strategy's interface method, and the specific implementation is executed.
+
+This approach provides several benefits:
+
+- Each algorithm is isolated in its own class, making the code more maintainable and testable.
+- You can add new algorithms without modifying existing code, adhering to the Open/Closed Principle.
+- Algorithms can be selected and changed at runtime based on conditions or user preferences.
+- The context (payment processor) is decoupled from the concrete algorithms.
+- Testing individual algorithms is easier since each strategy is independent.
+
+### 🏛️Metaphors
+
+Think of a travel planner deciding how to get to a destination. You might travel by car, train, airplane, or bus. Each transportation method has different costs, durations, comfort levels, and requirements. The travel planner (context) doesn't need to know the intricate details of how each mode of transport works. It simply chooses a strategy (transportation method) and executes it. When you need to change your travel method, you simply select a different strategy—the travel planner's code doesn't change, only the strategy being used.
+
+### 💡Real-world examples
+
+Common practical scenarios for applying the Strategy pattern include:
+
+- Payment processing systems supporting multiple payment methods (credit card, PayPal, cryptocurrency, bank transfer).
+- Sorting algorithms where different sorting strategies (quicksort, mergesort, bubblesort) can be selected based on data characteristics.
+- Compression algorithms where different compression strategies (ZIP, RAR, GZIP) can be chosen based on requirements.
+- Routing algorithms in navigation apps that select strategies like fastest route, shortest distance, or most scenic route.
+- Report generation systems that support different export formats (PDF, Excel, JSON).
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons
+  pros={[
+    "Open/Closed Principle. You can introduce new strategies without changing the context class.",
+    "Single Responsibility Principle. You can isolate the implementation details of an algorithm into separate classes.",
+    "You can swap algorithms at runtime, allowing dynamic selection based on conditions or user preferences.",
+    "Eliminates conditional statements for selecting an algorithm, making the code cleaner and more maintainable.",
+    "Strategies are easily testable in isolation, improving code quality and coverage.",
+  ]}
+  cons={[
+    "If you only have a few algorithms that rarely change, introducing this pattern may add unnecessary complexity.",
+    "Increased number of classes in your codebase, which can make it harder to navigate for simpler implementations.",
+    "The context and client code need to know about all strategies to select the right one.",
+  ]}
+/>
+
+## 🔍Applicability
+
+<Applicability
+  items={[
+    {
+      situation:
+        "Use the Strategy pattern when you have multiple ways to accomplish a task and need to choose between them at runtime.",
+      context:
+        "This allows you to encapsulate each approach and switch between them dynamically without modifying the context class.",
+    },
+    {
+      situation:
+        "Use the Strategy pattern when you want to avoid conditional logic for selecting algorithms.",
+      context:
+        "By encapsulating algorithms in separate classes, you replace complex if-else statements with clean, maintainable strategy selection.",
+    },
+    {
+      situation:
+        "Use the Strategy pattern when you need to add new algorithms frequently or expect algorithms to change.",
+      context:
+        "Since each strategy is independent, you can easily extend the system with new algorithms without touching existing code.",
+    },
+    {
+      situation:
+        "Use the Strategy pattern when different algorithms are appropriate for different contexts or data.",
+      context:
+        "For example, you might choose a quick sorting algorithm for small datasets and a more efficient one for large datasets.",
+    },
+  ]}
+/>
+
+## 🧭Implementation Plan
+
+To implement the Strategy pattern manually:
+
+1. Define a Strategy interface that declares a method for executing the algorithm (e.g., `execute()`).
+2. Create concrete strategy classes for each specific algorithm, implementing the Strategy interface.
+3. Each concrete strategy should encapsulate the algorithm implementation details.
+4. Create a Context class that accepts a strategy and provides a method to execute it.
+5. In the context class, store a reference to the strategy and provide a method to switch strategies at runtime.
+6. Client code creates the appropriate strategy instance and passes it to the context.
+7. When needed, the context executes the strategy through its interface method.
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+// Strategy interface
+interface PaymentStrategy {
+  pay(amount: number): string;
+}
+
+// Concrete strategies
+class CreditCardPayment implements PaymentStrategy {
+  constructor(private cardNumber: string) {}
+
+  pay(amount: number): string {
+    const last4 = this.cardNumber.slice(-4);
+    return `💳 Paid $${amount} using card ending in ${last4}`;
+  }
+}
+
+class PayPalPayment implements PaymentStrategy {
+  constructor(private email: string) {}
+
+  pay(amount: number): string {
+    return `🅿️ Paid $${amount} via PayPal`;
+  }
+}
+
+class CryptocurrencyPayment implements PaymentStrategy {
+  constructor(private walletAddress: string) {}
+
+  pay(amount: number): string {
+    const prefix = this.walletAddress.slice(0, 8);
+    return `₿ Paid ${amount} USDC to ${prefix}...`;
+  }
+}
+
+// Context class
+class PaymentProcessor {
+  constructor(private strategy: PaymentStrategy) {}
+
+  setStrategy(strategy: PaymentStrategy): void {
+    this.strategy = strategy;
+  }
+
+  process(amount: number): void {
+    console.log(this.strategy.pay(amount));
+  }
+}
+
+// Usage
+const processor = new PaymentProcessor(
+  new CreditCardPayment("1234567890123456")
+);
+processor.process(99.99);
+
+processor.setStrategy(new PayPalPayment("user@example.com"));
+processor.process(49.99);
+
+processor.setStrategy(
+  new CryptocurrencyPayment("0x742d35Cc6634C0532925a3b844Bc9e7595f42438")
+);
+processor.process(25.0);
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+from abc import ABC, abstractmethod
+
+# Strategy interface
+class PaymentStrategy(ABC):
+    @abstractmethod
+    def pay(self, amount):
+        pass
+
+# Concrete strategies
+class CreditCardPayment(PaymentStrategy):
+    def __init__(self, card_number):
+        self.card_number = card_number
+
+    def pay(self, amount):
+        last4 = self.card_number[-4:]
+        return f"💳 Paid ${amount} using card ending in {last4}"
+
+class PayPalPayment(PaymentStrategy):
+    def __init__(self, email):
+        self.email = email
+
+    def pay(self, amount):
+        return f"🅿️ Paid ${amount} via PayPal"
+
+class CryptocurrencyPayment(PaymentStrategy):
+    def __init__(self, wallet_address):
+        self.wallet_address = wallet_address
+
+    def pay(self, amount):
+        prefix = self.wallet_address[:8]
+        return f"₿ Paid {amount} USDC to {prefix}..."
+
+# Context class
+class PaymentProcessor:
+    def __init__(self, strategy):
+        self.strategy = strategy
+
+    def set_strategy(self, strategy):
+        self.strategy = strategy
+
+    def process(self, amount):
+        print(self.strategy.pay(amount))
+
+# Usage
+processor = PaymentProcessor(CreditCardPayment("1234567890123456"))
+processor.process(99.99)
+
+processor.set_strategy(PayPalPayment("user@example.com"))
+processor.process(49.99)
+
+processor.set_strategy(CryptocurrencyPayment("0x742d35Cc6634C0532925a3b844Bc9e7595f42438"))
+processor.process(25.0)
+```
+
+</TabItem>
+</Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function StrategyDemo() {
+  const [selectedStrategy, setSelectedStrategy] = React.useState("creditCard");
+  const [amount, setAmount] = React.useState(99.99);
+  const [log, setLog] = React.useState([]);
+
+  const strategies = {
+    creditCard: {
+      name: "Credit Card",
+      icon: "💳",
+      execute: (amt) =>
+        `Paid $${amt.toFixed(2)} using credit card ending in 3456`,
+    },
+    paypal: {
+      name: "PayPal",
+      icon: "🅿️",
+      execute: (amt) => `Paid $${amt.toFixed(2)} via PayPal account`,
+    },
+    crypto: {
+      name: "Cryptocurrency",
+      icon: "₿",
+      execute: (amt) => `Paid ${amt.toFixed(4)} USDC to wallet`,
+    },
+    bank: {
+      name: "Bank Transfer",
+      icon: "🏦",
+      execute: (amt) => `Transferred $${amt.toFixed(2)} via bank account`,
+    },
+  };
+
+  const processPayment = () => {
+    const strategy = strategies[selectedStrategy];
+    const result = strategy.execute(amount);
+    setLog((prev) => [...prev, `${strategy.icon} ${result}`]);
+  };
+
+  const clearLog = () => setLog([]);
+
+  const isDarkMode =
+    typeof window !== "undefined"
+      ? document.documentElement.getAttribute("data-theme") === "dark"
+      : false;
+
+  const styles = {
+    container: {
+      fontFamily: "sans-serif",
+      padding: "16px",
+      borderRadius: "8px",
+      backgroundColor: isDarkMode ? "#1e1e1e" : "#f5f5f5",
+      color: isDarkMode ? "#e0e0e0" : "#333",
+    },
+    section: {
+      marginBottom: "16px",
+      padding: "12px",
+      borderRadius: "6px",
+      backgroundColor: isDarkMode ? "#2a2a2a" : "#fff",
+      border: `1px solid ${isDarkMode ? "#444" : "#ddd"}`,
+    },
+    label: {
+      display: "block",
+      marginBottom: "8px",
+      fontWeight: "bold",
+      fontSize: "14px",
+    },
+    select: {
+      width: "100%",
+      padding: "8px",
+      borderRadius: "4px",
+      border: `1px solid ${isDarkMode ? "#555" : "#ccc"}`,
+      backgroundColor: isDarkMode ? "#333" : "#fff",
+      color: isDarkMode ? "#e0e0e0" : "#333",
+      fontSize: "14px",
+      marginBottom: "8px",
+    },
+    input: {
+      width: "100%",
+      padding: "8px",
+      borderRadius: "4px",
+      border: `1px solid ${isDarkMode ? "#555" : "#ccc"}`,
+      backgroundColor: isDarkMode ? "#333" : "#fff",
+      color: isDarkMode ? "#e0e0e0" : "#333",
+      fontSize: "14px",
+      marginBottom: "8px",
+      boxSizing: "border-box",
+    },
+    button: {
+      padding: "10px 16px",
+      borderRadius: "4px",
+      border: "none",
+      backgroundColor: isDarkMode ? "#0d47a1" : "#1976d2",
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: "14px",
+      fontWeight: "bold",
+      marginRight: "8px",
+    },
+    resetButton: {
+      padding: "10px 16px",
+      borderRadius: "4px",
+      border: "none",
+      backgroundColor: isDarkMode ? "#c62828" : "#d32f2f",
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: "14px",
+      fontWeight: "bold",
+    },
+    logContainer: {
+      marginTop: "16px",
+      padding: "12px",
+      borderRadius: "6px",
+      backgroundColor: isDarkMode ? "#1e1e1e" : "#f9f9f9",
+      border: `1px solid ${isDarkMode ? "#444" : "#e0e0e0"}`,
+      maxHeight: "200px",
+      overflowY: "auto",
+    },
+    logEntry: {
+      padding: "8px",
+      marginBottom: "4px",
+      borderRadius: "4px",
+      backgroundColor: isDarkMode ? "#2a2a2a" : "#fff",
+      fontSize: "14px",
+    },
+  };
+
+  return (
+    <div style={styles.container}>
+      <h3>Strategy Pattern Demo</h3>
+
+      <div style={styles.section}>
+        <label style={styles.label}>Select Payment Strategy:</label>
+        <select
+          value={selectedStrategy}
+          onChange={(e) => setSelectedStrategy(e.target.value)}
+          style={styles.select}
+        >
+          <option value="creditCard">
+            {strategies.creditCard.icon} {strategies.creditCard.name}
+          </option>
+          <option value="paypal">
+            {strategies.paypal.icon} {strategies.paypal.name}
+          </option>
+          <option value="crypto">
+            {strategies.crypto.icon} {strategies.crypto.name}
+          </option>
+          <option value="bank">
+            {strategies.bank.icon} {strategies.bank.name}
+          </option>
+        </select>
+
+        <label style={styles.label}>Amount:</label>
+        <input
+          type="number"
+          value={amount}
+          onChange={(e) => setAmount(parseFloat(e.target.value))}
+          step="0.01"
+          min="0"
+          style={styles.input}
+        />
+
+        <button onClick={processPayment} style={styles.button}>
+          Process Payment
+        </button>
+        <button onClick={clearLog} style={styles.resetButton}>
+          Clear Log
+        </button>
+      </div>
+
+      <div style={styles.logContainer}>
+        <h4 style={{ marginTop: 0, marginBottom: "8px" }}>Transaction Log:</h4>
+        {log.length === 0 ? (
+          <p style={{ color: isDarkMode ? "#999" : "#999", margin: 0 }}>
+            No transactions yet. Select a strategy and click "Process Payment".
+          </p>
+        ) : (
+          <div>
+            {log.map((entry, i) => (
+              <div key={i} style={styles.logEntry}>
+                {entry}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+## 🔗Relations to other patterns
+
+- [Strategy](/docs/behavioral/strategy) and [Command](/docs/behavioral/command) share a similar structure, but they solve different problems. Strategy encapsulates an algorithm and makes them interchangeable, while Command encapsulates a request as an object. Strategies are often stateless and reusable, whereas commands typically encapsulate both data and behavior for a specific action.
+
+- [Strategy](/docs/behavioral/strategy) works well with [State](/docs/behavioral/state) pattern. While Strategy allows selecting different algorithms, State allows an object to change its behavior based on its internal state. They can be combined when behavior needs to change based on both the strategy selected and the current state.
+
+- [Strategy](/docs/behavioral/strategy) can use [Factory Method](/docs/creational/factory-method) to create strategy instances, allowing for flexible strategy instantiation based on runtime conditions.
+
+- [Template Method](/docs/behavioral/template-method) and [Strategy](/docs/behavioral/strategy) both encapsulate varying behavior. Template Method uses inheritance (subclasses override steps), while Strategy uses composition (client chooses implementation). Strategy is generally more flexible for runtime changes.
+
+- [Decorator](/docs/structural/decorator) can be combined with Strategy to wrap strategies with additional behavior without modifying them.
+
+---
+
+## 📚Sources
+
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring Guru - Strategy Pattern](https://refactoring.guru/design-patterns/strategy)
+- [Wikipedia - Strategy pattern](https://en.wikipedia.org/wiki/Strategy_pattern)
