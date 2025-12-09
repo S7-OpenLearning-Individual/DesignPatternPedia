@@ -1,5 +1,393 @@
 ---
 title: Observer
+hide_title: true
+description: >
+  Like that old news email, but everyone actually reads it.
 ---
 
-This is Observer Pattern page
+import { BehavioralPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from "@theme/TOCInline";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+
+<BehavioralPatternTag
+  title="Observer"
+  aliases={["Pub-Sub", "Listener", "Event Emitter"]}
+/>
+
+---
+
+The **Observer** pattern defines a one-to-many dependency between objects so that when one object changes state, all of its dependents are notified and updated automatically.
+
+## 🧩The problem
+
+Imagine you're building a stock market trading application. When a stock changes in price, the relevant parties need to be notified right away. People such as advisors, trading algorithms, risk management systems, and user dashboards rely on the latest data. If you hardcode these notifications into the stock price update logic, you create tight coupling. Adding a new subscriber means modifying the stock class, and removing one requires more changes. Moreover, the stock class becomes bloated with notification logic that has nothing to do with tracking price data. If you need to notify different groups of observers in different ways, the complexity multiplies significantly.
+
+## 🛠️Solutions
+
+The Observer pattern solves this by defining a subscription mechanism. Instead of the subject (stock) directly notifying specific subscribers, subscribers register themselves with the subject. When the subject's state changes, it automatically notifies all registered subscribers without knowing their specific details. This establishes a clean separation of concerns:
+
+- The subject only knows about an abstract observer interface, not concrete observer implementations.
+- Subscribers can be added or removed dynamically without modifying the subject.
+- Multiple subscribers can react to the same event independently.
+- The system becomes more flexible and extensible.
+
+### 🏛️Metaphors
+
+Think of a newspaper subscription service. When you subscribe to a newspaper, you don't need to go to the printing press every morning asking "Is the paper ready?" Instead, the newspaper publisher automatically delivers the paper to your doorstep each morning. The publisher doesn't need to know who all the subscribers are individually. All they do is maintain a list and send copies to everyone on it. When you want to stop receiving the paper, you simply unsubscribe, and the publisher removes you from the list. New subscribers can be added at any time without the publisher changing their printing process.
+
+### 💡Real-world examples
+
+Common practical scenarios for applying the Observer pattern include:
+
+- User interface event handling, where buttons, text fields, and other components notify listeners when user interactions occur.
+- Model-View-Controller (MVC) architectures, where models notify views of data changes so they can update accordingly.
+- Real-time data systems like stock tickers, weather updates, or notification services that push data to multiple subscribers.
+- Reactive programming libraries (e.g. Angular, RxJS) that use observables to handle streams of data.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons
+  pros={[
+    "Open/Closed Principle. You can introduce new subscriber classes without having to change the publisher's code (and vice versa if there's a publisher interface).",
+    "You can establish run-time connections between objects.",
+    "Observers are loosely coupled to the subject, promoting better code organization and reusability.",
+    "Supports broadcasting of information to multiple interested parties.",
+  ]}
+  cons={[
+    "Observers are notified in random order, which can lead to unpredictable behavior or performance issues.",
+    "Unsubscribed observers can accumulate in memory if not properly cleaned up, leading to memory leaks.",
+    "The complexity of the system can increase with many observers and inter-observer dependencies.",
+  ]}
+/>
+
+## 🔍Applicability
+
+<Applicability
+  items={[
+    {
+      situation:
+        "Use the Observer pattern when a change to one object requires changing others, and the number of objects is unknown beforehand.",
+      context:
+        "This is especially useful when you don't want to create tight coupling between objects. By using the Observer pattern, objects can communicate through a loosely coupled subscription mechanism.",
+    },
+    {
+      situation:
+        "Use the Observer pattern when an object should notify other objects about state changes without assuming who these objects are.",
+      context:
+        "The pattern allows you to decouple the subject from the observers, making it easy to add or remove observers at runtime.",
+    },
+    {
+      situation:
+        "Use the Observer pattern in event-driven architectures where multiple components need to react to the same events.",
+      context:
+        "For example, in GUI applications, buttons, text fields, and other components can notify listeners when user interactions occur.",
+    },
+  ]}
+/>
+
+## 🧭Implementation Plan
+
+To implement the Observer pattern manually:
+
+1. Create a Subject interface or class that provides methods to subscribe (`attach()`), unsubscribe (`detach()`), and notify observers.
+2. Create an Observer interface that defines the update method that subjects will call to notify observers of state changes.
+3. Implement concrete observer classes that implement the Observer interface and define their specific reactions to subject updates.
+4. Implement a concrete subject class that maintains a list of observers and calls their update methods when its state changes.
+5. Client code creates the subject and observer instances, attaches observers to the subject, and modifies the subject's state.
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+// Observer interface
+interface Observer {
+  update(data: any): void;
+}
+
+// Subject class
+class Subject {
+  private observers: Observer[] = [];
+  private state: any;
+
+  // Attach an observer to the subject
+  attach(observer: Observer): void {
+    if (!this.observers.includes(observer)) {
+      this.observers.push(observer);
+      console.log("Observer attached.");
+    }
+  }
+
+  // Detach an observer from the subject
+  detach(observer: Observer): void {
+    const index = this.observers.indexOf(observer);
+    if (index !== -1) {
+      this.observers.splice(index, 1);
+      console.log("Observer detached.");
+    }
+  }
+
+  // Notify all observers about state change
+  notify(): void {
+    for (const observer of this.observers) {
+      observer.update(this.state);
+    }
+  }
+
+  // Set the subject's state and notify observers
+  setState(state: any): void {
+    this.state = state;
+    this.notify();
+  }
+
+  getState(): any {
+    return this.state;
+  }
+}
+
+// Concrete Observer 1
+class ConcreteObserverA implements Observer {
+  update(data: any): void {
+    console.log(`ConcreteObserverA: Reacted to the event. New state: ${data}`);
+  }
+}
+
+// Concrete Observer 2
+class ConcreteObserverB implements Observer {
+  update(data: any): void {
+    console.log(`ConcreteObserverB: Reacted to the event. New state: ${data}`);
+  }
+}
+
+// Usage
+const subject = new Subject();
+
+const observerA = new ConcreteObserverA();
+const observerB = new ConcreteObserverB();
+
+subject.attach(observerA);
+subject.attach(observerB);
+
+subject.setState("State changed to: New Value");
+
+subject.detach(observerA);
+
+subject.setState("State changed to: Another Value");
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+from abc import ABC, abstractmethod
+
+# Observer interface
+class Observer(ABC):
+    @abstractmethod
+    def update(self, data):
+        pass
+
+# Subject class
+class Subject:
+    def __init__(self):
+        self._observers = []
+        self._state = None
+
+    # Attach an observer to the subject
+    def attach(self, observer):
+        if observer not in self._observers:
+            self._observers.append(observer)
+            print("Observer attached.")
+
+    # Detach an observer from the subject
+    def detach(self, observer):
+        if observer in self._observers:
+            self._observers.remove(observer)
+            print("Observer detached.")
+
+    # Notify all observers about state change
+    def notify(self):
+        for observer in self._observers:
+            observer.update(self._state)
+
+    # Set the subject's state and notify observers
+    def set_state(self, state):
+        self._state = state
+        self.notify()
+
+    def get_state(self):
+        return self._state
+
+# Concrete Observer 1
+class ConcreteObserverA(Observer):
+    def update(self, data):
+        print(f"ConcreteObserverA: Reacted to the event. New state: {data}")
+
+# Concrete Observer 2
+class ConcreteObserverB(Observer):
+    def update(self, data):
+        print(f"ConcreteObserverB: Reacted to the event. New state: {data}")
+
+# Usage
+subject = Subject()
+
+observer_a = ConcreteObserverA()
+observer_b = ConcreteObserverB()
+
+subject.attach(observer_a)
+subject.attach(observer_b)
+
+subject.set_state("State changed to: New Value")
+
+subject.detach(observer_a)
+
+subject.set_state("State changed to: Another Value")
+```
+
+</TabItem>
+</Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function ObserverDemo() {
+  const [stock, setStock] = React.useState(100);
+  const [observers, setObservers] = React.useState([
+    { id: 1, name: "Trader Bot", price: 100 },
+    { id: 2, name: "Risk Manager", price: 100 },
+  ]);
+  const [log, setLog] = React.useState([
+    "System initialized with stock price: $100",
+  ]);
+
+  const updateStockPrice = (newPrice) => {
+    setStock(newPrice);
+    const updatedObservers = observers.map((obs) => ({
+      ...obs,
+      price: newPrice,
+    }));
+    setObservers(updatedObservers);
+    setLog((l) => [
+      ...l,
+      `Stock price updated to: $${newPrice}`,
+      `${updatedObservers.length} observers notified`,
+    ]);
+  };
+
+  const addObserver = (name) => {
+    const newObserver = {
+      id: Math.max(...observers.map((o) => o.id), 0) + 1,
+      name,
+      price: stock,
+    };
+    setObservers([...observers, newObserver]);
+    setLog((l) => [...l, `New observer added: ${name}`]);
+  };
+
+  const removeObserver = (id) => {
+    const observer = observers.find((o) => o.id === id);
+    setObservers(observers.filter((o) => o.id !== id));
+    if (observer) {
+      setLog((l) => [...l, `Observer removed: ${observer.name}`]);
+    }
+  };
+
+  const clearLog = () => setLog([]);
+
+  return (
+    <div style={{ fontFamily: "sans-serif" }}>
+      <h3>Observer Pattern Demo - Stock Price Notification</h3>
+
+      <div style={{ marginBottom: "20px" }}>
+        <h4>Stock Price Control</h4>
+        <input
+          type="number"
+          value={stock}
+          onChange={(e) => updateStockPrice(Number(e.target.value))}
+          style={{ padding: "8px", marginRight: "10px" }}
+        />
+        <span style={{ fontSize: "18px", fontWeight: "bold" }}>
+          Current Price: ${stock}
+        </span>
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <h4>Observers ({observers.length})</h4>
+        <button
+          onClick={() => addObserver("New Observer")}
+          style={{ marginRight: "10px" }}
+        >
+          Add Observer
+        </button>
+        <div style={{ marginTop: "10px" }}>
+          {observers.map((obs) => (
+            <div
+              key={obs.id}
+              style={{
+                padding: "10px",
+                margin: "5px",
+                border: "1px solid var(--ifm-color-emphasis-300)",
+                borderRadius: "4px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <span>
+                {obs.name} - Notified price: ${obs.price}
+              </span>
+              <button onClick={() => removeObserver(obs.id)}>Remove</button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h4>Event Log</h4>
+        <button onClick={clearLog}>Clear Logs</button>
+        <div
+          style={{
+            border: "1px solid var(--ifm-color-emphasis-300)",
+            borderRadius: "4px",
+            padding: "10px",
+            marginTop: "10px",
+            maxHeight: "200px",
+            overflowY: "auto",
+            backgroundColor: "var(--ifm-color-emphasis-100)",
+          }}
+        >
+          {log.map((entry, index) => (
+            <div key={index} style={{ padding: "5px 0", fontSize: "12px" }}>
+              {entry}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+## 🔗Relations to other patterns
+
+- [Mediator](/docs/behavioral/mediator), similar in promoting loose coupling, but centralizes communication between multiple objects
+- [Strategy](/docs/behavioral/strategy), can work alongside Observer to define different notification strategies
+- [Command](/docs/behavioral/command), can be used with Observer to queue and execute observer notifications
+
+---
+
+## 📚Sources
+
+Information used in this page was collected from various reliable sources:
+
+- [Observer Pattern - Refactoring Guru](https://refactoring.guru/design-patterns/observer)
