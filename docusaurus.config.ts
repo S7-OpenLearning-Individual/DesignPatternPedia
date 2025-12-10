@@ -70,6 +70,11 @@ const config: Config = {
         },
         {
           position: "left",
+          to: "/docs/navigator",
+          label: "Navigator",
+        },
+        {
+          position: "left",
           to: "docs/behavioral",
           label: "Behavioral",
         },

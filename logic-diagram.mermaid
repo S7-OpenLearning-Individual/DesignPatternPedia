@@ -1,0 +1,56 @@
+flowchart TD
+    Start["What do you need to do?"] --> Q1{"Are you creating<br/>new objects?"}
+    
+    Q1 -->|Yes| Creational["Creational Patterns<br/>(Object Creation)"]
+    Q1 -->|No| Q2{"Are you dealing with<br/>object composition<br/>or structure?"}
+    
+    Q2 -->|Yes| Structural["Structural Patterns<br/>(Object Composition)"]
+    Q2 -->|No| Behavioral["Behavioral Patterns<br/>(Object Interaction)"]
+    
+    %% Creational Branch
+    Creational --> C1{"Do you want to<br/>restrict instances?"}
+    C1 -->|Yes| Singleton["Singleton<br/>(One instance)"]
+    C1 -->|No| C2{"Does the object require<br/>multiple steps to create?"}
+    
+    C2 -->|Yes| C3{"Do you need<br/>variants?"}
+    C3 -->|Yes| AbstractFactory["Abstract Factory<br/>(Family of objects)"]
+    C3 -->|No| Builder["Builder<br/>(Step-by-step)"]
+    
+    C2 -->|No| C4{"Need to clone<br/>existing objects?"}
+    C4 -->|Yes| Prototype["Prototype<br/>(Clone objects)"]
+    C4 -->|No| FactoryMethod["Factory Method<br/>(Encapsulate creation)"]
+    
+    %% Structural Branch
+    Structural --> S1{"Are you wrapping<br/>an object?"}
+    S1 -->|Yes| S2{"Need to change<br/>object's interface?"}
+    S2 -->|Yes| Adapter["Adapter<br/>(Convert interface)"]
+    S2 -->|No| S3{"Adding functionality<br/>dynamically?"}
+    S3 -->|Yes| Decorator["Decorator<br/>(Add behavior)"]
+    S3 -->|No| Proxy["Proxy<br/>(Control access)"]
+    
+    S1 -->|No| S4{"Building a tree<br/>structure?"}
+    S4 -->|Yes| Composite["Composite<br/>(Part-whole)"]
+    S4 -->|No| S5{"Simplifying<br/>complex system?"}
+    S5 -->|Yes| Facade["Facade<br/>(Unified interface)"]
+    S5 -->|No| S6{"Optimizing<br/>memory?"}
+    S6 -->|Yes| Flyweight["Flyweight<br/>(Share objects)"]
+    S6 -->|No| Bridge["Bridge<br/>(Decouple interface)"]
+    
+    %% Behavioral Branch
+    Behavioral --> B1{"Is it about<br/>sequencing?"}
+    B1 -->|Yes| B2{"Pass requests<br/>through chain?"}
+    B2 -->|Yes| ChainOfResp["Chain of Responsibility<br/>(Pass along chain)"]
+    B2 -->|No| B3{"Execute commands<br/>later?"}
+    B3 -->|Yes| Command["Command<br/>(Encapsulate action)"]
+    B3 -->|No| Iterator["Iterator<br/>(Access elements)"]
+    
+    B1 -->|No| B4{"Multiple states<br/>or algorithms?"}
+    B4 -->|Yes| B5{"Object changes<br/>behavior?"}
+    B5 -->|Yes| State["State<br/>(Change behavior)"]
+    B5 -->|No| Strategy["Strategy<br/>(Select algorithm)"]
+    
+    B4 -->|No| B6{"Need to track<br/>changes?"}
+    B6 -->|Yes| Observer["Observer<br/>(Notify dependents)"]
+    B6 -->|No| B7{"Saving/restoring<br/>state?"}
+    B7 -->|Yes| Memento["Memento<br/>(Capture state)"]
+    B7 -->|No| Visitor["Visitor<br/>(Add operations)"]
