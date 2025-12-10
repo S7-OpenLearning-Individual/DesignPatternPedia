@@ -1,5 +1,484 @@
 ---
 title: Visitor
+hide_title: true
+description: >
+  Separate what you do from what you're doing it to.
 ---
 
-This is Visitor Pattern page
+import { BehavioralPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from "@theme/TOCInline";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+
+<BehavioralPatternTag title="Visitor" aliases={["Dispatch", "Traversal"]} />
+
+---
+
+The **Visitor** pattern allows you to define new operations on object structures without changing the classes of the elements on which it operates. By representing operations as separate visitor objects, you can add new behaviors to a complex data structure in a clean, extensible manner without cluttering the original classes.
+
+## 🧩The problem
+
+Imagine you're building a compiler that parses code into an abstract syntax tree (AST). Your AST contains different types of nodes: expressions, statements, function declarations, and more. Initially, you implement a compilation operation directly in each node class. Later, you need to add optimization, code generation, type checking, and pretty-printing features.
+
+If you add these operations to each node class, your classes become bloated with unrelated logic. Each node class ends up with dozens of methods for different operations, violating the Single Responsibility Principle. Every time you want to add a new operation, you must modify all the node classes. If someone wants to extend the system with custom operations, they have no clean way to do it without modifying the core classes.
+
+## 🛠️Solutions
+
+The Visitor pattern solves this by extracting operations into separate visitor classes. Instead of having nodes perform operations on themselves, you let visitors "visit" the nodes and perform their operations. Each visitor represents a different operation, and each node accepts visitors through an `accept()` method.
+
+This approach provides several benefits:
+
+- Operations are decoupled from the object structure. Adding new operations doesn't require modifying node classes.
+- Related operations are grouped together in a single visitor class, keeping code organized and maintainable.
+- Complex operations across multiple node types become simpler to implement and understand.
+- You can add new operations without changing existing code, adhering to the Open/Closed Principle.
+- The single responsibility of each class is preserved—nodes represent structure, visitors represent operations.
+
+### 🏛️Metaphors
+
+Think of a museum tour guide. The museum has various artworks: paintings, sculptures, and installations. A guide represents a specific way of experiencing the museum (e.g., an art history tour, a children's tour, or a technical restoration tour). When the guide visits each artwork, they provide different commentary and insights depending on their expertise and purpose. New guides can be added without the museum changing its collection. Not every artwork needs to know about different guide types they simply accepts visitors and lets them do their work.
+
+### 💡Real-world examples
+
+Common practical scenarios for applying the Visitor pattern include:
+
+- Compilers and interpreters that need to perform multiple operations (parsing, optimization, code generation) on abstract syntax trees.
+- Document processing systems that need to export documents to different formats (PDF, HTML, XML) without modifying document classes.
+- File system utilities that perform different operations on files and directories (compression, encryption, analysis).
+- Reporting systems that generate different report types from the same data structure.
+- Tree traversal and manipulation in graph databases or DOM implementations.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons
+  pros={[
+    "Open/Closed Principle. You can introduce new operations without changing classes of the elements that the operations work on.",
+    "Single Responsibility Principle. Operations on objects are isolated from the objects themselves in separate visitor classes.",
+    "Simplifies complex operations across different object types by grouping them into a single visitor class.",
+    "Visitors can accumulate state while traversing the object structure, enabling complex computations.",
+    "Makes it easy to add new operations to an established object structure without modification.",
+  ]}
+  cons={[
+    "Adding new element types to the object structure requires updating all existing visitor classes to handle the new type.",
+    "Visitors may need access to private members of elements, which can require breaking encapsulation.",
+    "The pattern can be overkill if you only have a few operations or a simple object structure.",
+    "Increases code complexity by introducing more classes and an additional layer of indirection.",
+  ]}
+/>
+
+## 🔍Applicability
+
+<Applicability
+  items={[
+    {
+      situation:
+        "Use the Visitor pattern when you need to perform operations on complex object structures and those operations change frequently.",
+      context:
+        "Instead of modifying the object classes each time, you create new visitor classes to handle new operations, keeping the object structure stable.",
+    },
+    {
+      situation:
+        "Use the Visitor pattern when many unrelated operations need to be performed on objects in a structure.",
+      context:
+        "Extracting these operations into visitors keeps your object classes clean and prevents them from becoming bloated with single-purpose methods.",
+    },
+    {
+      situation:
+        "Use the Visitor pattern when you want to enable external code to extend the behavior of your object structure without modifying it.",
+      context:
+        "Visitors allow third-party developers to define their own operations on your object structure without changing your core classes.",
+    },
+    {
+      situation:
+        "Use the Visitor pattern when you need to apply the same operation uniformly across different types of objects.",
+      context:
+        "A visitor can visit all objects in a structure and perform consistent operations regardless of the object type.",
+    },
+  ]}
+/>
+
+## 🧭Implementation Plan
+
+To implement the Visitor pattern manually:
+
+1. Create an Element interface or abstract class that defines an `accept()` method taking a visitor parameter.
+2. Create concrete element classes that implement the Element interface and define `accept()` to call a specific visitor method.
+3. Create a Visitor interface that defines visit methods for each element type (e.g., `visitConcreteElementA()`, `visitConcreteElementB()`).
+4. Create concrete visitor classes that implement the Visitor interface and define the actual operations for each element type.
+5. In the `accept()` method of each element, call the appropriate visit method on the visitor (e.g., `visitor.visitConcreteElementA(this)`).
+6. Create an object structure that contains elements and can be traversed by visitors.
+7. Client code creates visitors and passes them to elements through their `accept()` method.
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+// Element interface
+interface Element {
+  accept(visitor: Visitor): void;
+}
+
+// Concrete elements
+class TextElement implements Element {
+  constructor(private text: string) {}
+
+  accept(visitor: Visitor): void {
+    visitor.visitText(this);
+  }
+
+  getText(): string {
+    return this.text;
+  }
+}
+
+class ImageElement implements Element {
+  constructor(private fileName: string) {}
+
+  accept(visitor: Visitor): void {
+    visitor.visitImage(this);
+  }
+
+  getFileName(): string {
+    return this.fileName;
+  }
+}
+
+class DocumentElement implements Element {
+  private children: Element[] = [];
+
+  accept(visitor: Visitor): void {
+    visitor.visitDocument(this);
+    this.children.forEach((child) => child.accept(visitor));
+  }
+
+  addChild(element: Element): void {
+    this.children.push(element);
+  }
+
+  getChildren(): Element[] {
+    return this.children;
+  }
+}
+
+// Visitor interface
+interface Visitor {
+  visitText(element: TextElement): void;
+  visitImage(element: ImageElement): void;
+  visitDocument(element: DocumentElement): void;
+}
+
+// Concrete visitors
+class HtmlExportVisitor implements Visitor {
+  private output: string = "";
+
+  visitText(element: TextElement): void {
+    this.output += `<p>${element.getText()}</p>\n`;
+  }
+
+  visitImage(element: ImageElement): void {
+    this.output += `<img src="${element.getFileName()}" />\n`;
+  }
+
+  visitDocument(element: DocumentElement): void {
+    this.output += "<html>\n<body>\n";
+  }
+
+  getOutput(): string {
+    return this.output + "</body>\n</html>";
+  }
+}
+
+class WordCountVisitor implements Visitor {
+  private count: number = 0;
+
+  visitText(element: TextElement): void {
+    this.count += element.getText().split(" ").length;
+  }
+
+  visitImage(element: ImageElement): void {
+    // Images don't contribute to word count
+  }
+
+  visitDocument(element: DocumentElement): void {
+    // Document itself doesn't count
+  }
+
+  getCount(): number {
+    return this.count;
+  }
+}
+
+// Usage
+const doc = new DocumentElement();
+doc.addChild(new TextElement("Hello World"));
+doc.addChild(new ImageElement("photo.jpg"));
+doc.addChild(new TextElement("Goodbye"));
+
+const htmlVisitor = new HtmlExportVisitor();
+doc.accept(htmlVisitor);
+console.log(htmlVisitor.getOutput());
+
+const wordVisitor = new WordCountVisitor();
+doc.accept(wordVisitor);
+console.log(`Word count: ${wordVisitor.getCount()}`);
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+from abc import ABC, abstractmethod
+from typing import List
+
+# Element interface
+class Element(ABC):
+    @abstractmethod
+    def accept(self, visitor):
+        pass
+
+# Concrete elements
+class TextElement(Element):
+    def __init__(self, text):
+        self.text = text
+
+    def accept(self, visitor):
+        visitor.visit_text(self)
+
+    def get_text(self):
+        return self.text
+
+class ImageElement(Element):
+    def __init__(self, file_name):
+        self.file_name = file_name
+
+    def accept(self, visitor):
+        visitor.visit_image(self)
+
+    def get_file_name(self):
+        return self.file_name
+
+class DocumentElement(Element):
+    def __init__(self):
+        self.children = []
+
+    def accept(self, visitor):
+        visitor.visit_document(self)
+        for child in self.children:
+            child.accept(visitor)
+
+    def add_child(self, element):
+        self.children.append(element)
+
+    def get_children(self):
+        return self.children
+
+# Visitor interface
+class Visitor(ABC):
+    @abstractmethod
+    def visit_text(self, element):
+        pass
+
+    @abstractmethod
+    def visit_image(self, element):
+        pass
+
+    @abstractmethod
+    def visit_document(self, element):
+        pass
+
+# Concrete visitors
+class HtmlExportVisitor(Visitor):
+    def __init__(self):
+        self.output = ""
+
+    def visit_text(self, element):
+        self.output += f"<p>{element.get_text()}</p>\n"
+
+    def visit_image(self, element):
+        self.output += f'<img src="{element.get_file_name()}" />\n'
+
+    def visit_document(self, element):
+        self.output += "<html>\n<body>\n"
+
+    def get_output(self):
+        return self.output + "</body>\n</html>"
+
+class WordCountVisitor(Visitor):
+    def __init__(self):
+        self.count = 0
+
+    def visit_text(self, element):
+        self.count += len(element.get_text().split())
+
+    def visit_image(self, element):
+        # Images don't contribute to word count
+        pass
+
+    def visit_document(self, element):
+        # Document itself doesn't count
+        pass
+
+    def get_count(self):
+        return self.count
+
+# Usage
+doc = DocumentElement()
+doc.add_child(TextElement("Hello World"))
+doc.add_child(ImageElement("photo.jpg"))
+doc.add_child(TextElement("Goodbye"))
+
+html_visitor = HtmlExportVisitor()
+doc.accept(html_visitor)
+print(html_visitor.get_output())
+
+word_visitor = WordCountVisitor()
+doc.accept(word_visitor)
+print(f"Word count: {word_visitor.get_count()}")
+```
+
+</TabItem>
+</Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function VisitorDemo() {
+  const [output, setOutput] = React.useState("");
+  const [selectedVisitor, setSelectedVisitor] = React.useState("html");
+  const isDarkMode =
+    document.documentElement.getAttribute("data-theme") === "dark";
+
+  const elements = [
+    { type: "text", value: "Welcome to the Museum" },
+    { type: "image", value: "painting.jpg" },
+    { type: "text", value: "A masterpiece from the Renaissance" },
+  ];
+
+  const visit = (visitorType) => {
+    setSelectedVisitor(visitorType);
+
+    if (visitorType === "html") {
+      const html = elements
+        .map((item) => {
+          if (item.type === "text") {
+            return `<p>${item.value}</p>`;
+          } else if (item.type === "image") {
+            return `<img src="${item.value}" alt="artwork" />`;
+          }
+        })
+        .join("\n");
+      setOutput(html);
+    } else if (visitorType === "wordCount") {
+      const totalWords = elements
+        .filter((item) => item.type === "text")
+        .reduce((count, item) => count + item.value.split(" ").length, 0);
+      setOutput(`Total word count: ${totalWords}`);
+    } else if (visitorType === "markdown") {
+      const markdown = elements
+        .map((item) => {
+          if (item.type === "text") {
+            return `${item.value}`;
+          } else if (item.type === "image") {
+            return `![artwork](${item.value})`;
+          }
+        })
+        .join("\n\n");
+      setOutput(markdown);
+    }
+  };
+
+  const getButtonStyle = (isSelected) => ({
+    padding: "10px 15px",
+    marginRight: "10px",
+    marginBottom: "10px",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    backgroundColor: isSelected ? "#007bff" : isDarkMode ? "#555" : "#e0e0e0",
+    color: isSelected ? "white" : isDarkMode ? "#e0e0e0" : "black",
+    fontWeight: "bold",
+  });
+
+  const styles = {
+    container: {
+      padding: "20px",
+      fontFamily: "Arial, sans-serif",
+      color: isDarkMode ? "#e0e0e0" : "black",
+    },
+    buttonGroup: {
+      marginBottom: "20px",
+    },
+    output: {
+      backgroundColor: isDarkMode ? "#1e1e1e" : "#f5f5f5",
+      border: `1px solid ${isDarkMode ? "#444" : "#ddd"}`,
+      color: isDarkMode ? "#e0e0e0" : "black",
+      borderRadius: "4px",
+      padding: "15px",
+      marginTop: "20px",
+      whiteSpace: "pre-wrap",
+      wordBreak: "break-word",
+      minHeight: "100px",
+    },
+  };
+
+  return (
+    <div style={styles.container}>
+      <h3>Visitor Pattern Demo</h3>
+      <p>Select a visitor to see different operations on the document:</p>
+
+      <div style={styles.buttonGroup}>
+        <button
+          onClick={() => visit("html")}
+          style={getButtonStyle(selectedVisitor === "html")}
+        >
+          HTML Export
+        </button>
+        <button
+          onClick={() => visit("wordCount")}
+          style={getButtonStyle(selectedVisitor === "wordCount")}
+        >
+          Word Count
+        </button>
+        <button
+          onClick={() => visit("markdown")}
+          style={getButtonStyle(selectedVisitor === "markdown")}
+        >
+          Markdown Export
+        </button>
+      </div>
+
+      <div style={styles.output}>{output || "Select a visitor above..."}</div>
+    </div>
+  );
+}
+```
+
+## 🔗Relations to other patterns
+
+- [Visitor](/docs/behavioral/visitor) is often used with [Composite](/docs/structural/composite) to traverse and perform operations on complex tree structures. Composite defines the structure, while Visitor defines the operations.
+
+- [Visitor](/docs/behavioral/visitor) and [Strategy](/docs/behavioral/strategy) are similar in structure but solve different problems. Strategy encapsulates interchangeable algorithms, while Visitor encapsulates operations on complex object structures.
+
+- [Visitor](/docs/behavioral/visitor) can work with [Iterator](/docs/behavioral/iterator) to traverse object structures in different orders while maintaining separation of traversal and operations.
+
+- [Interpreter](/docs/behavioral/template-method) and [Visitor](/docs/behavioral/visitor) both work with tree structures. Interpreter defines grammar rules, while Visitor defines operations on those structures.
+
+- [Chain of Responsibility](/docs/behavioral/chain-of-responsibility) can be used alongside Visitor to pass visitor objects through a chain of handlers.
+
+---
+
+## 📚Sources
+
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring Guru - Visitor Pattern](https://refactoring.guru/design-patterns/visitor)
