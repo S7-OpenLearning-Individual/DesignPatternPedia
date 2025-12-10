@@ -1,5 +1,441 @@
 ---
 title: Template Method
+hide_title: true
+description: >
+  Follow the recipe, but cook your own meal.
 ---
 
-This is Template Method Pattern page
+import { BehavioralPatternTag } from "@site/src/components/pattern-page-features/pattern-alias-and-tag";
+import TwoColumnProsCons from "@site/src/components/pattern-page-features/pros-and-cons";
+import TOCInline from "@theme/TOCInline";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Applicability from "@site/src/components/pattern-page-features/applicability";
+
+<BehavioralPatternTag title="Template Method" />
+
+---
+
+The **Template Method** pattern defines the skeleton of an algorithm in a base class, but lets subclasses override specific steps of the algorithm without changing its structure. This pattern establishes a framework where the overall algorithm remains consistent while allowing variations in certain steps.
+
+## 🧩The problem
+
+Imagine you're building a data processing system that needs to handle multiple file formats like CSV, JSON, and XML. The overall process is similar for all formats: read the file, validate the data, transform it, and save the results. However, the specific implementation of validation and transformation differs based on the file format. If you implement the entire algorithm in each subclass, you'll end up duplicating the common steps (read, save) across all classes. This violates the DRY (Don't Repeat Yourself) principle and makes maintenance harder. When the common logic needs to change, you must update it in multiple places.
+
+## 🛠️Solutions
+
+The **Template Method** pattern solves this by defining the algorithm's structure in a base class as a template. The base class implements the common, unchanging steps and declares abstract methods for the steps that vary. Subclasses then override only the abstract methods with their specific implementations. This way:
+
+- The algorithm structure is defined once and reused across all subclasses.
+- Common logic is centralized, reducing code duplication.
+- Subclasses only need to implement the specific steps they differ on.
+- Changes to the common algorithm flow are made in one place.
+- The algorithm's invariant structure is protected from modification.
+
+### 🏛️Metaphors
+
+Think of baking a cake using a recipe. The recipe defines the general steps: preheat oven, mix ingredients, bake, cool, and decorate. However, the specific ingredients and flavors vary depending on the type of cake (chocolate, vanilla, strawberry). The recipe provides the template, but each baker can substitute ingredients and decoration techniques while following the same overall structure. The order of steps remains consistent, but the details of each step can vary.
+
+### 💡Real-world examples
+
+Common practical scenarios for applying the Template Method pattern include:
+
+- Data processing pipelines where different file formats follow the same processing steps (read, validate, transform, save).
+- Web frameworks that define a common request handling flow but allow developers to override specific hooks like authentication, logging, and response formatting.
+- Game development where different character types follow the same life cycle (spawn, update, render, destroy) but with different implementations.
+
+## ⚖️ Pros and Cons
+
+<TwoColumnProsCons
+  pros={[
+    "You can let clients override only particular parts of a large algorithm, making them less affected by changes that happen to other parts of the algorithm.",
+    "You can pull the duplicate code into a base class, eliminating code duplication across subclasses.",
+    "Open/Closed Principle. You can introduce new subclasses without changing existing algorithm code.",
+    "Single Responsibility Principle. Allows you to move the invariant parts of an algorithm into the parent class, leaving the variant parts to subclasses.",
+  ]}
+  cons={[
+    "Some clients may be limited by the provided template structure and might need the algorithm to deviate from the predefined skeleton.",
+    "Template methods tend to be harder to maintain the more steps they have.",
+    "Violation of the Liskov Substitution Principle can occur if subclasses don't properly implement the template method contract.",
+  ]}
+/>
+
+## 🔍Applicability
+
+<Applicability
+  items={[
+    {
+      situation:
+        "Use the Template Method pattern when you have multiple classes that perform similar operations with some variations in certain steps.",
+      context:
+        "Instead of duplicating the common steps in each class, you define the algorithm structure in a base class and let subclasses override the varying steps.",
+    },
+    {
+      situation:
+        "Use the Template Method pattern when you want to avoid code duplication across similar algorithms.",
+      context:
+        "By extracting the common structure into a base class, you maintain a single source of truth for the algorithm flow.",
+    },
+    {
+      situation:
+        "Use the Template Method pattern when you want to control the extension points of an algorithm.",
+      context:
+        "You define where subclasses can hook into the algorithm, preventing them from accidentally breaking the overall structure.",
+    },
+    {
+      situation:
+        "Use the Template Method pattern in frameworks or libraries where you provide a standard flow but allow customization at specific points.",
+      context:
+        "Users of your framework can override specific methods (hooks) to customize behavior without needing to understand or modify the entire algorithm.",
+    },
+  ]}
+/>
+
+## 🧭Implementation Plan
+
+To implement the Template Method pattern manually:
+
+1. Identify the algorithm or process that has both common and varying steps.
+2. Create an abstract base class that defines the template method, which outlines the overall algorithm structure.
+3. In the template method, call abstract methods for steps that vary across subclasses and implement the common steps directly.
+4. For variant steps, declare abstract methods in the base class that subclasses must implement.
+5. Optionally, provide hook methods with default implementations that subclasses can override if needed.
+6. Create concrete subclasses that extend the base class and implement the abstract methods with their specific logic.
+7. Client code instantiates the appropriate subclass and calls the template method, which executes the complete algorithm.
+
+### 💻Code samples
+
+<Tabs>
+<TabItem value="ts" label="TypeScript">
+
+```ts
+// Abstract base class defining the template method
+abstract class DataProcessor {
+  // Template method - defines the algorithm structure
+  process(filePath: string): void {
+    const data = this.readFile(filePath);
+    const validatedData = this.validate(data);
+    const transformedData = this.transform(validatedData);
+    this.save(transformedData);
+  }
+
+  // Common step - same for all subclasses
+  private readFile(filePath: string): string {
+    console.log(`📖 Reading file from ${filePath}`);
+    return "raw data";
+  }
+
+  // Abstract methods - to be implemented by subclasses
+  protected abstract validate(data: string): string;
+  protected abstract transform(data: string): string;
+
+  // Common step - same for all subclasses
+  private save(data: string): void {
+    console.log(`💾 Saving processed data`);
+  }
+}
+
+// Concrete subclass for CSV processing
+class CSVProcessor extends DataProcessor {
+  protected validate(data: string): string {
+    console.log("✅ Validating CSV format");
+    return data.split(",").join("|");
+  }
+
+  protected transform(data: string): string {
+    console.log("🔄 Transforming CSV to structured format");
+    return data.toUpperCase();
+  }
+}
+
+// Concrete subclass for JSON processing
+class JSONProcessor extends DataProcessor {
+  protected validate(data: string): string {
+    console.log("✅ Validating JSON format");
+    try {
+      JSON.parse(data);
+      return data;
+    } catch {
+      throw new Error("Invalid JSON");
+    }
+  }
+
+  protected transform(data: string): string {
+    console.log("🔄 Transforming JSON to normalized format");
+    const obj = JSON.parse(data);
+    return JSON.stringify(obj, null, 2);
+  }
+}
+
+// Concrete subclass for XML processing
+class XMLProcessor extends DataProcessor {
+  protected validate(data: string): string {
+    console.log("✅ Validating XML format");
+    // Simplified validation
+    return data;
+  }
+
+  protected transform(data: string): string {
+    console.log("🔄 Transforming XML to JSON");
+    return `{"xml": "${data}"}`;
+  }
+}
+
+// Usage
+const csvProcessor = new CSVProcessor();
+csvProcessor.process("data.csv");
+
+const jsonProcessor = new JSONProcessor();
+jsonProcessor.process("data.json");
+
+const xmlProcessor = new XMLProcessor();
+xmlProcessor.process("data.xml");
+```
+
+</TabItem>
+<TabItem value="py" label="Python">
+
+```python
+from abc import ABC, abstractmethod
+
+# Abstract base class defining the template method
+class DataProcessor(ABC):
+    # Template method - defines the algorithm structure
+    def process(self, file_path):
+        data = self.read_file(file_path)
+        validated_data = self.validate(data)
+        transformed_data = self.transform(validated_data)
+        self.save(transformed_data)
+
+    # Common step - same for all subclasses
+    def read_file(self, file_path):
+        print(f"📖 Reading file from {file_path}")
+        return "raw data"
+
+    # Abstract methods - to be implemented by subclasses
+    @abstractmethod
+    def validate(self, data):
+        pass
+
+    @abstractmethod
+    def transform(self, data):
+        pass
+
+    # Common step - same for all subclasses
+    def save(self, data):
+        print("💾 Saving processed data")
+
+# Concrete subclass for CSV processing
+class CSVProcessor(DataProcessor):
+    def validate(self, data):
+        print("✅ Validating CSV format")
+        return data.replace(",", "|")
+
+    def transform(self, data):
+        print("🔄 Transforming CSV to structured format")
+        return data.upper()
+
+# Concrete subclass for JSON processing
+class JSONProcessor(DataProcessor):
+    def validate(self, data):
+        print("✅ Validating JSON format")
+        import json
+        try:
+            json.loads(data)
+            return data
+        except json.JSONDecodeError:
+            raise ValueError("Invalid JSON")
+
+    def transform(self, data):
+        print("🔄 Transforming JSON to normalized format")
+        import json
+        obj = json.loads(data)
+        return json.dumps(obj, indent=2)
+
+# Concrete subclass for XML processing
+class XMLProcessor(DataProcessor):
+    def validate(self, data):
+        print("✅ Validating XML format")
+        return data
+
+    def transform(self, data):
+        print("🔄 Transforming XML to JSON")
+        return f'{{"xml": "{data}"}}'
+
+# Usage
+csv_processor = CSVProcessor()
+csv_processor.process("data.csv")
+
+json_processor = JSONProcessor()
+json_processor.process("data.json")
+
+xml_processor = XMLProcessor()
+xml_processor.process("data.xml")
+```
+
+</TabItem>
+</Tabs>
+
+### 🎮Playground
+
+:::note
+
+This sample is to get a 'feel' for the pattern. The code itself may not reflect a correct implementation of the pattern.
+
+:::
+
+```jsx live
+function TemplateMethodDemo() {
+  const [selectedFormat, setSelectedFormat] = React.useState("csv");
+  const [log, setLog] = React.useState([]);
+
+  const processors = {
+    csv: {
+      name: "CSV Processor",
+      icon: "📊",
+      validate: (d) => `Validating CSV format: ${d}`,
+      transform: (d) => `Transforming to structured: ${d.toUpperCase()}`,
+    },
+    json: {
+      name: "JSON Processor",
+      icon: "📋",
+      validate: (d) => `Validating JSON format: ${d}`,
+      transform: (d) => `Formatting JSON with indentation: ${d}`,
+    },
+    xml: {
+      name: "XML Processor",
+      icon: "🏷️",
+      validate: (d) => `Validating XML structure: ${d}`,
+      transform: (d) => `Converting to JSON equivalent: ${d}`,
+    },
+  };
+
+  const processData = () => {
+    const processor = processors[selectedFormat];
+    const newLog = [
+      `${processor.icon} Processing ${processor.name}`,
+      "📖 Reading file",
+      processor.validate("sample data"),
+      processor.transform("sample data"),
+      "💾 Saving processed data",
+      "✨ Process complete",
+    ];
+    setLog(newLog);
+  };
+
+  const clearLog = () => setLog([]);
+
+  const isDarkMode =
+    typeof window !== "undefined"
+      ? document.documentElement.getAttribute("data-theme") === "dark"
+      : false;
+
+  const styles = {
+    container: {
+      fontFamily: "sans-serif",
+      padding: "16px",
+      borderRadius: "8px",
+      backgroundColor: isDarkMode ? "#1e1e1e" : "#f5f5f5",
+      color: isDarkMode ? "#e0e0e0" : "#333",
+    },
+    section: {
+      marginBottom: "16px",
+    },
+    label: {
+      display: "block",
+      marginBottom: "8px",
+      fontWeight: "bold",
+    },
+    select: {
+      padding: "8px",
+      borderRadius: "4px",
+      border: `1px solid ${isDarkMode ? "#555" : "#ccc"}`,
+      backgroundColor: isDarkMode ? "#2a2a2a" : "#fff",
+      color: isDarkMode ? "#e0e0e0" : "#333",
+      marginBottom: "12px",
+    },
+    button: {
+      padding: "8px 16px",
+      marginRight: "8px",
+      borderRadius: "4px",
+      border: "none",
+      backgroundColor: isDarkMode ? "#0d47a1" : "#1976d2",
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: "14px",
+    },
+    clearButton: {
+      padding: "8px 16px",
+      borderRadius: "4px",
+      border: "none",
+      backgroundColor: isDarkMode ? "#666" : "#757575",
+      color: "#fff",
+      cursor: "pointer",
+      fontSize: "14px",
+    },
+    logContainer: {
+      marginTop: "16px",
+      padding: "12px",
+      borderRadius: "6px",
+      backgroundColor: isDarkMode ? "#2a2a2a" : "#f9f9f9",
+      border: `1px solid ${isDarkMode ? "#444" : "#e0e0e0"}`,
+      maxHeight: "200px",
+      overflowY: "auto",
+    },
+    logItem: {
+      padding: "4px 0",
+      borderBottom: `1px solid ${isDarkMode ? "#444" : "#e0e0e0"}`,
+      fontSize: "13px",
+    },
+  };
+
+  return (
+    <div style={styles.container}>
+      <div style={styles.section}>
+        <label style={styles.label}>Select Data Format:</label>
+        <select
+          style={styles.select}
+          value={selectedFormat}
+          onChange={(e) => setSelectedFormat(e.target.value)}
+        >
+          <option value="csv">CSV</option>
+          <option value="json">JSON</option>
+          <option value="xml">XML</option>
+        </select>
+      </div>
+
+      <div style={styles.section}>
+        <button style={styles.button} onClick={processData}>
+          Process Data
+        </button>
+        <button style={styles.clearButton} onClick={clearLog}>
+          Clear Log
+        </button>
+      </div>
+
+      {log.length > 0 && (
+        <div style={styles.logContainer}>
+          {log.map((item, index) => (
+            <div key={index} style={styles.logItem}>
+              {item}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+## 🔗Relations to other patterns
+
+- **[Factory Method](/docs/creational/factory-method)** - Factory Method is a specialization of Template Method. At the same time, a Factory Method may serve as a step in a large Template Method.
+- **[Strategy](/docs/behavioral/strategy)** - Template Method is based on inheritance: it lets you alter parts of an algorithm by extending those parts in subclasses. Strategy is based on composition: you can alter parts of the object's behavior by supplying it with different strategies that correspond to that behavior. Template Method works at the class level, so it's static. Strategy works on the object level, letting you switch behaviors at runtime.
+
+---
+
+## 📚Sources
+
+Information used in this page was collected from various reliable sources:
+
+- [Refactoring Guru - Template Method](https://refactoring.guru/design-patterns/template-method)
