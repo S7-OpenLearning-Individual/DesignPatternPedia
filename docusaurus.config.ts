@@ -11,7 +11,7 @@ const config: Config = {
     v4: true,
   },
   url: "https://your-docusaurus-site.example.com",
-  baseUrl: "/DesignPatternPedia/",
+  baseUrl: "/",
   organizationName: "S7-OpenLearning-Individual",
   projectName: "DesignPatternPedia",
   onBrokenLinks: "throw",
