@@ -1,11 +1,11 @@
-name: Test deployment
+name: Test build
 
 on:
   pull_request:
 
 jobs:
   test-deploy:
-    name: Test deployment
+    name: Install dependencies and validate build
     runs-on: ubuntu-latest
     defaults:
       run:

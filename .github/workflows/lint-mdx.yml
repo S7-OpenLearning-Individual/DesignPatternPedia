@@ -1,0 +1,46 @@
+name: Lint MDX Structure
+
+on:
+  pull_request:
+    paths:
+      - "docs/behavioral/**/*.mdx"
+      - "docs/creational/**/*.mdx"
+      - "docs/structural/**/*.mdx"
+      - "template.mdx"
+      - "scripts/lint-mdx-structure.js"
+  push:
+    branches:
+      - main
+    paths:
+      - "docs/behavioral/**/*.mdx"
+      - "docs/creational/**/*.mdx"
+      - "docs/structural/**/*.mdx"
+
+jobs:
+  lint-structure:
+    runs-on: ubuntu-latest
+    name: Validate MDX Structure
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run MDX structure linter
+        run: node scripts/lint-mdx-structure.js
+
+      - name: Comment PR on failure
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ **MDX Structure Validation Failed**\n\nOne or more pattern files are missing required headers. Please check the workflow logs for details and ensure all files follow the structure defined in `template.mdx`.'
+            })

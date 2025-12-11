@@ -1,6 +1,7 @@
 import { themes as prismThemes } from "prism-react-renderer";
 import type { Config } from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
+import packageJson from "./package.json";
 
 //todo enable search
 const config: Config = {
@@ -109,7 +110,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Made by Joris Brugman`,
+      copyright: `Made by Joris Brugman | v${packageJson.version}`,
     },
     prism: {
       theme: prismThemes.github,

@@ -1,47 +1,14 @@
 # DesignPatternPedia
 
 - [DesignPatternPedia](#designpatternpedia)
-  - [Page Structure](#page-structure)
   - [Coding Standards](#coding-standards)
   - [Installation](#installation)
     - [Local Development](#local-development)
+    - [Linting](#linting)
     - [Build and serve](#build-and-serve)
   - [Contributing](#contributing)
 
 This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
-
-## Page Structure
-
-Each page follows a basic structure to ensure that a user can easily find metadata on a certain design pattern. These elements include;
-
-1. The name of the design pattern.
-   1. Include extra used names or alternative names used just below the title itself.
-   2. Each page needs a 'description' in the config, with a funny quote or otherwise short hook to get users engaged.
-2. The group the design pattern belongs to.
-   1. Creational, Structural or Behavioral
-3. Description
-   1. A short paragraph explaining, in simple terms, what the pattern is about.
-4. An up-to-date table of contents.
-5. Problem statement
-   1. A small real-life example of why this can be a problem.
-6. Potential solution
-   1. An analogy or metaphor to explain in human terms how the pattern works.
-7. Examples
-   1. Real world examples of application of the pattern.
-8. Pros and cons
-   1. Pros and cons of the pattern.
-9. Applicability
-   1. Explain when, and HOW the pattern is applicable to a situation.
-10. How can the user see a potential implementation plan.
-11. Code samples
-12. Snippets in various programming languages.
-13. Playground
-    1. A 'playground' to get a 'feel' for the pattern.
-
-Some extras, common elements may include;
-
-1. A diagram or image explaining the pattern.
-2. Relations or uses in other design patterns.
 
 ## Coding Standards
 
@@ -54,8 +21,8 @@ Some extras, common elements may include;
 7. All docs/pages are `.mdx` files.
 8. Code compiles and tests pass.
 9. Directories follow the correct pattern structure.
-10. Each page is built using the [page structure](#page-structure).
-11. Custom components should not use a title, they should use the correct heading level in the page itself to ensure proper url based linking.
+10. Each page is built using the [template](/template.mdx) (validated by `npm run lint:mdx`).
+11. Custom components should not implement their own title, they should use the correct heading (#) level in the page itself to ensure proper url based linking.
 12. Images need to have padding applied around them, optimally `2rem`.
 
 ## Installation
@@ -74,6 +41,16 @@ npm i
 
 This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
 
+### Linting
+
+To validate that all pattern documentation files follow the required structure:
+
+```bash
+npm run lint:mdx
+```
+
+This checks that all MDX files in `docs/behavioral/`, `docs/creational/`, and `docs/structural/` contain the required headers as defined in `template.mdx`. See [scripts/README.md](scripts/README.md) for more details.
+
 ### Build and serve
 
 Certain pieces of functionality such as switching locales & searching only works in a production environment. To achieve this you'll need to build and 'deploy' the site locally. To do this run the following commands.
@@ -90,4 +67,12 @@ And then to serve the newly created build, simply run.
 
 ## Contributing
 
-Would you like to propose changes to the pattern-wiki? Then feel free to create a pull request in this repository. Make sure that your PR follows the standards as set in the [coding standards](#coding-standards) and [page structure](#page-structure). These standards ensure that the wiki is of high quality and that both the users and developers can find the right information quickly.
+Would you like to propose changes to the pattern-wiki? Then feel free to create a pull request in this repository. Make sure that your PR follows the standards as set in the [coding standards](#coding-standards). These standards ensure that the wiki is of high quality and that both the users and developers can find the right information quickly. The steps to work on an issue or task are as follows:
+
+1. Fork the repository.
+2. Create a new branch for your changes.
+3. Make your changes, ensuring they follow the coding standards.
+4. Run the linter to ensure your changes meet the required structure.
+5. Create a pull request describing your changes.
+6. Wait for the review and feedback from the maintainers.
+7. Profit.
