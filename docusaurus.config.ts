@@ -2,8 +2,10 @@ import { themes as prismThemes } from "prism-react-renderer";
 import type { Config } from "@docusaurus/types";
 import type * as Preset from "@docusaurus/preset-classic";
 import packageJson from "./package.json";
+import "dotenv/config";
 
-//todo enable search
+const baseUrlOrDefault = process.env.BASE_URL || "/";
+
 const config: Config = {
   title: "Design Pattern Pedia",
   tagline: "Practicing Patterns Made Plain and Practical",
@@ -12,7 +14,11 @@ const config: Config = {
     v4: true,
   },
   url: "https://your-docusaurus-site.example.com",
-  baseUrl: "/",
+  baseUrl: baseUrlOrDefault,
+  customFields: {
+    // We need to pass this directly as process.env is not available in the client bundle. But we do need this variable in the client bundle.
+    baseUrl: baseUrlOrDefault,
+  },
   organizationName: "S7-OpenLearning-Individual",
   projectName: "DesignPatternPedia",
   onBrokenLinks: "throw",

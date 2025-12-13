@@ -6,6 +6,9 @@
     - [Local Development](#local-development)
     - [Linting](#linting)
     - [Build and serve](#build-and-serve)
+  - [Deployment](#deployment)
+    - [GitHub Pages](#github-pages)
+    - [Docker Image](#docker-image)
   - [Contributing](#contributing)
 
 This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
@@ -24,6 +27,7 @@ This website is built using [Docusaurus](https://docusaurus.io/), a modern stati
 10. Each page is built using the [template](/template.mdx) (validated by `npm run lint:mdx`).
 11. Custom components should not implement their own title, they should use the correct heading (#) level in the page itself to ensure proper url based linking.
 12. Images need to have padding applied around them, optimally `2rem`.
+13. Code has no 'TODO' blocks, only a 'FUTURE_WORK' block may be present with a reference to an issue or task.
 
 ## Installation
 
@@ -64,6 +68,25 @@ And then to serve the newly created build, simply run.
 ```bash
  npm run serve
 ```
+
+## Deployment
+
+To deploy the website, there are multiple options available depending on your hosting preferences. But first you should create a `.env` file in the root directory of the project with the following content:
+
+```env
+# This value MUST start and end with a slash '/', unless it's the root '/'.
+BASE_URL=''
+```
+
+This step is only necessary when you want to differ from the default `baseUrl` value of `/`. This is particularly useful when deploying to GitHub Pages under a repository, e.g., `https://username.github.io/repository-name/`, where the `BASE_URL` should be set to `/repository-name/`. See the [Docusaurus docs](https://docusaurus.io/docs/api/docusaurus-config#baseUrl) for more information
+
+### GitHub Pages
+
+T.B.A
+
+### Docker Image
+
+T.B.A
 
 ## Contributing
 
