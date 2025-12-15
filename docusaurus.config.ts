@@ -53,12 +53,12 @@ const config: Config = {
         hashed: true,
         indexDocs: true,
         indexPages: true,
+        indexBlog: false,
       },
     ],
     "@docusaurus/theme-mermaid",
   ],
   themeConfig: {
-    indexBlog: false,
     // Replace with your project's social card
     image: "img/docusaurus-social-card.jpg",
     colorMode: {
