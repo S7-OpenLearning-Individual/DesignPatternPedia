@@ -1,7 +1,10 @@
 module.exports = {
   ci: {
+    collect: {
+      numberOfRuns: 3,
+    },
     upload: {
-      target: "temporary-public-storage",
+      target: 'temporary-public-storage',
     },
   },
 };
