@@ -57,6 +57,7 @@ jobs:
 
   dockerhub-release:
     name: Compile and Push Docker Image
+    needs: deploy
     runs-on: ubuntu-latest
     permissions:
       packages: write
