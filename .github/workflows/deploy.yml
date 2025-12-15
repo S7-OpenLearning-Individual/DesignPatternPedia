@@ -27,8 +27,9 @@ jobs:
         run: npm run build
 
       - name: Upload Build Artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
+          name: build
           path: build
 
   deploy:
@@ -54,30 +55,38 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: build
+
       - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.15.x
+          lhci autorun
 
-      - name: Build website
-        run: npm run build
-
-      - name: Run Lighthouse CI
-        run: >
-          npx --yes @lhci/cli@0.15.x autorun
-          --collect.url="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
-          --collect.settings.chromeFlags="--headless --no-sandbox --disable-gpu"
+      - name: Upload Lighthouse Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: .lighthouseci/
+          overwrite: true
 
       - name: Generate Lighthouse Badges
+        if: always()
         uses: myactionway/lighthouse-badger-action@v2.2
         with:
-          urls: 'https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/'
+          urls: https://designpatternpedia.nl
+          badge_output_path: lighthouse_results
+          commit_to_branch: false
+          upload_artifact: true
