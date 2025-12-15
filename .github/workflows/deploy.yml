@@ -55,6 +55,12 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
+    dockerhub-release:
+      # compile the docker image
+      # push to dockerhub
+      # log the url of the dockerhub repo here (https://hub.docker.com/repository/docker/theartcher/designpatternpedia)
+      name: Compile and Push Docker Image
+
   lighthouse:
     name: Lighthouse
     needs: deploy
