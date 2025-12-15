@@ -1,10 +1,12 @@
 module.exports = {
   ci: {
     collect: {
-      numberOfRuns: 3,
+      staticDistDir: "./build",
+      numberOfRuns: 1,
     },
     upload: {
-      target: 'temporary-public-storage',
+      target: "filesystem",
+      outputDir: "./lighthouse-report",
     },
   },
 };

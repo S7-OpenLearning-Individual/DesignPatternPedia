@@ -84,14 +84,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lighthouse-report
-          path: .lighthouseci/
+          path: lighthouse-report/
           overwrite: true
-
-      - name: Generate Lighthouse Badges
-        if: always()
-        uses: myactionway/lighthouse-badger-action@v2.2
-        with:
-          urls: https://designpatternpedia.nl
-          badge_output_path: lighthouse_results
-          commit_to_branch: false
-          upload_artifact: true
+          if-no-files-found: error
