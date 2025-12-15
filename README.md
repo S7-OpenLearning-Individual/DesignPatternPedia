@@ -8,7 +8,7 @@
     - [Build and serve](#build-and-serve)
   - [Deployment](#deployment)
     - [GitHub Pages](#github-pages)
-    - [Docker Image](#docker-image)
+    - [Docker](#docker)
   - [Contributing](#contributing)
 
 This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
@@ -84,9 +84,21 @@ This step is only necessary when you want to differ from the default `baseUrl` v
 
 T.B.A
 
-### Docker Image
+### Docker
 
-T.B.A
+The [Dockerfile](./Dockerfile) can be found in the root directory of the project. To build the Docker image _locally_, run the following command:
+
+```bash
+docker build . -t designpatternpedia
+```
+
+To then run the Docker image _locally_, use the following command:
+
+```bash
+docker run -p 3000:3000 designpatternpedia
+```
+
+The compiled image can be found on [Docker Hub at 'theartcher/designpatternpedia'](https://hub.docker.com/repository/docker/theartcher/designpatternpedia).
 
 ## Contributing
 

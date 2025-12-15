@@ -53,6 +53,7 @@ const config: Config = {
         hashed: true,
         indexDocs: true,
         indexPages: true,
+        indexBlog: false,
       },
     ],
     "@docusaurus/theme-mermaid",
