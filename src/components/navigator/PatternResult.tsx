@@ -2,8 +2,6 @@ import React from "react";
 import styles from "./navigator.module.css";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 
-const baseURL = "/DesignPatternPedia/docs";
-
 interface PatternResultProps {
   name: string;
   description: string;

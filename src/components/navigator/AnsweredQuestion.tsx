@@ -1,6 +1,7 @@
 import React from "react";
-import QuestionCard, { YesOrNo } from "./QuestionCard";
+import QuestionCard from "./QuestionCard";
 import styles from "./navigator.module.css";
+import { YesOrNo } from "@site/src/models/yes-or-no";
 
 interface AnsweredQuestionProps {
   question: string;
@@ -22,11 +23,13 @@ const AnsweredQuestion: React.FC<AnsweredQuestionProps> = ({
           question={question}
           selectedAnswer={answer}
           onAnswerYes={() => {
+            //Only call if the answer changed
             if (answer !== "yes") {
               onChangeAnswer("yes");
             }
           }}
           onAnswerNo={() => {
+            //Only call if the answer changed
             if (answer !== "no") {
               onChangeAnswer("no");
             }

@@ -1,27 +1,5 @@
-// Decision Tree Node Types
-export type NodeType = "question" | "pattern";
+import { DecisionTree } from "../models/decision-tree";
 
-export interface DecisionNode {
-  id: string;
-  type: NodeType;
-  question?: string; // For question nodes
-  title?: string; // For pattern nodes
-  description?: string; // For pattern nodes
-  icon?: string; // Optional icon identifier
-  yesPath?: string; // ID of next node if "Yes"
-  noPath?: string; // ID of next node if "No"
-  pattern?: {
-    name: string;
-    description: string;
-    path: string;
-  };
-}
-
-export interface DecisionTree {
-  [nodeId: string]: DecisionNode;
-}
-
-// Decision Tree Structure
 export const decisionTree: DecisionTree = {
   // First main decision
   q1: {
@@ -427,31 +405,4 @@ export const decisionTree: DecisionTree = {
       path: "behavioral/visitor",
     },
   },
-};
-
-// Helper function to get node by ID
-export const getNode = (nodeId: string): DecisionNode | undefined => {
-  return decisionTree[nodeId];
-};
-
-// Helper function to get next node based on answer
-export const getNextNode = (
-  nodeId: string,
-  answer: "yes" | "no"
-): string | undefined => {
-  const node = getNode(nodeId);
-  if (!node) return undefined;
-  return answer === "yes" ? node.yesPath : node.noPath;
-};
-
-// Helper function to check if node is a pattern endpoint
-export const isPatternNode = (nodeId: string): boolean => {
-  const node = getNode(nodeId);
-  return node?.type === "pattern";
-};
-
-// Helper function to check if node is a question
-export const isQuestionNode = (nodeId: string): boolean => {
-  const node = getNode(nodeId);
-  return node?.type === "question";
 };

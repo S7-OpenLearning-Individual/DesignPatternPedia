@@ -1,19 +1,15 @@
 import React, { useState } from "react";
-import {
-  decisionTree,
-  getNode,
-  getNextNode,
-  isPatternNode,
-} from "@site/src/data/decision-tree";
 import QuestionCard from "./QuestionCard";
 import PatternResult from "./PatternResult";
 import AnsweredQuestion from "./AnsweredQuestion";
 import styles from "./navigator.module.css";
-
-export interface Answer {
-  nodeId: string;
-  answer: "yes" | "no";
-}
+import {
+  getNextNode,
+  getNode,
+  isPatternNode,
+} from "@site/src/utils/decision-tree-helper";
+import { YesOrNo } from "@site/src/models/yes-or-no";
+import { Answer } from "@site/src/models/answer";
 
 const NavigatorContainer: React.FC = () => {
   const [answers, setAnswers] = useState<Answer[]>([]);
@@ -30,11 +26,11 @@ const NavigatorContainer: React.FC = () => {
     return <div>Error: Node not found</div>;
   }
 
-  const handleAnswer = (answer: "yes" | "no") => {
+  const handleAnswer = (answer: YesOrNo) => {
     setAnswers([...answers, { nodeId: currentNodeId, answer }]);
   };
 
-  const handleGoBack = (index: number, newAnswer?: "yes" | "no") => {
+  const handleGoBack = (index: number, newAnswer?: YesOrNo) => {
     const targetAnswer = newAnswer || answers[index].answer;
     setAnswers(
       answers
@@ -54,7 +50,10 @@ const NavigatorContainer: React.FC = () => {
       {/* Show all previous questions with their selected answers */}
       {answers.map((answer, index) => {
         const node = getNode(answer.nodeId);
-        if (!node) return null;
+
+        if (!node) {
+          return null;
+        }
 
         // Check if the next node after this answer is a pattern (not a question)
         const nextNodeId = getNextNode(answer.nodeId, answer.answer);
@@ -65,7 +64,7 @@ const NavigatorContainer: React.FC = () => {
         return (
           <AnsweredQuestion
             key={index}
-            question={node.question || ""}
+            question={node.question}
             answer={answer.answer}
             onChangeAnswer={(newAnswer) => handleGoBack(index, newAnswer)}
             showDivider={!isNextNodePattern}
