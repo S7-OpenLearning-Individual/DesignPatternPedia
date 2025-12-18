@@ -1,7 +1,6 @@
 import React from "react";
 import styles from "./navigator.module.css";
-
-export type YesOrNo = "yes" | "no";
+import { YesOrNo } from "@site/src/models/yes-or-no";
 
 interface QuestionCardProps {
   question: string;
