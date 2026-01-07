@@ -24,6 +24,8 @@ jobs:
         run: npm install
 
       - name: Build website
+        env:
+          SEARCH: ${{ secrets.SEARCH }}
         run: npm run build
 
       - name: Upload Pages Artifact
