@@ -5,6 +5,7 @@ import packageJson from "./package.json";
 import "dotenv/config";
 
 const baseUrlOrDefault = process.env.BASE_URL || "/";
+const useAdvancedSearch = process.env.SEARCH === "ADVANCED";
 
 const config: Config = {
   title: "Design Pattern Pedia",
@@ -47,19 +48,33 @@ const config: Config = {
   ],
   themes: [
     "@docusaurus/theme-live-codeblock",
-    [
-      require.resolve("@easyops-cn/docusaurus-search-local"),
-      {
-        hashed: true,
-        indexDocs: true,
-        indexPages: true,
-        indexBlog: false,
-      },
-    ],
+    ...(useAdvancedSearch
+      ? []
+      : [
+          [
+            require.resolve("@easyops-cn/docusaurus-search-local"),
+            {
+              hashed: true,
+              indexDocs: true,
+              indexPages: true,
+              indexBlog: false,
+            },
+          ],
+        ]),
     "@docusaurus/theme-mermaid",
   ],
   themeConfig: {
-    // Replace with your project's social card
+    ...(useAdvancedSearch
+      ? {
+          algolia: {
+            appId: "QFVS6MUVRT",
+            apiKey: "cafb35d52858566ca1ff1cabdb161d4c",
+            indexName: "YOUR_INDEX_NAME",
+            contextualSearch: true,
+            searchPagePath: "search",
+          },
+        }
+      : {}),
     image: "img/docusaurus-social-card.jpg",
     colorMode: {
       respectPrefersColorScheme: true,

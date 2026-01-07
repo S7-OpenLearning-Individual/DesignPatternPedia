@@ -7,6 +7,7 @@
     - [Linting](#linting)
     - [Build and serve](#build-and-serve)
   - [Deployment](#deployment)
+    - [Algolia Search](#algolia-search)
     - [GitHub Pages](#github-pages)
     - [Docker](#docker)
   - [Contributing](#contributing)
@@ -74,11 +75,20 @@ And then to serve the newly created build, simply run.
 To deploy the website, there are multiple options available depending on your hosting preferences. But first you should create a `.env` file in the root directory of the project with the following content:
 
 ```env
-# This value MUST start and end with a slash '/', unless it's the root '/'.
-BASE_URL=''
+# This value MUST start and end with a slash '/'
+BASE_URL='/'
+
+# To enable advanced Algolia search features, set this value to 'ADVANCED', otherwise leave it blank
+SEARCH="ADVANCED"
 ```
 
-This step is only necessary when you want to differ from the default `baseUrl` value of `/`. This is particularly useful when deploying to GitHub Pages under a repository, e.g., `https://username.github.io/repository-name/`, where the `BASE_URL` should be set to `/repository-name/`. See the [Docusaurus docs](https://docusaurus.io/docs/api/docusaurus-config#baseUrl) for more information
+This step is only necessary when you want to differ from the default `baseUrl` value of `/`. This is particularly useful when deploying to GitHub Pages under a repository, e.g., `https://username.github.io/repository-name/`, where the `BASE_URL` should be set to `/repository-name/`. See the [Docusaurus docs](https://docusaurus.io/docs/api/docusaurus-config#baseUrl) for more information.
+
+### Algolia Search
+
+This website is optimized using Algolia Search. By default, this functionality will only work for the production environment of DesignPatternPedia ([https://designpatternpedia.com](https://designpatternpedia.com)). If you want to enable this functionality for your own deployment, you'll need to create an account with Algolia and set up a new application. Please refer to Docusaurus documentation on [how to set up Algolia Search](https://docusaurus.io/docs/search#using-algolia-docsearch) for more information.
+
+If you'd like to 'keep it simple', you can disable Algolia Search altogether by setting the `SEARCH` variable in your `.env` file to any value other than `ADVANCED` (or leaving it blank). This will revert the search functionality to the [local search](https://docusaurus.io/docs/search#using-local-search), which is less advanced but requires no additional setup.
 
 ### GitHub Pages
 
