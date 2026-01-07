@@ -19,15 +19,15 @@ This website is built using [Docusaurus](https://docusaurus.io/), a modern stati
 2. All images have `alt` texts explaining their purpose and contents.
 3. All basic page elements that can be re-used should be turned into components.
 4. Code is written in American English.
-5. Page content is written in Queens English.
+5. Page content is written in Queen's English.
 6. Page content is cited, sourced, and referenced where deemed necessary.
 7. All docs/pages are `.mdx` files.
 8. Code compiles and tests pass.
 9. Directories follow the correct pattern structure.
-10. Each page is built using the [template](/template.mdx) (validated by `npm run lint:mdx`).
+10. Each _pattern_ page is built using the [template](/template.mdx) (validated by `npm run lint:mdx`).
 11. Custom components should not implement their own title, they should use the correct heading (#) level in the page itself to ensure proper url based linking.
 12. Images need to have padding applied around them, optimally `2rem`.
-13. Code has no 'TODO' blocks, only a 'FUTURE_WORK' block may be present with a reference to an issue or task.
+13. Source code contains no 'TODO' blocks, only a 'FUTURE_WORK' block may be present with a reference to an issue or task.
 
 ## Installation
 

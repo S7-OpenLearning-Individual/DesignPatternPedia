@@ -179,10 +179,6 @@
   }
 
   .answerBtn {
-    min-width: 100%;
-  }
-
-  .answerButtons {
-    flex-direction: column;
+    min-width: 30vw;
   }
 }
